@@ -1,0 +1,54 @@
+import OSS from 'ali-oss'
+import store from "@/store/index.js";
+
+let prefix = 'password-x/'
+
+// 设置oss信息并验证是否正确
+export async function login(form) {
+    return new Promise((resolve, reject) => {
+        const client = new OSS(form)
+
+        // 获取文件列表验证权限是否正确
+        client.list({'max-keys': 1}).then(() => {
+            resolve(client)
+        }).catch((err) => {
+            reject(err);
+        });
+    })
+}
+
+async function saveLoginAudit(loginAuditArray) {
+    // 保存
+}
+
+function loginRecord(loginAuditArray) {
+
+}
+
+export function put(ossKey, json) {
+    let headers = {
+        // 指定Object的存储类型。
+        'x-oss-storage-class': 'Standard', // 指定Object的访问权限。
+        'x-oss-object-acl': 'private', // 指定PutObject操作时是否覆盖同名目标Object。此处设置为true，表示禁止覆盖同名Object。
+        'x-oss-forbid-overwrite': 'true',
+    };
+    return new Promise((resolve, reject) => {
+        let buffer = new OSS.Buffer(JSON.stringify(json));
+        store.state.ossClient.put(prefix + ossKey, buffer, headers).then(res => {
+            resolve(res)
+        }).catch((err) => {
+            reject(err)
+        });
+    })
+}
+
+export function get(ossKey) {
+    return new Promise((resolve, reject) => {
+        store.state.ossClient.get(prefix + ossKey).then(res => {
+            resolve(JSON.parse(res.content))
+        }).catch((err) => {
+            reject(err)
+        });
+    })
+}
+

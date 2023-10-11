@@ -1,9 +1,15 @@
 const routes = [
     {
+        path: '/',
+        name: 'Index',
+        title: '密码管理',
+        component: () => import('@/components/Index.vue'),
+    },
+    {
         path: '/login',
         name: 'Login',
-        title: '首页',
-        component: () => import('@/components/Login.vue'), //.vue不能省略
+        title: '密码管理-登录',
+        component: () => import('@/components/Login.vue'),
     }
 ]
 export default routes
