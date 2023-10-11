@@ -1,7 +1,7 @@
 <script setup>
 import {reactive} from 'vue'
 import {login as loginOSS} from '@/utils/oss.js'
-import {getBowerId, encrypt} from '@/utils/security.js'
+import {encrypt, getBowerId} from '@/utils/security.js'
 import {ElNotification} from 'element-plus'
 import store from "@/store/index.js";
 import {useRouter} from "vue-router";
@@ -10,6 +10,7 @@ const router = useRouter()
 
 const ruleFormRef = ref()
 
+// oss 配置
 const ossForm = reactive({
   region: 'oss-cn-beijing',
   accessKeyId: 'LTAI5tNtsokaNJXbfpCDYmAc',
@@ -17,6 +18,7 @@ const ossForm = reactive({
   bucket: 'password-x',
 })
 
+// 表单校验规则
 const formRules = reactive({
   region: [
     {required: true, message: '请输入region', trigger: 'blur'}
@@ -85,8 +87,7 @@ const loginFail = (err) => {
 </script>
 
 <template>
-  <img alt="" class="back-img"
-       src="~@/assets/images/backImg.svg">
+  <img alt="" class="back-img" src="~@/assets/images/backImg.svg">
   <div class="content">
     <div class="content-input">
       <div class="title">
@@ -157,7 +158,6 @@ const loginFail = (err) => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
 }
 
 .content-button {
