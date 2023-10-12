@@ -38,6 +38,7 @@ const saveMainPassword = () => {
 // 初始化主密码
 const initMainPassword = () => {
   alertMode.value = 'init'
+  alertVisStatus.mainPassword = true
 }
 
 // 修改主密码

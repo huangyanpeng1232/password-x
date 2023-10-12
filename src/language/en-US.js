@@ -14,6 +14,7 @@ export default {
     'index.table.operation.affirm': 'affirm',
     'index.table.operation.cancel': 'cancel',
     'index.table.operation.delete': 'delete',
+    'index.table.delete.success': 'delete success',
     'login.form.title': 'Ali cloud oss config',
     'login.form.region.verify': 'please input region',
     'login.form.accessKeyId.verify': 'please input accessKeyId',

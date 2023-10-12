@@ -9,6 +9,14 @@ const alertVisStatus = reactive({
 // 密码弹框模式
 const passwordAlertTitle = ref('')
 
+// 密码字典
+const passwordDist = reactive({
+  uppercase: "ABCDEFGHJKLMNPQRSTUVWXYZ",
+  lowercase: "abcdefghjkmnpqrstuvwxyz",
+  number: "0123456789",
+  symbol: "~!@#$^&*()_+.,;",
+})
+
 // 密码表单
 const passwordForm = reactive({
   id: '',

@@ -2,47 +2,65 @@
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
 import {copyText, isUrl} from "@/utils/global.js";
+import {getFile, putFile} from "@/utils/oss.js";
 import PasswordForm from "@/components/PasswordForm.vue";
+import {ElMessage, ElNotification} from "element-plus";
+import {decrypt, encrypt} from "@/utils/security.js";
 
 const {t} = useI18n()
+
+// 密码表单组件对象
+const passwordFormRef = ref()
+// 主密码验证组件对象
+const mainPasswordVerifyRef = ref()
+// 主密码设置组件对象
+const mainPasswordSettingRef = ref()
+// 系统设置组件对象
+const systemSettingRef = ref()
 
 // 搜索字符串
 const searchText = ref('')
 // 主密码
 const mainPassword = ref('')
-// 密码表单组件对象
-const passwordFormRef = ref()
-// 主密码验证组件对象
-const mainPasswordVerifyRef = ref()
-// 系统设置组件对象
-const systemSettingRef = ref()
-// 与oss的同步状态
+// 是否允许同步数据到oss
 const syncStatus = reactive({
   password: false
 })
-
+// 密码列表解密后的密文
+const passwordCiphertext = ref('')
+// 密码正确性验证参数
+const verifyValue = ref('')
 // 显示的密码列表
-const showPasswordArray = ref([
-  {
-    name: '1111',
-    address: 'http://wwww.kkk',
-    userName: '12344',
-    password: '12344',
-    remark: '12344',
-  }
-])
-
-// 密码字典
-const passwordDist = reactive({
-  uppercase: "ABCDEFGHJKLMNPQRSTUVWXYZ",
-  lowercase: "abcdefghjkmnpqrstuvwxyz",
-  number: "0123456789",
-  symbol: "~!@#$^&*()_+.,;",
-})
+const showPasswordArray = ref([])
+// 密码列表
+const passwordArray = ref([])
 
 // 搜索
-const searchPassword = async () => {
+const loadShowPassword = async () => {
+  // 搜索条件为空，直接复制
+  if (searchText.value === '') {
+    showPasswordArray.value = passwordArray.value
+    return
+  }
 
+  // 搜索结果列表
+  let array = [];
+  for (let i = 0; i < passwordArray.value.length; i++) {
+    let name = passwordArray.value[i].name || ''
+    let userName = passwordArray.value[i].userName || ''
+    let address = passwordArray.value[i].address || ''
+    let remark = passwordArray.value[i].remark || ''
+
+    if (
+        name.indexOf(searchText.value) !== -1
+        || userName.indexOf(searchText.value) !== -1
+        || address.indexOf(searchText.value) !== -1
+        || remark.indexOf(searchText.value) !== -1
+    ) {
+      array.push(passwordArray.value[i]);
+    }
+  }
+  showPasswordArray.value = array
 }
 
 // 显示密码窗口
@@ -52,30 +70,39 @@ const addPassword = () => {
 
 // 显示修改密码窗口
 const updatePassword = (password) => {
-  passwordFormRef.value.updatePassword()
+  passwordFormRef.value.updatePassword(password)
 }
 
 // 锁定密码
 const lockMainPassword = () => {
-
+  // 同步状态改为未同步
+  syncStatus.password = false
+  // 清空搜索列表
+  showPasswordArray.value = []
+  // 清空密码列表
+  passwordArray.value = []
+  // 清空当前主密码
+  mainPassword.value = ''
+  // 删除本地缓存的主密码
+  mainPasswordVerifyRef.value.delLocalMainPassword()
 }
 
 // 解锁密码
 const unlockMainPassword = () => {
-  mainPasswordVerifyRef.value.verifyMainPassword('')
+  mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
 }
 
 // 分享密码
 const sharePassword = (password) => {
-  let text = '名称：' + password.name + '\r\n'
+  let text = t('password.name') + ': ' + password.name + '\r\n'
   if (password.address) {
-    text += '地址：' + password.address + '\r\n'
+    text += t('password.address') + ': ' + password.address + '\r\n'
   }
   if (password.userName) {
-    text += '用户名：' + password.userName + '\r\n'
+    text += t('password.userName') + ': ' + password.userName + '\r\n'
   }
   if (password.password) {
-    text += '密码：' + password.password + '\r\n'
+    text += t('password.password') + ': ' + password.password + '\r\n'
   }
   if (password.remark) {
     text += password.remark + '\r\n'
@@ -86,12 +113,26 @@ const sharePassword = (password) => {
 
 // 删除密码
 const deletePassword = (password) => {
+  for (let i = 0; i < passwordArray.value.length; i++) {
+    if (passwordArray.value[i].id === password.id) {
+      passwordArray.value.splice(i, 1)
+      break
+    }
+  }
+  // 同步密码到oss
+  syncPasswordToOSS()
+  // 重新刷新搜索结果
+  loadShowPassword()
 
+  ElMessage.success(t('index.table.delete.success'))
 }
 
-// 设置主密码
-const setMainPassword = (password) => {
-  mainPassword.value = password
+// 主密码加载成功
+const mainPasswordLoadSucceed = (password) => {
+  let passwordListText = decrypt(password, passwordCiphertext.value)
+  passwordArray.value = JSON.parse(passwordListText)
+  syncStatus.password = true
+  loadShowPassword()
 }
 
 // 主密码变更
@@ -104,10 +145,41 @@ const openSystemSetting = () => {
   systemSettingRef.value.openSystemSetting()
 }
 
-const syncPassword = () => {
-  syncStatus.password = true
+// 上传到oss
+const syncPasswordToOSS = () => {
+  let passwordCiphertext = encrypt(mainPassword.value, JSON.stringify(passwordArray))
+  passwordCiphertext.value = passwordCiphertext
+
+  let body = {
+    verifyValue: encrypt(mainPassword, 'password-x'),
+    passwordCiphertext: passwordCiphertext
+  }
+  putFile('password.json', body).then(res => {
+    console.log('文件同步成功', res.code)
+  }).catch(err => {
+    console.error(err)
+  })
 }
-syncPassword()
+
+// 从oss获取密码文件
+const getPasswordByOSS = () => {
+  getFile('password.json').then(res => {
+    verifyValue.value = res.verifyValue
+    passwordCiphertext.value = res.passwordCiphertext
+    mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
+  }).catch(e => {
+    // 404是没找到文件，可能是第一次使用属于正常情况
+    if (e.status === 404) {
+      // 初始化主密码
+      mainPasswordSettingRef.value.initMainPassword()
+    } else {
+      ElNotification.error(e.code)
+      console.error(e)
+    }
+  })
+}
+
+getPasswordByOSS()
 </script>
 
 <template>
@@ -115,7 +187,7 @@ syncPassword()
     <el-col :lg="{span:20,offset:2}" id="passwordList">
       <el-row style="padding: 10px 10px 0 10px;">
         <el-col :sm="{span:8}" class="hidden-xs-only" style="font-weight: bold;">
-          <el-text style="padding-left: 5px;font-size: 105%;">{{ t('index.title.passwordCount') }}</el-text>
+          <el-text style="padding-left: 5px;font-size: 105%;">{{passwordArray.value.length}}{{ t('index.title.passwordCount') }}</el-text>
         </el-col>
         <el-col :sm="{span:16}" :xs="{span:24}" style="text-align: right">
           <el-input
@@ -201,7 +273,7 @@ syncPassword()
   <PasswordForm ref="passwordFormRef"></PasswordForm>
 
   <!--  验证主密码-->
-  <MainPasswordVerify ref="mainPasswordVerifyRef" @verifyPass="setMainPassword"></MainPasswordVerify>
+  <MainPasswordVerify ref="mainPasswordVerifyRef" @verifyPass="mainPasswordLoadSucceed"></MainPasswordVerify>
 
   <!--  初始化/修改主密码-->
   <MainPasswordSetting ref="mainPasswordSettingRef" @mainPasswordChange="mainPasswordChange"></MainPasswordSetting>

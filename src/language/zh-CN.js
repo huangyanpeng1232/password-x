@@ -14,6 +14,7 @@ export default  {
     'index.table.operation.affirm': '确认',
     'index.table.operation.cancel': '取消',
     'index.table.operation.delete': '删除',
+    'index.table.delete.success': '删除成功',
     'login.form.title': '阿里云OSS配置',
     'login.form.region.verify': '请输入region',
     'login.form.accessKeyId.verify': '请输入accessKeyId',

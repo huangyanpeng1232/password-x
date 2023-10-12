@@ -1,5 +1,7 @@
 <script setup>
 import {useI18n} from "vue-i18n";
+import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
+import {ElMessage} from "element-plus";
 
 const {t} = useI18n()
 // 事件声明
@@ -17,18 +19,61 @@ const alertVisStatus = reactive({
 
 // 保存主密码
 const saveMainPassword = () => {
-  emit('verifyPass','123')
-  alertVisStatus.verifyMainPassword = false
+  let value = decrypt(mainPassword.value, ciphertext.value)
+  if (value && value === 'password-x') {
+    emit('verifyPass', mainPassword.value)
+    setLocalMainPassword(mainPassword.value)
+    alertVisStatus.verifyMainPassword = false
+  } else {
+    ElMessage.error('密码错误')
+  }
+}
+
+// 删除本地缓存中的主密码
+const delLocalMainPassword = (password) => {
+  localStorage.removeItem('mainPasswordCiphertext')
+}
+// 设置本地缓存中主密码
+const setLocalMainPassword = (password) => {
+  let bowerId = getBowerId();
+  let mainPasswordCiphertext = encrypt(bowerId, password)
+  localStorage.setItem('mainPasswordCiphertext', mainPasswordCiphertext)
+}
+
+// 获取本地缓存中的主密码
+const getLocalMainPassword = () => {
+  let mainPasswordCiphertext = localStorage.getItem('mainPasswordCiphertext')
+  if (!mainPasswordCiphertext) {
+    return null;
+  }
+  let bowerId = getBowerId();
+  let localMainPassword = decrypt(bowerId, mainPasswordCiphertext)
+  if (localMainPassword) {
+    return localMainPassword;
+  } else {
+    return null;
+  }
 }
 
 // 验证主密码
 const verifyMainPassword = (text) => {
   ciphertext.value = text
-  alertVisStatus.verifyMainPassword = true
+  let localMainPassword = getLocalMainPassword();
+  if (!localMainPassword) {
+    alertVisStatus.verifyMainPassword = true
+    return
+  }
+  let value = decrypt(localMainPassword, text)
+  if (value && value === 'password-x') {
+    emit('verifyPass', localMainPassword)
+  } else {
+    alertVisStatus.verifyMainPassword = true
+  }
 }
 
 defineExpose({
-  verifyMainPassword
+  verifyMainPassword,
+  delLocalMainPassword
 });
 
 </script>

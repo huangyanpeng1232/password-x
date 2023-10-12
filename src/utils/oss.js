@@ -25,7 +25,7 @@ function loginRecord(loginAuditArray) {
 
 }
 
-export function put(ossKey, json) {
+export function putFile(ossKey, json) {
     let headers = {
         // 指定Object的存储类型。
         'x-oss-storage-class': 'Standard', // 指定Object的访问权限。
@@ -34,7 +34,7 @@ export function put(ossKey, json) {
     };
     return new Promise((resolve, reject) => {
         let buffer = new OSS.Buffer(JSON.stringify(json));
-        store.state.ossClient.put(prefix + ossKey, buffer, headers).then(res => {
+        store.state.oss.put(prefix + ossKey, buffer, headers).then(res => {
             resolve(res)
         }).catch((err) => {
             reject(err)
@@ -42,12 +42,12 @@ export function put(ossKey, json) {
     })
 }
 
-export function get(ossKey) {
+export function getFile(ossKey) {
     return new Promise((resolve, reject) => {
-        store.state.ossClient.get(prefix + ossKey).then(res => {
+        store.state.oss.get(prefix + ossKey).then(res => {
             resolve(JSON.parse(res.content))
         }).catch((err) => {
-            reject(err)
+            reject(err);
         });
     })
 }
