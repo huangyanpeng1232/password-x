@@ -5,10 +5,14 @@ import {encrypt, getBowerId} from '@/utils/security.js'
 import {ElNotification} from 'element-plus'
 import store from "@/store/index.js";
 import {useRouter} from "vue-router";
+import {useI18n} from "vue-i18n";
+
+const {t,locale} = useI18n()
 
 const router = useRouter()
 
 const ruleFormRef = ref()
+
 
 // oss 配置
 const ossForm = reactive({
@@ -21,16 +25,16 @@ const ossForm = reactive({
 // 表单校验规则
 const formRules = reactive({
   region: [
-    {required: true, message: '请输入region', trigger: 'blur'}
+    {required: true, message: t('login.form.region.verify'), trigger: 'blur'}
   ],
   accessKeyId: [
-    {required: true, message: '请输入accessKeyId', trigger: 'blur'}
+    {required: true, message: t('login.form.accessKeyId.verify'), trigger: 'blur'}
   ],
   accessKeySecret: [
-    {required: true, message: '请输入accessKeySecret', trigger: 'blur'}
+    {required: true, message: t('login.form.accessKeySecret.verify'), trigger: 'blur'}
   ],
   bucket: [
-    {required: true, message: '请输入bucket', trigger: 'blur'}
+    {required: true, message: t('login.form.bucket.verify'), trigger: 'blur'}
   ]
 })
 
@@ -61,7 +65,7 @@ const loginSucceed = (oss) => {
   // 保存到localStorage用于下次登录
   localStorage.setItem('ossForm', ciphertext)
 
-  ElNotification.success('登录成功');
+  ElNotification.success(t('login.form.successMessage'));
 
   router.push('/')
 }
@@ -70,28 +74,51 @@ const loginSucceed = (oss) => {
 const loginFail = (err) => {
   let message = err.code;
   if (err.code === 'RequestError') {
-    message = '请检查：桶名称、跨域设置、region配置'
+    message = t('login.form.error.RequestError')
   } else if (err.code === 'InvalidAccessKeyId') {
-    message = 'accessKeyId错误'
+    message = t('login.form.error.InvalidAccessKeyId')
   } else if (err.code === 'SignatureDoesNotMatch') {
-    message = 'accessKeySecret错误'
+    message = t('login.form.error.SignatureDoesNotMatch')
   } else if (err.code === 'AccessDenied') {
-    message = '用户没有访问OSS权限'
+    message = t('login.form.error.AccessDenied')
   }
   ElNotification({
     type: 'error',
-    title: '登录失败',
+    title: t('login.form.failMessage'),
     message: message,
   })
+}
+
+console.log(locale.value)
+
+// 修改语言
+const changeLanguage = (language) => {
+  console.log(language)
+  locale.value = language
 }
 </script>
 
 <template>
   <img alt="" class="back-img" src="~@/assets/images/backImg.svg">
   <div class="content">
+    <div class="language-div">
+      <el-link
+          :type="locale === 'zh-cn'?'primary':'default'"
+          @click="changeLanguage('zh-cn')"
+          :underline="false"
+      >简体中文
+      </el-link>
+      /
+      <el-link
+          :type="locale === 'en-us'?'primary':'default'"
+          @click="changeLanguage('en-us')"
+          :underline="false"
+      >English
+      </el-link>
+    </div>
     <div class="content-input">
       <div class="title">
-        阿里云OSS配置
+        {{t('login.form.title')}}
       </div>
       <el-form ref="ruleFormRef" :rules="formRules" :model="ossForm">
         <el-form-item prop="region">
@@ -175,4 +202,10 @@ const loginFail = (err) => {
   color: #606266;
 }
 
+.language-div {
+  position: fixed;
+  right: 0;
+  padding: 10px;
+  color: #999;
+}
 </style>
