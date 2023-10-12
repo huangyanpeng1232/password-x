@@ -49,4 +49,5 @@ export default {
     'systemSetting.language': 'language',
     'systemSetting.cacheMainPassword': 'cache main password',
     'systemSetting.save': 'save',
+    'passwordForm.autoGeneratePassword': 'A password is automatically generated when you add a password',
 }

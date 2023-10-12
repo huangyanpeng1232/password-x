@@ -10,7 +10,6 @@ const {t} = useI18n()
 const searchText = ref('')
 // 主密码
 const mainPassword = ref('')
-
 // 密码表单组件对象
 const passwordFormRef = ref()
 // 主密码验证组件对象
@@ -53,18 +52,17 @@ const addPassword = () => {
 
 // 显示修改密码窗口
 const updatePassword = (password) => {
-  password
   passwordFormRef.value.updatePassword()
 }
 
-// 解锁密码
+// 锁定密码
 const lockMainPassword = () => {
 
 }
 
-// 锁定密码
+// 解锁密码
 const unlockMainPassword = () => {
-
+  mainPasswordVerifyRef.value.verifyMainPassword('')
 }
 
 // 分享密码
@@ -106,6 +104,10 @@ const openSystemSetting = () => {
   systemSettingRef.value.openSystemSetting()
 }
 
+const syncPassword = () => {
+  syncStatus.password = true
+}
+syncPassword()
 </script>
 
 <template>

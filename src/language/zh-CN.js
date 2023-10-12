@@ -41,7 +41,7 @@ export default  {
     'passwordForm.generateForm.lowercase': '小写',
     'passwordForm.generateForm.number': '数字',
     'passwordForm.generateForm.symbol': '符号',
-    'passwordForm.generateForm.length': '位',
+    'passwordForm.generateForm.length': '长度',
     'passwordForm.generateForm.randomPassword': '随机生成',
     'passwordForm.generateForm.remark': '备注...',
     'passwordForm.generateForm.save': '保存',
@@ -49,5 +49,7 @@ export default  {
     'systemSetting.language': '语言',
     'systemSetting.cacheMainPassword': '缓存主密码',
     'systemSetting.save': '保存',
+    'systemSetting.defaultPasswordRule': '默认密码生成规则',
+    'passwordForm.autoGeneratePassword': '添加密码时自动生成一个密码',
 
 }

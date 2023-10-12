@@ -69,7 +69,7 @@ defineExpose({
   <el-drawer
       v-model="alertVisStatus.password"
       :title="passwordAlertTitle"
-      size="640px"
+      size="550px"
       direction="rtl"
   >
     <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="100px"
@@ -103,14 +103,17 @@ defineExpose({
             <el-col :span="6" style="text-align: center">
               <el-checkbox size="small" v-model="generateForm.symbol" :label="t('passwordForm.generateForm.symbol')" border/>
             </el-col>
-            <el-col :span="12">
-              <el-slider v-model="generateForm.length" :min="4" :max="32"/>
-            </el-col>
-            <el-col :span="3" :offset="2">
-              {{ generateForm.length }}{{t('passwordForm.generateForm.length')}}
+          </el-row>
+          <el-row style="margin-top: 15px">
+            <el-col :span="10" :offset="7">
+              <el-input size="small" v-model="generateForm.length">
+                <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
+              </el-input>
             </el-col>
             <el-col :span="6" :offset="1">
-              <el-button size="small" type="success" plain @click="generatePassword">{{t('passwordForm.generateForm.randomPassword')}}</el-button>
+              <el-button size="small" style="position: relative;top:-5px" type="success" plain
+                         @click="generatePassword">{{ t('passwordForm.generateForm.randomPassword') }}
+              </el-button>
             </el-col>
           </el-row>
         </el-card>

@@ -11,6 +11,7 @@ const alertVisStatus = reactive({
 const settingForm = reactive({
   language: 'zh-cn',
   cacheMainPassword: true,
+  autoGeneratePassword: true,
 })
 // 语言列表
 const languages = reactive([
@@ -23,6 +24,14 @@ const languages = reactive([
     label: 'English',
   }
 ])
+// 语言列表
+const defaultPasswordRule = reactive({
+  length: 16,
+  number: true,
+  lowercase: true,
+  uppercase: true,
+  symbol: true,
+})
 
 // 打开系统设置
 const openSystemSetting = () => {
@@ -47,7 +56,7 @@ defineExpose({
       :title="t('systemSetting.title')"
       width="600px"
   >
-    <el-form :model="settingForm" label-width="170px" :inline="true">
+    <el-form :model="settingForm" label-width="200px">
       <el-form-item :label="t('systemSetting.language')">
         <el-select v-model="settingForm.language">
           <el-option
@@ -60,6 +69,37 @@ defineExpose({
       </el-form-item>
       <el-form-item :label="t('systemSetting.cacheMainPassword')">
         <el-switch v-model="settingForm.cacheMainPassword"></el-switch>
+      </el-form-item>
+      <el-form-item :label="t('passwordForm.autoGeneratePassword')">
+        <el-switch v-model="settingForm.autoGeneratePassword" clearable/>
+      </el-form-item>
+      <el-form-item :label="t('systemSetting.defaultPasswordRule')">
+        <el-row style="margin-top: 15px">
+          <el-col :span="8">
+            <el-checkbox size="small" v-model="defaultPasswordRule.uppercase"
+                         :label="t('passwordForm.generateForm.uppercase')" border/>
+          </el-col>
+          <el-col :span="8">
+            <el-checkbox size="small" v-model="defaultPasswordRule.lowercase"
+                         :label="t('passwordForm.generateForm.lowercase')" border/>
+          </el-col>
+          <el-col :span="8">
+            <el-checkbox size="small" v-model="defaultPasswordRule.number"
+                         :label="t('passwordForm.generateForm.number')" border/>
+          </el-col>
+          <el-col :span="8">
+            <el-checkbox size="small" v-model="defaultPasswordRule.symbol"
+                         :label="t('passwordForm.generateForm.symbol')" border/>
+          </el-col>
+          <el-col :span="8">
+            <div>
+              <el-input size="small" style="position: relative;top:3px" v-model="defaultPasswordRule.length">
+                <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
+              </el-input>
+            </div>
+
+          </el-col>
+        </el-row>
       </el-form-item>
     </el-form>
 

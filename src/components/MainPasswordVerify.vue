@@ -17,7 +17,8 @@ const alertVisStatus = reactive({
 
 // 保存主密码
 const saveMainPassword = () => {
-
+  emit('verifyPass','123')
+  alertVisStatus.verifyMainPassword = false
 }
 
 // 验证主密码
