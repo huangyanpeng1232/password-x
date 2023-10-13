@@ -1,14 +1,15 @@
+<!--系统设置-->
 <script setup>
 import {useI18n} from "vue-i18n";
-import {ElNotification} from "element-plus";
 import {useRouter} from "vue-router";
 import {loadConfig, updateConfig} from "@/utils/global.js";
+import store from "@/store/index.js";
 
 const router = useRouter()
 
 const {t, locale} = useI18n()
 
-// 事件声明
+// 声明此组件可能调用的事件
 const emit = defineEmits(['updateMainPassword', 'deleteAccount'])
 
 // 弹框显示控制
@@ -31,65 +32,75 @@ const settingForm = reactive({
 
 // 语言列表
 const languages = reactive([
-  {
-    key: 'zh-cn',
-    label: '简体中文',
-  },
-  {
-    key: 'en-us',
-    label: 'English',
-  }
+  {key: 'zh-cn', label: '简体中文',},
+  {key: 'en-us', label: 'English',}
 ])
 
 // 打开系统设置
 const openSystemSetting = () => {
+  // 读取系统配置
   let config = loadConfig()
   if (config) {
     for (let key in config) {
       settingForm[key] = config[key]
     }
   }
+  // 设置界面语言
   settingForm.language = locale.value;
+  // 显示设置弹框
   alertVisStatus.setting = true
 }
 
 // 保存设置
 const saveSetting = () => {
   let generateForm = settingForm.defaultPasswordRule;
+  // 密码规则校验
   if (!generateForm.number && !generateForm.symbol && !generateForm.lowercase && !generateForm.uppercase) {
-    ElMessage.error('必须选择一种密码字符类型')
+    ElMessage.error(t('systemSetting.passwordRuleVerify'))
     return
   }
 
+  // 更新系统配置
   updateConfig(settingForm)
+  // 若设置不缓存主密码则立即删除缓存中的主密码
   if (settingForm.cacheMainPassword === false) {
     localStorage.removeItem('mainPasswordCiphertext')
   }
+  // 设置系统语言
   locale.value = settingForm.language;
+  // 关闭密码弹框
   alertVisStatus.setting = false
 }
 
 // 退出登录
 const logout = () => {
+  // 删除oss配置信息
   localStorage.removeItem('ossForm')
+  // 删除本地缓存的主密码
   localStorage.removeItem('mainPasswordCiphertext')
-  ElNotification.success(t('systemSetting.logout.success'));
+  // 删除oss对象
+  store.commit('delOss')
+  // 重定向到登录界面
   router.push('/login')
 }
 
-// 修改主密码
-const updateMainPassword = () => {
+// 显示修改主密码弹框
+const showUpdateMainPassword = () => {
   alertVisStatus.setting = false
   emit('updateMainPassword')
 }
 
-// 注销账号
-const deleteAccount = () => {
+// 显示注销账号弹框
+const showDeleteAccount = () => {
+  alertVisStatus.setting = false
   emit('deleteAccount')
 }
 
+// 导出的方法
 defineExpose({
-  openSystemSetting
+  openSystemSetting,
+  showUpdateMainPassword,
+  logout
 });
 </script>
 
@@ -145,8 +156,8 @@ defineExpose({
         </el-row>
       </el-form-item>
       <el-form-item>
-        <el-button plain @click="updateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
-        <el-button type="danger" plain @click="deleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
+        <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
+        <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
         <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
       </el-form-item>
     </el-form>

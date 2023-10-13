@@ -17,14 +17,7 @@ export async function login(form) {
     })
 }
 
-async function saveLoginAudit(loginAuditArray) {
-    // 保存
-}
-
-function loginRecord(loginAuditArray) {
-
-}
-
+// 上传文件
 export function putFile(ossKey, json) {
     let headers = {
         // 指定Object的存储类型。
@@ -42,6 +35,7 @@ export function putFile(ossKey, json) {
     })
 }
 
+// 获取文件
 export function getFile(ossKey) {
     return new Promise((resolve, reject) => {
         store.state.oss.get(prefix + ossKey).then(res => {
@@ -56,7 +50,7 @@ export function getFile(ossKey) {
     })
 }
 
-
+// 删除文件
 export function delFile(ossKey) {
     return store.state.oss.delete(prefix + ossKey)
 }

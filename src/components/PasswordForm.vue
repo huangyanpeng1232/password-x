@@ -1,20 +1,21 @@
+<!--密码表单-->
 <script setup>
 import {useI18n} from "vue-i18n";
-import {v4 as uuid} from "uuid";
-import {getSystemConfig, randomText,copyText} from "@/utils/global.js";
 
-// 事件声明
+import {copyText, getSystemConfig, randomText} from "@/utils/global.js";
+
+// 声明此组件可能调用的事件
 const emit = defineEmits(['addPassword', 'updatePassword'])
 
 const {t} = useI18n()
 
+// 密码表单对象
 const passwordFormRef = ref()
-
 // 弹框显示控制
 const alertVisStatus = reactive({
   password: false
 })
-// 密码弹框模式
+// 密码弹框模式（新增/修改）
 const passwordAlertMode = ref('')
 
 // 密码字典
@@ -25,9 +26,10 @@ const passwordDist = reactive({
   symbol: "~!@#$^&*()_+.,;",
 })
 
+// 默认密码表单
 const defaultPassword = () => {
   return {
-    id: '',
+    id: 0,
     name: '',
     address: '',
     userName: '',
@@ -41,12 +43,13 @@ const passwordForm = reactive(defaultPassword())
 
 // 密码生成规则表单
 const generateForm = reactive({
-  length: 16,
-  number: true,
-  lowercase: true,
-  uppercase: true,
-  symbol: true,
+  length: 16,// 密码长度
+  number: true,// 是否使用数字
+  lowercase: true,// 是否使用小写字母
+  uppercase: true,// 是否使用大写字母
+  symbol: true,// 是否使用特殊符号
 })
+
 // 密码表单校验规则
 const passwordFormRules = reactive({
   name: [
@@ -57,7 +60,7 @@ const passwordFormRules = reactive({
 // 根据规则生成密码
 const generatePassword = () => {
   if (!generateForm.number && !generateForm.symbol && !generateForm.lowercase && !generateForm.uppercase) {
-    ElMessage.error('必须选择一种密码字符类型')
+    ElMessage.error(t('systemSetting.passwordRuleVerify'))
     return
   }
 
@@ -82,21 +85,28 @@ const generatePassword = () => {
 // 保存密码
 const savePassword = async (passwordFormRef) => {
 
+  // 校验密码表单
   await passwordFormRef.validate((valid) => {
     if (!valid) {
+      // 校验未通过
       return
     }
 
+    // 隐藏密码表单
     alertVisStatus.password = false
     if (passwordAlertMode.value === 'add') {
-      passwordForm.id = uuid()
+      // 新增密码设置id为时间戳
+      passwordForm.id = Date.now()
+      // 触发密码新增事件
       emit('addPassword', passwordForm);
     } else {
+      // 触发密码修改事件
       emit('updatePassword', passwordForm);
     }
   })
 }
 
+// 初始化系统配置中的默认密码规则
 const initRuleConfig = () => {
   let defaultPasswordRule = getSystemConfig('defaultPasswordRule')
   if (defaultPasswordRule) {
@@ -107,36 +117,48 @@ const initRuleConfig = () => {
 }
 
 // 添加密码
-const addPassword = () => {
+const showAddPassword = () => {
+  // 初始化系统配置中的默认密码规则
   initRuleConfig()
+  // 使用默认的密码表单
   let password = defaultPassword()
+
   for (let key in password) {
     passwordForm[key] = password[key]
   }
 
+  // 获取系统配置是否自动生成一次密码
   let autoGeneratePassword = getSystemConfig('autoGeneratePassword')
   if (autoGeneratePassword) {
+    // 生成密码
     generatePassword()
   }
 
+  // 设置表单模式为新增
   passwordAlertMode.value = 'add';
+  // 显示表单
   alertVisStatus.password = true
 }
 
 // 修改密码
-const updatePassword = (password) => {
+const showUpdatePassword = (password) => {
+  // 初始化系统配置中的默认密码规则
   initRuleConfig()
+
   for (let key in password) {
     passwordForm[key] = password[key]
   }
 
+  // 设置表单模式为修改
   passwordAlertMode.value = 'update'
+  // 显示表单
   alertVisStatus.password = true
 }
 
+// 导出的方法
 defineExpose({
-  addPassword,
-  updatePassword
+  showAddPassword,
+  showUpdatePassword
 });
 </script>
 
@@ -150,10 +172,10 @@ defineExpose({
     <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="100px"
              style="padding-right: 30px">
       <el-form-item :label="t('password.name')" prop="name">
-        <el-input v-model="passwordForm.name"></el-input>
+        <el-input v-model="passwordForm.name" clearable></el-input>
       </el-form-item>
       <el-form-item :label="t('password.address')">
-        <el-input v-model="passwordForm.address"></el-input>
+        <el-input v-model="passwordForm.address" clearable></el-input>
       </el-form-item>
       <el-form-item :label="t('password.userName')">
         <el-input v-model="passwordForm.userName" clearable/>
@@ -162,7 +184,7 @@ defineExpose({
         <el-card style="width: 100%;">
           <el-row>
             <el-col>
-              <el-input v-model="passwordForm.password">
+              <el-input v-model="passwordForm.password" clearable>
                 <template #append>
                   <el-button @click="copyText(passwordForm.password)">复制</el-button>
                 </template></el-input>
@@ -183,13 +205,12 @@ defineExpose({
             </el-col>
           </el-row>
           <el-row style="margin-top: 15px">
-            <el-col :span="8" :offset="8">
-              <el-input size="small" v-model="generateForm.length">
+            <el-col style="text-align: center">
+              <el-input v-model="generateForm.length" size="small" style="width: 120px;">
                 <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
               </el-input>
-            </el-col>
-            <el-col :span="7" :offset="1">
-              <el-button size="small" style="position: relative;top:-5px" type="success" plain
+
+              <el-button plain size="small" style="position: relative;top:-5px;margin-left: 10px" type="success"
                          @click="generatePassword">{{ t('passwordForm.generateForm.randomPassword') }}
               </el-button>
             </el-col>

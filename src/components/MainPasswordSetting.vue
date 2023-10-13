@@ -1,3 +1,4 @@
+<!--修改/初始化主密码-->
 <script setup>
 import {ElMessage} from 'element-plus'
 import {useI18n} from "vue-i18n";
@@ -5,7 +6,8 @@ import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
 import {getSystemConfig} from "@/utils/global.js";
 
 const {t} = useI18n()
-// 事件声明
+
+// 声明此组件可能调用的事件
 const emit = defineEmits(['mainPasswordChange'])
 
 // 现在的主密码
@@ -14,40 +16,43 @@ const oldMainPassword = ref('')
 const mainPassword = ref('')
 // 确认主密码
 const affirmMainPassword = ref('')
-// 密文
+// 验证主密码是否正确的密文
 const ciphertext = ref('')
-
 // 弹框显示控制
 const alertVisStatus = reactive({
   mainPassword: false
 })
 
-// 弹框模式
+// 弹框模式初始化/修改主密码
 const alertMode = ref('')
 
 // 保存主密码
 const saveMainPassword = () => {
+  // 修改主密码验证原密码是否正确
   if(alertMode.value === 'update'){
     // 验证主密码
     let value = decrypt(oldMainPassword.value, ciphertext.value)
-    console.log(value)
     if (!value || value !== 'password-x') {
       ElMessage.error(t('mainPasswordSetting.form.mainPasswordError'))
       return
     }
   }
+  // 校验两次密码是否一致
   if (mainPassword.value !== affirmMainPassword.value) {
     ElMessage.error(t('mainPasswordSetting.form.passwordsDiff'))
     return
   }
-  // 通知主页密码变更
+  // 触发密码变更事件
   emit('mainPasswordChange', mainPassword.value)
 
+  // 获取系统配置是否缓存主密码
   let cacheMainPassword = getSystemConfig('cacheMainPassword')
   if(cacheMainPassword || cacheMainPassword == null){
-    // 保存到本地缓存
+    // 获取浏览器指纹
     let bowerId = getBowerId();
+    // 使用浏览器指纹加密主密码
     let mainPasswordCiphertext = encrypt(bowerId, mainPassword.value)
+    // 保存到本地缓存
     localStorage.setItem('mainPasswordCiphertext', mainPasswordCiphertext)
   }
 
@@ -66,15 +71,16 @@ const initMainPassword = () => {
 }
 
 // 修改主密码
-const updateMainPassword = (text) => {
+const showUpdateMainPassword = (text) => {
   ciphertext.value = text
   alertMode.value = 'update'
   alertVisStatus.mainPassword = true
 }
 
+// 导出方法
 defineExpose({
   initMainPassword,
-  updateMainPassword
+  showUpdateMainPassword
 });
 
 </script>
@@ -83,12 +89,12 @@ defineExpose({
   <el-dialog
       v-model="alertVisStatus.mainPassword"
       :title="t('mainPasswordSetting.form.setMainPassword')"
-      width="400px"
+      width="430px"
       :close-on-click-modal="alertMode === 'update'"
       :close-on-press-escape="alertMode === 'update'"
       :show-close="alertMode === 'update'"
   >
-    <el-form :inline="true" label-width="90px">
+    <el-form :inline="true" label-width="100px">
       <el-form-item v-if="alertMode === 'update'" :label="t('mainPasswordSetting.form.currentPassword')">
         <el-input type="password" v-model="oldMainPassword"
                   style="width: 231px"></el-input>
@@ -102,6 +108,9 @@ defineExpose({
                   style="width: 231px"></el-input>
       </el-form-item>
     </el-form>
+    <el-text type="danger">
+      {{ t('mainPasswordSetting.forget.message') }}
+    </el-text>
 
     <template #footer>
           <span class="dialog-footer">

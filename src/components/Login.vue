@@ -1,3 +1,4 @@
+<!--登录页-->
 <script setup>
 import {reactive} from 'vue'
 import {login as loginOSS} from '@/utils/oss.js'
@@ -12,8 +13,8 @@ const {t,locale} = useI18n()
 
 const router = useRouter()
 
+// 登录表单规则校验
 const ruleFormRef = ref()
-
 
 // oss 配置
 const ossForm = reactive({
@@ -65,9 +66,9 @@ const loginSucceed = (oss) => {
   let ciphertext = encrypt(bowerId, JSON.stringify(ossForm))
   // 保存到localStorage用于下次登录
   localStorage.setItem('ossForm', ciphertext)
-
+  // 提示登录成功
   ElNotification.success(t('login.form.successMessage'));
-
+  // 重定向到首页
   router.push('/')
 }
 
@@ -83,6 +84,7 @@ const loginFail = (err) => {
   } else if (err.code === 'AccessDenied') {
     message = t('login.form.error.AccessDenied')
   }
+  // 提示失败原因
   ElNotification({
     type: 'error',
     title: t('login.form.failMessage'),
@@ -94,9 +96,11 @@ const loginFail = (err) => {
 // 修改语言
 const changeLanguage = (language) => {
   locale.value = language
+  // 修改系统配置
   setSystemConfig('language', language)
 }
 
+// 初始化语言配置
 const initLanguageConfig = () => {
   let language = getSystemConfig('language');
   if (language) {
@@ -104,6 +108,7 @@ const initLanguageConfig = () => {
   }
 }
 
+// 初始化语言配置
 initLanguageConfig()
 </script>
 

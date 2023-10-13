@@ -1,13 +1,12 @@
+<!--密码首页-->
 <script setup>
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
 import {copyText, getSystemConfig, isUrl} from "@/utils/global.js";
-import {delFile, getFile, putFile} from "@/utils/oss.js";
+import {getFile, putFile} from "@/utils/oss.js";
 import {ElMessage, ElNotification} from "element-plus";
 import {decrypt, encrypt} from "@/utils/security.js";
-import {useRouter} from "vue-router";
 
-const router = useRouter()
 
 const {t, locale} = useI18n()
 
@@ -15,34 +14,32 @@ const {t, locale} = useI18n()
 const passwordFormRef = ref()
 // 主密码验证组件对象
 const mainPasswordVerifyRef = ref()
-// 主密码设置组件对象
+// 主密码初始化/设置组件对象
 const mainPasswordSettingRef = ref()
 // 系统设置组件对象
 const systemSettingRef = ref()
 // 注销账户组件对象
 const deleteAccountRef = ref()
 
-// 搜索字符串
+// 搜索文本内容
 const searchText = ref('')
 // 主密码
 const mainPassword = ref('')
-// 是否允许同步数据到oss
-const syncStatus = reactive({
-  password: false
-})
-// 密码列表解密后的密文
+// 是否允许同步数据到oss（若为成功同步oss内容就更新oss会造成密码丢失）
+const passwordSyncStatus = ref(false)
+// 密码列表未解密的密文
 const passwordCiphertext = ref('')
-// 密码正确性验证参数
+// 主密码正确性验证参数
 const verifyValue = ref('')
-// 显示的密码列表
+// 页面显示的密码列表
 const showPasswordArray = ref([])
-// 密码列表
+// 全部的密码列表
 const passwordArray = ref([])
 
-// 搜索
+// 搜索（根据搜索字符串显示符合条件的密码）
 const loadShowPassword = async () => {
-  // 搜索条件为空，直接复制
-  if (searchText.value === '') {
+  // 搜索条件为空，直接复制密码列表
+  if (!searchText.value) {
     showPasswordArray.value = passwordArray.value
     return
   }
@@ -54,12 +51,14 @@ const loadShowPassword = async () => {
     let userName = passwordArray.value[i].userName || ''
     let address = passwordArray.value[i].address || ''
     let remark = passwordArray.value[i].remark || ''
+    let password = passwordArray.value[i].password || ''
 
     if (
-        name.indexOf(searchText.value) !== -1
-        || userName.indexOf(searchText.value) !== -1
-        || address.indexOf(searchText.value) !== -1
-        || remark.indexOf(searchText.value) !== -1
+        name.includes(searchText.value)
+        || userName.includes(searchText.value)
+        || address.includes(searchText.value)
+        || remark.includes(searchText.value)
+        || password.includes(searchText.value)
     ) {
       array.push(passwordArray.value[i]);
     }
@@ -67,58 +66,63 @@ const loadShowPassword = async () => {
   showPasswordArray.value = array
 }
 
-// 显示密码窗口
+// 显示添加密码窗口
 const showAddPassword = () => {
-  passwordFormRef.value.addPassword()
+  passwordFormRef.value.showAddPassword()
 }
 
 // 显示修改密码窗口
 const showUpdatePassword = (password) => {
-  passwordFormRef.value.updatePassword(password)
+  passwordFormRef.value.showUpdatePassword(password)
 }
 
-// 新增密码
+// 新增密码事件
 const addPassword = (password) => {
-  console.log(password)
+  // 新增在密码列表的第一位
   passwordArray.value.unshift(password)
+  // 同步到oss
   syncPasswordToOSS()
+  // 更新到显示列表
   loadShowPassword()
 }
 
-// 修改密码
+// 修改密码事件
 const updatePassword = (password) => {
   for (let i = 0; i < passwordArray.value.length; i++) {
     if (passwordArray.value[i].id === password.id) {
+      // 修改密码
       passwordArray.value[i] = password
+      // 同步到oss
       syncPasswordToOSS()
+      // 更新到显示列表
       loadShowPassword()
       break
     }
   }
 }
 
-// 锁定密码
+// 锁定密码（删除主密码以及密码列表但保留未解密的密码字符串）
 const lockMainPassword = () => {
   // 更新加密后的密码字符串
   passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
-  // 同步状态改为未同步
-  syncStatus.password = false
-  // 清空搜索列表
+  // 设置同步状态为不可同步
+  passwordSyncStatus.value = false
+  // 清空展示的密码列表
   showPasswordArray.value = []
-  // 清空密码列表
+  // 清空全部的密码列表
   passwordArray.value = []
-  // 清空当前主密码
+  // 清空主密码
   mainPassword.value = ''
   // 删除本地缓存的主密码
   mainPasswordVerifyRef.value.delLocalMainPassword()
 }
 
-// 解锁密码
+// 解锁密码（通过输入主密码解密密码字符串并显示到密码列表）
 const unlockMainPassword = () => {
   mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
 }
 
-// 分享密码
+// 分享密码（按照一定格式将密码拼接并复制到剪切板）
 const sharePassword = (password) => {
   let text = t('password.name') + ': ' + password.name + '\r\n'
   if (password.address) {
@@ -134,6 +138,7 @@ const sharePassword = (password) => {
     text += password.remark + '\r\n'
   }
   text = text.substring(0, text.length - 2)
+  // 复制到剪切板
   copyText(text);
 }
 
@@ -145,60 +150,80 @@ const deletePassword = (password) => {
       break
     }
   }
-  // 同步密码到oss
+
+  // 同步密码列表到oss
   syncPasswordToOSS()
   // 重新刷新搜索结果
   loadShowPassword()
-
+  // 删除成功提示
   ElMessage.success(t('index.table.delete.success'))
 }
 
-// 主密码加载成功
+// 主密码加载成功事件
 const mainPasswordLoadSucceed = (password) => {
+  // 设置主密码
   mainPassword.value = password
+  // 根据主密码解密密文
   let passwordListText = decrypt(password, passwordCiphertext.value)
+  // 设置密码列表
   passwordArray.value = JSON.parse(passwordListText)
-  syncStatus.password = true
+  // 设置同步状态为可同步
+  passwordSyncStatus.value = true
+  // 显示密码列表
   loadShowPassword()
 }
 
 // 主密码变更
 const mainPasswordChange = (password) => {
+  // 更新主密码
   mainPassword.value = password
+  // 同步到oss
   syncPasswordToOSS()
+  // 提示变更成功
   ElMessage.success(t('index.mainPassword.changeSuccess'))
 }
 
-// 系统设置
+// 打开系统设置
 const openSystemSetting = () => {
   systemSettingRef.value.openSystemSetting()
 }
 
 // 修改主密码
-const updateMainPassword = () => {
-  mainPasswordSettingRef.value.updateMainPassword(verifyValue.value)
+const showUpdateMainPassword = () => {
+  mainPasswordSettingRef.value.showUpdateMainPassword(verifyValue.value)
 }
 
-// 上传到oss
+// 同步密码列表到oss
 const syncPasswordToOSS = () => {
+  if (!passwordSyncStatus.value) {
+    // 不允许同步
+    return
+  }
+  // 使用主密码加密密码列表
   passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
+  // 使用主密码加密密码验证字符
   verifyValue.value = encrypt(mainPassword.value, 'password-x')
-  let body = {
+  // 上传文件
+  putFile('password.json', {
     verifyValue: verifyValue.value,
     passwordCiphertext: passwordCiphertext.value
-  }
-  putFile('password.json', body)
+  })
 }
 
-// 从oss获取密码文件
-const getPasswordByOSS = () => {
+// 从oss加载密码文件
+const loadPasswordByOSS = () => {
   getFile('password.json').then(res => {
     if (res.verifyValue) {
+      // 设置验证字符串
       verifyValue.value = res.verifyValue;
+      // 密码列表密文
       passwordCiphertext.value = res.passwordCiphertext
+      // 验证主密码（主密码验证通过后会将密文解密并更新到密码列表）
       mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
     } else {
-      // 初始化主密码
+      // 设置同步状态为可同步
+      passwordSyncStatus.value = true
+      // 验证字符串未空，第一次使用，初始化主密码
       mainPasswordSettingRef.value.initMainPassword()
     }
   }).catch(e => {
@@ -207,28 +232,34 @@ const getPasswordByOSS = () => {
   })
 }
 
-// 确认注销账户
+// 注销账户事件
 const affirmDeleteAccount = () => {
-  delFile('password.json')
+  // 清除加密的密码列表
   passwordCiphertext.value = null
-  mainPasswordVerifyRef.value.delLocalMainPassword()
-  localStorage.removeItem('ossForm')
-  localStorage.removeItem('mainPasswordCiphertext')
+  // 设置同步状态为不可同步
+  passwordSyncStatus.value = false
+  // 提示注销成功
   ElNotification.success(t('systemSetting.deleteAccount.success'));
-  router.push('/login')
+  // 退出登录
+  systemSettingRef.value.logout()
 }
 
 // 注销账户
-const deleteAccount = () => {
-  deleteAccountRef.value.deleteAccount(verifyValue.value)
+const showDeleteAccount = () => {
+  deleteAccountRef.value.showDeleteAccount(verifyValue.value)
 }
 
+// 页面加载完成后事件
 onMounted(() => {
+
+  // 设置系统语言
   let language = getSystemConfig('language')
   if (language) {
     locale.value = language
   }
-  getPasswordByOSS();
+
+  // 从oss加载密码文件
+  loadPasswordByOSS();
 })
 </script>
 
@@ -237,7 +268,7 @@ onMounted(() => {
     <el-col :lg="{span:20,offset:2}" id="passwordList">
       <el-row style="padding: 10px 10px 0 10px;">
         <el-col :sm="{span:8}" class="hidden-xs-only" style="font-weight: bold;">
-          <el-text v-if="passwordArray" style="padding-left: 5px;font-size: 105%;">
+          <el-text v-if="passwordArray" class="password-table-title">
             {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
           </el-text>
         </el-col>
@@ -250,18 +281,51 @@ onMounted(() => {
               :disabled="!mainPassword"
               @keyup.enter="loadShowPassword"
           />
+          <!--          添加密码-->
           <el-button
-              :disabled="!mainPassword || !syncStatus.password"
+              :disabled="!mainPassword || !passwordSyncStatus"
               @click="showAddPassword()"
               style="margin-left: 15px">
             {{ t('index.title.addPassword') }}
           </el-button>
-          <el-button v-if="!mainPassword" :disabled="!passwordCiphertext" :icon="Unlock"
-                     :title="t('index.title.unlock')" @click="unlockMainPassword"></el-button>
-          <el-button v-if="mainPassword" :icon="Lock" :title="t('index.title.lock')"
-                     @click="lockMainPassword"></el-button>
-          <el-button @click="openSystemSetting" :icon="Setting"></el-button>
-
+          <!--          解锁密码-->
+          <el-tooltip
+              :content="t('index.title.unlock')"
+              effect="dark"
+              placement="top"
+          >
+            <el-button
+                v-if="!mainPassword"
+                :disabled="!passwordCiphertext"
+                :icon="Unlock"
+                @click="unlockMainPassword"
+            >
+            </el-button>
+          </el-tooltip>
+          <!--          锁定密码-->
+          <el-tooltip
+              :content="t('index.title.lock')"
+              effect="dark"
+              placement="top"
+          >
+            <el-button
+                v-if="mainPassword"
+                :icon="Lock"
+                @click="lockMainPassword"
+            >
+            </el-button>
+          </el-tooltip>
+          <!--          系统设置-->
+          <el-tooltip
+              :content="t('index.title.setting')"
+              effect="dark"
+              placement="top"
+          >
+            <el-button
+                :icon="Setting"
+                @click="openSystemSetting"
+            ></el-button>
+          </el-tooltip>
         </el-col>
       </el-row>
       <el-divider style="margin-bottom: 5px;"></el-divider>
@@ -269,7 +333,8 @@ onMounted(() => {
         <el-col style="padding: 15px">
           <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
             <template #empty>
-              没有保存的密码
+              <!--              密码列表为空时展示-->
+              {{ t('index.table.empty') }}
             </template>
             <el-table-column :label="t('password.name')" prop="name"></el-table-column>
             <el-table-column :label="t('password.address')" prop="address">
@@ -291,8 +356,10 @@ onMounted(() => {
                     <template v-if="scope.row.show">{{ scope.row.password }}</template>
                   </span>
                   <div class="pass-action-div">
+                    <!-- 显示/隐藏密码-->
                     <View v-if="!scope.row.show" @click="scope.row.show = !scope.row.show"></View>
                     <Hide v-if="scope.row.show" @click="scope.row.show = !scope.row.show"></Hide>
+                    <!-- 复制密码-->
                     <CopyDocument @click="copyText(scope.row.password)"></CopyDocument>
                   </div>
                 </div>
@@ -301,13 +368,16 @@ onMounted(() => {
             <el-table-column :label="t('password.remark')" width="200px" prop="remark"></el-table-column>
             <el-table-column :label="t('index.table.operation')" width="150px">
               <template #default="scope">
+                <!--                分享-->
                 <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
                   {{ t('index.table.share') }}
                 </el-link>
+                <!--                编辑-->
                 <el-link :underline="false" style="margin-left: 10px" type="primary"
                          @click="showUpdatePassword(scope.row)">
                   {{ t('index.table.edit') }}
                 </el-link>
+                <!--                删除-->
                 <el-popconfirm
                     :title="t('index.table.operation.affirmDelete')"
                     :confirm-button-text="t('index.table.operation.affirm')"
@@ -337,8 +407,8 @@ onMounted(() => {
   <MainPasswordSetting ref="mainPasswordSettingRef" @mainPasswordChange="mainPasswordChange"></MainPasswordSetting>
 
   <!--  系统设置-->
-  <SystemSetting ref="systemSettingRef" @deleteAccount="deleteAccount"
-                 @updateMainPassword="updateMainPassword"></SystemSetting>
+  <SystemSetting ref="systemSettingRef" @deleteAccount="showDeleteAccount"
+                 @updateMainPassword="showUpdateMainPassword"></SystemSetting>
 
   <!--  注销账户-->
   <DeleteAccount ref="deleteAccountRef" @affirmDeleteAccount="affirmDeleteAccount"></DeleteAccount>
@@ -380,5 +450,11 @@ onMounted(() => {
 
 .password-text {
   line-height: 30px;
+}
+
+.password-table-title {
+  padding-left: 5px;
+  font-size: 105%;
+  cursor: default;
 }
 </style>

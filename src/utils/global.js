@@ -1,5 +1,6 @@
 import {ElMessage} from 'element-plus'
 
+// 复制文本
 export async function copyText(text) {
     let textarea = document.createElement('textarea');
     textarea.setAttribute('readonly', 'readonly');
@@ -12,10 +13,12 @@ export async function copyText(text) {
     ElMessage.success('复制成功')
 }
 
+// 更新系统全部配置
 export function updateConfig(config) {
     localStorage.setItem('systemConfig', JSON.stringify(config))
 }
 
+// 读取系统全部配置
 export function loadConfig() {
     let systemConfigText = localStorage.getItem('systemConfig')
     if (!systemConfigText) {
@@ -24,6 +27,7 @@ export function loadConfig() {
     return JSON.parse(systemConfigText)
 }
 
+// 获取系统配置
 export function getSystemConfig(key) {
     let systemConfigText = localStorage.getItem('systemConfig')
     if (!systemConfigText) {
@@ -33,6 +37,7 @@ export function getSystemConfig(key) {
     return systemConfig[key]
 }
 
+// 设置系统配置
 export function setSystemConfig(key, value) {
     let systemConfigText = localStorage.getItem('systemConfig')
     let systemConfig = {}
@@ -43,10 +48,12 @@ export function setSystemConfig(key, value) {
     updateConfig(systemConfig)
 }
 
+// 判断字符串是否为url
 export function isUrl(str) {
     return str && /^.*:\/\/.*$/.test(str)
 }
 
+// 随机密码
 export function randomText(pool, length) {
     console.log(pool)
     // 随机出来的密码

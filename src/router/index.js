@@ -10,7 +10,7 @@ const router = createRouter({
     routes: routes,
 })
 
-// 全局前置守卫，这里可以加入用户登录判断
+// 全局前置守卫，用户登录判断
 router.beforeEach((to, from, next) => {
 
     if (to.path === "/login") {
