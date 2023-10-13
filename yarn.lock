@@ -2233,6 +2233,11 @@ utility@^1.16.1, utility@^1.18.0:
     mz "^2.7.0"
     unescape "^1.0.1"
 
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.npmmirror.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
+
 vite-plugin-inspect@^0.7.40:
   version "0.7.40"
   resolved "https://registry.npmmirror.com/vite-plugin-inspect/-/vite-plugin-inspect-0.7.40.tgz#94bd33194a562408a7c4c9f78cd94a75f74aff84"

@@ -1,7 +1,15 @@
 <script setup>
 import {useI18n} from "vue-i18n";
+import {ElNotification} from "element-plus";
+import {useRouter} from "vue-router";
+import {loadConfig, updateConfig} from "@/utils/global.js";
+
+const router = useRouter()
 
 const {t, locale} = useI18n()
+
+// 事件声明
+const emit = defineEmits(['updateMainPassword', 'deleteAccount'])
 
 // 弹框显示控制
 const alertVisStatus = reactive({
@@ -12,7 +20,15 @@ const settingForm = reactive({
   language: 'zh-cn',
   cacheMainPassword: true,
   autoGeneratePassword: true,
+  defaultPasswordRule: {
+    length: 16,
+    number: true,
+    lowercase: true,
+    uppercase: true,
+    symbol: true,
+  }
 })
+
 // 语言列表
 const languages = reactive([
   {
@@ -24,25 +40,52 @@ const languages = reactive([
     label: 'English',
   }
 ])
-// 语言列表
-const defaultPasswordRule = reactive({
-  length: 16,
-  number: true,
-  lowercase: true,
-  uppercase: true,
-  symbol: true,
-})
 
 // 打开系统设置
 const openSystemSetting = () => {
-  settingForm.language = locale.value
+  let config = loadConfig()
+  if (config) {
+    for (let key in config) {
+      settingForm[key] = config[key]
+    }
+  }
+  settingForm.language = locale.value;
   alertVisStatus.setting = true
 }
 
 // 保存设置
 const saveSetting = () => {
-  locale.value = settingForm.language
+  let generateForm = settingForm.defaultPasswordRule;
+  if (!generateForm.number && !generateForm.symbol && !generateForm.lowercase && !generateForm.uppercase) {
+    ElMessage.error('必须选择一种密码字符类型')
+    return
+  }
+
+  updateConfig(settingForm)
+  if (settingForm.cacheMainPassword === false) {
+    localStorage.removeItem('mainPasswordCiphertext')
+  }
+  locale.value = settingForm.language;
   alertVisStatus.setting = false
+}
+
+// 退出登录
+const logout = () => {
+  localStorage.removeItem('ossForm')
+  localStorage.removeItem('mainPasswordCiphertext')
+  ElNotification.success(t('systemSetting.logout.success'));
+  router.push('/login')
+}
+
+// 修改主密码
+const updateMainPassword = () => {
+  alertVisStatus.setting = false
+  emit('updateMainPassword')
+}
+
+// 注销账号
+const deleteAccount = () => {
+  emit('deleteAccount')
 }
 
 defineExpose({
@@ -56,7 +99,7 @@ defineExpose({
       :title="t('systemSetting.title')"
       width="600px"
   >
-    <el-form :model="settingForm" label-width="200px">
+    <el-form :model="settingForm" label-width="150px">
       <el-form-item :label="t('systemSetting.language')">
         <el-select v-model="settingForm.language">
           <el-option
@@ -76,30 +119,35 @@ defineExpose({
       <el-form-item :label="t('systemSetting.defaultPasswordRule')">
         <el-row style="margin-top: 15px">
           <el-col :span="8">
-            <el-checkbox size="small" v-model="defaultPasswordRule.uppercase"
+            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.uppercase"
                          :label="t('passwordForm.generateForm.uppercase')" border/>
           </el-col>
           <el-col :span="8">
-            <el-checkbox size="small" v-model="defaultPasswordRule.lowercase"
+            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.lowercase"
                          :label="t('passwordForm.generateForm.lowercase')" border/>
           </el-col>
           <el-col :span="8">
-            <el-checkbox size="small" v-model="defaultPasswordRule.number"
+            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.number"
                          :label="t('passwordForm.generateForm.number')" border/>
           </el-col>
           <el-col :span="8">
-            <el-checkbox size="small" v-model="defaultPasswordRule.symbol"
+            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
                          :label="t('passwordForm.generateForm.symbol')" border/>
           </el-col>
           <el-col :span="8">
             <div>
-              <el-input size="small" style="position: relative;top:3px" v-model="defaultPasswordRule.length">
+              <el-input size="small" style="position: relative;top:3px"
+                        v-model="settingForm.defaultPasswordRule.length">
                 <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
               </el-input>
             </div>
-
           </el-col>
         </el-row>
+      </el-form-item>
+      <el-form-item>
+        <el-button plain @click="updateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
+        <el-button type="danger" plain @click="deleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
+        <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
       </el-form-item>
     </el-form>
 
@@ -109,6 +157,7 @@ defineExpose({
           </span>
     </template>
   </el-dialog>
+
 </template>
 
 <style scoped>

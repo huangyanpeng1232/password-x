@@ -2,6 +2,7 @@
 import {useI18n} from "vue-i18n";
 import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
 import {ElMessage} from "element-plus";
+import {getSystemConfig} from "@/utils/global.js";
 
 const {t} = useI18n()
 // 事件声明
@@ -21,11 +22,16 @@ const alertVisStatus = reactive({
 const saveMainPassword = () => {
   let value = decrypt(mainPassword.value, ciphertext.value)
   if (value && value === 'password-x') {
+    // 通知主页面
     emit('verifyPass', mainPassword.value)
+    // 缓存密码
     setLocalMainPassword(mainPassword.value)
+    // 清空表单
+    mainPassword.value = ''
+    // 隐藏弹框
     alertVisStatus.verifyMainPassword = false
   } else {
-    ElMessage.error('密码错误')
+    ElMessage.error(t('mainPasswordVerify.form.verify'))
   }
 }
 
@@ -35,6 +41,10 @@ const delLocalMainPassword = (password) => {
 }
 // 设置本地缓存中主密码
 const setLocalMainPassword = (password) => {
+  let cacheMainPassword = getSystemConfig('cacheMainPassword')
+  if(cacheMainPassword === false){
+    return
+  }
   let bowerId = getBowerId();
   let mainPasswordCiphertext = encrypt(bowerId, password)
   localStorage.setItem('mainPasswordCiphertext', mainPasswordCiphertext)
@@ -42,6 +52,11 @@ const setLocalMainPassword = (password) => {
 
 // 获取本地缓存中的主密码
 const getLocalMainPassword = () => {
+  let cacheMainPassword = getSystemConfig('cacheMainPassword')
+  if(cacheMainPassword === false){
+    return null
+  }
+
   let mainPasswordCiphertext = localStorage.getItem('mainPasswordCiphertext')
   if (!mainPasswordCiphertext) {
     return null;
@@ -82,9 +97,9 @@ defineExpose({
   <el-dialog
       v-model="alertVisStatus.verifyMainPassword"
       :title="t('mainPasswordVerify.form.title')"
-      width="400px"
+      width="450px"
   >
-    <el-form label-width="60px" :inline="true">
+    <el-form label-width="120px" :inline="true">
       <el-form-item :label="t('mainPasswordVerify.form.mainPassword')">
         <el-input type="password" @keyup.enter="saveMainPassword" v-model="mainPassword"
                   style="width: 231px"></el-input>

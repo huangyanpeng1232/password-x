@@ -2,6 +2,7 @@
 import {reactive} from 'vue'
 import {login as loginOSS} from '@/utils/oss.js'
 import {encrypt, getBowerId} from '@/utils/security.js'
+import {getSystemConfig, setSystemConfig} from '@/utils/global.js'
 import {ElNotification} from 'element-plus'
 import store from "@/store/index.js";
 import {useRouter} from "vue-router";
@@ -89,13 +90,21 @@ const loginFail = (err) => {
   })
 }
 
-console.log(locale.value)
 
 // 修改语言
 const changeLanguage = (language) => {
-  console.log(language)
   locale.value = language
+  setSystemConfig('language', language)
 }
+
+const initLanguageConfig = () => {
+  let language = getSystemConfig('language');
+  if (language) {
+    changeLanguage(language)
+  }
+}
+
+initLanguageConfig()
 </script>
 
 <template>

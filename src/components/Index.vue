@@ -1,13 +1,15 @@
 <script setup>
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
-import {copyText, isUrl} from "@/utils/global.js";
-import {getFile, putFile} from "@/utils/oss.js";
-import PasswordForm from "@/components/PasswordForm.vue";
+import {copyText, getSystemConfig, isUrl} from "@/utils/global.js";
+import {delFile, getFile, putFile} from "@/utils/oss.js";
 import {ElMessage, ElNotification} from "element-plus";
 import {decrypt, encrypt} from "@/utils/security.js";
+import {useRouter} from "vue-router";
 
-const {t} = useI18n()
+const router = useRouter()
+
+const {t, locale} = useI18n()
 
 // 密码表单组件对象
 const passwordFormRef = ref()
@@ -17,6 +19,8 @@ const mainPasswordVerifyRef = ref()
 const mainPasswordSettingRef = ref()
 // 系统设置组件对象
 const systemSettingRef = ref()
+// 注销账户组件对象
+const deleteAccountRef = ref()
 
 // 搜索字符串
 const searchText = ref('')
@@ -64,17 +68,39 @@ const loadShowPassword = async () => {
 }
 
 // 显示密码窗口
-const addPassword = () => {
+const showAddPassword = () => {
   passwordFormRef.value.addPassword()
 }
 
 // 显示修改密码窗口
-const updatePassword = (password) => {
+const showUpdatePassword = (password) => {
   passwordFormRef.value.updatePassword(password)
+}
+
+// 新增密码
+const addPassword = (password) => {
+  console.log(password)
+  passwordArray.value.unshift(password)
+  syncPasswordToOSS()
+  loadShowPassword()
+}
+
+// 修改密码
+const updatePassword = (password) => {
+  for (let i = 0; i < passwordArray.value.length; i++) {
+    if (passwordArray.value[i].id === password.id) {
+      passwordArray.value[i] = password
+      syncPasswordToOSS()
+      loadShowPassword()
+      break
+    }
+  }
 }
 
 // 锁定密码
 const lockMainPassword = () => {
+  // 更新加密后的密码字符串
+  passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
   // 同步状态改为未同步
   syncStatus.password = false
   // 清空搜索列表
@@ -129,6 +155,7 @@ const deletePassword = (password) => {
 
 // 主密码加载成功
 const mainPasswordLoadSucceed = (password) => {
+  mainPassword.value = password
   let passwordListText = decrypt(password, passwordCiphertext.value)
   passwordArray.value = JSON.parse(passwordListText)
   syncStatus.password = true
@@ -137,7 +164,9 @@ const mainPasswordLoadSucceed = (password) => {
 
 // 主密码变更
 const mainPasswordChange = (password) => {
-  passwordFormRef.value.updatePassword(password);
+  mainPassword.value = password
+  syncPasswordToOSS()
+  ElMessage.success(t('index.mainPassword.changeSuccess'))
 }
 
 // 系统设置
@@ -145,41 +174,62 @@ const openSystemSetting = () => {
   systemSettingRef.value.openSystemSetting()
 }
 
+// 修改主密码
+const updateMainPassword = () => {
+  mainPasswordSettingRef.value.updateMainPassword(verifyValue.value)
+}
+
 // 上传到oss
 const syncPasswordToOSS = () => {
-  let passwordCiphertext = encrypt(mainPassword.value, JSON.stringify(passwordArray))
-  passwordCiphertext.value = passwordCiphertext
-
+  passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
+  verifyValue.value = encrypt(mainPassword.value, 'password-x')
   let body = {
-    verifyValue: encrypt(mainPassword, 'password-x'),
-    passwordCiphertext: passwordCiphertext
+    verifyValue: verifyValue.value,
+    passwordCiphertext: passwordCiphertext.value
   }
-  putFile('password.json', body).then(res => {
-    console.log('文件同步成功', res.code)
-  }).catch(err => {
-    console.error(err)
-  })
+  putFile('password.json', body)
 }
 
 // 从oss获取密码文件
 const getPasswordByOSS = () => {
   getFile('password.json').then(res => {
-    verifyValue.value = res.verifyValue
-    passwordCiphertext.value = res.passwordCiphertext
-    mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
-  }).catch(e => {
-    // 404是没找到文件，可能是第一次使用属于正常情况
-    if (e.status === 404) {
+    if (res.verifyValue) {
+      verifyValue.value = res.verifyValue;
+      passwordCiphertext.value = res.passwordCiphertext
+      mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
+    } else {
       // 初始化主密码
       mainPasswordSettingRef.value.initMainPassword()
-    } else {
-      ElNotification.error(e.code)
-      console.error(e)
     }
+  }).catch(e => {
+    ElNotification.error(e.code)
+    console.log(e)
   })
 }
 
-getPasswordByOSS()
+// 确认注销账户
+const affirmDeleteAccount = () => {
+  delFile('password.json')
+  passwordCiphertext.value = null
+  mainPasswordVerifyRef.value.delLocalMainPassword()
+  localStorage.removeItem('ossForm')
+  localStorage.removeItem('mainPasswordCiphertext')
+  ElNotification.success(t('systemSetting.deleteAccount.success'));
+  router.push('/login')
+}
+
+// 注销账户
+const deleteAccount = () => {
+  deleteAccountRef.value.deleteAccount(verifyValue.value)
+}
+
+onMounted(() => {
+  let language = getSystemConfig('language')
+  if (language) {
+    locale.value = language
+  }
+  getPasswordByOSS();
+})
 </script>
 
 <template>
@@ -187,7 +237,9 @@ getPasswordByOSS()
     <el-col :lg="{span:20,offset:2}" id="passwordList">
       <el-row style="padding: 10px 10px 0 10px;">
         <el-col :sm="{span:8}" class="hidden-xs-only" style="font-weight: bold;">
-          <el-text style="padding-left: 5px;font-size: 105%;">{{passwordArray.value.length}}{{ t('index.title.passwordCount') }}</el-text>
+          <el-text v-if="passwordArray" style="padding-left: 5px;font-size: 105%;">
+            {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
+          </el-text>
         </el-col>
         <el-col :sm="{span:16}" :xs="{span:24}" style="text-align: right">
           <el-input
@@ -196,16 +248,18 @@ getPasswordByOSS()
               :placeholder="t('index.title.search')"
               :prefix-icon="Search"
               :disabled="!mainPassword"
-              @keyup.enter="searchPassword"
+              @keyup.enter="loadShowPassword"
           />
           <el-button
               :disabled="!mainPassword || !syncStatus.password"
-              @click="addPassword()"
+              @click="showAddPassword()"
               style="margin-left: 15px">
             {{ t('index.title.addPassword') }}
           </el-button>
-          <el-button v-if="!mainPassword" @click="unlockMainPassword" :icon="Unlock"></el-button>
-          <el-button v-if="mainPassword" @click="lockMainPassword" :icon="Lock"></el-button>
+          <el-button v-if="!mainPassword" :disabled="!passwordCiphertext" :icon="Unlock"
+                     :title="t('index.title.unlock')" @click="unlockMainPassword"></el-button>
+          <el-button v-if="mainPassword" :icon="Lock" :title="t('index.title.lock')"
+                     @click="lockMainPassword"></el-button>
           <el-button @click="openSystemSetting" :icon="Setting"></el-button>
 
         </el-col>
@@ -214,6 +268,9 @@ getPasswordByOSS()
       <el-row>
         <el-col style="padding: 15px">
           <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
+            <template #empty>
+              没有保存的密码
+            </template>
             <el-table-column :label="t('password.name')" prop="name"></el-table-column>
             <el-table-column :label="t('password.address')" prop="address">
               <template #default="scope">
@@ -247,7 +304,8 @@ getPasswordByOSS()
                 <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
                   {{ t('index.table.share') }}
                 </el-link>
-                <el-link style="margin-left: 10px" :underline="false" type="primary" @click="updatePassword(scope.row)">
+                <el-link :underline="false" style="margin-left: 10px" type="primary"
+                         @click="showUpdatePassword(scope.row)">
                   {{ t('index.table.edit') }}
                 </el-link>
                 <el-popconfirm
@@ -270,7 +328,7 @@ getPasswordByOSS()
   </el-row>
 
   <!--  密码表单-->
-  <PasswordForm ref="passwordFormRef"></PasswordForm>
+  <PasswordForm ref="passwordFormRef" @addPassword="addPassword" @updatePassword="updatePassword"></PasswordForm>
 
   <!--  验证主密码-->
   <MainPasswordVerify ref="mainPasswordVerifyRef" @verifyPass="mainPasswordLoadSucceed"></MainPasswordVerify>
@@ -279,7 +337,11 @@ getPasswordByOSS()
   <MainPasswordSetting ref="mainPasswordSettingRef" @mainPasswordChange="mainPasswordChange"></MainPasswordSetting>
 
   <!--  系统设置-->
-  <SystemSetting ref="systemSettingRef"></SystemSetting>
+  <SystemSetting ref="systemSettingRef" @deleteAccount="deleteAccount"
+                 @updateMainPassword="updateMainPassword"></SystemSetting>
+
+  <!--  注销账户-->
+  <DeleteAccount ref="deleteAccountRef" @affirmDeleteAccount="affirmDeleteAccount"></DeleteAccount>
 </template>
 
 <style scoped>

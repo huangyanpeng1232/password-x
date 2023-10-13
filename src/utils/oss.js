@@ -47,8 +47,17 @@ export function getFile(ossKey) {
         store.state.oss.get(prefix + ossKey).then(res => {
             resolve(JSON.parse(res.content))
         }).catch((err) => {
-            reject(err);
+            if (err.status === 404) {
+                resolve({})
+            } else {
+                reject(err);
+            }
         });
     })
+}
+
+
+export function delFile(ossKey) {
+    return store.state.oss.delete(prefix + ossKey)
 }
 

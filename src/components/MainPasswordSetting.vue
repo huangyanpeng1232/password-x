@@ -1,6 +1,8 @@
 <script setup>
 import {ElMessage} from 'element-plus'
 import {useI18n} from "vue-i18n";
+import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
+import {getSystemConfig} from "@/utils/global.js";
 
 const {t} = useI18n()
 // 事件声明
@@ -27,12 +29,34 @@ const alertMode = ref('')
 const saveMainPassword = () => {
   if(alertMode.value === 'update'){
     // 验证主密码
+    let value = decrypt(oldMainPassword.value, ciphertext.value)
+    console.log(value)
+    if (!value || value !== 'password-x') {
+      ElMessage.error(t('mainPasswordSetting.form.mainPasswordError'))
+      return
+    }
   }
   if (mainPassword.value !== affirmMainPassword.value) {
     ElMessage.error(t('mainPasswordSetting.form.passwordsDiff'))
     return
   }
-  emit('mainPasswordChange',mainPassword)
+  // 通知主页密码变更
+  emit('mainPasswordChange', mainPassword.value)
+
+  let cacheMainPassword = getSystemConfig('cacheMainPassword')
+  if(cacheMainPassword || cacheMainPassword == null){
+    // 保存到本地缓存
+    let bowerId = getBowerId();
+    let mainPasswordCiphertext = encrypt(bowerId, mainPassword.value)
+    localStorage.setItem('mainPasswordCiphertext', mainPasswordCiphertext)
+  }
+
+  // 清空表单
+  oldMainPassword.value = ''
+  mainPassword.value = ''
+  affirmMainPassword.value = ''
+
+  alertVisStatus.mainPassword = false
 }
 
 // 初始化主密码
@@ -45,6 +69,7 @@ const initMainPassword = () => {
 const updateMainPassword = (text) => {
   ciphertext.value = text
   alertMode.value = 'update'
+  alertVisStatus.mainPassword = true
 }
 
 defineExpose({
@@ -59,8 +84,11 @@ defineExpose({
       v-model="alertVisStatus.mainPassword"
       :title="t('mainPasswordSetting.form.setMainPassword')"
       width="400px"
+      :close-on-click-modal="alertMode === 'update'"
+      :close-on-press-escape="alertMode === 'update'"
+      :show-close="alertMode === 'update'"
   >
-    <el-form label-width="60px" :inline="true">
+    <el-form :inline="true" label-width="90px">
       <el-form-item v-if="alertMode === 'update'" :label="t('mainPasswordSetting.form.currentPassword')">
         <el-input type="password" v-model="oldMainPassword"
                   style="width: 231px"></el-input>

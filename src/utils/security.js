@@ -23,7 +23,7 @@ export function getBowerId() {
 // AES加密
 export function encrypt(key, data) {
     const dataHex = CryptoJS.enc.Utf8.parse(data); // 需要加密的数据
-    const keyHex = CryptoJS.enc.Utf8.parse(key); // 秘钥
+    const keyHex = CryptoJS.enc.Utf8.parse(md5(key)); // 秘钥
     const ivHex = CryptoJS.enc.Utf8.parse(''); // 偏移量
     const encrypted = CryptoJS.AES.encrypt(dataHex, keyHex, {
         iv: ivHex, mode: CryptoJS.mode.CBC, // 加密模式
@@ -36,7 +36,7 @@ export function encrypt(key, data) {
 export function decrypt(key, data) {
     let encryptedHexStr = CryptoJS.enc.Hex.parse(data);
     let src = CryptoJS.enc.Base64.stringify(encryptedHexStr);
-    const keyHex = CryptoJS.enc.Utf8.parse(key); // 秘钥
+    const keyHex = CryptoJS.enc.Utf8.parse(md5(key)); // 秘钥
     const ivHex = CryptoJS.enc.Utf8.parse('');
     let decrypt = CryptoJS.AES.decrypt(src, keyHex, {
         iv: ivHex, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7,
