@@ -35,11 +35,25 @@ const verifyValue = ref('')
 const showPasswordArray = ref([])
 // 全部的密码列表
 const passwordArray = ref([])
+// 选中的分组
+const groupCheckNodes = ref([])
+// 分组数据
+const groupTree = ref([])
+
+let delaySearch = null;
+
+// 搜索录入事件
+const searchKeyup = () => {
+  if(delaySearch){
+    clearTimeout(delaySearch)
+  }
+  delaySearch = setTimeout(loadShowPassword,400)
+}
 
 // 搜索（根据搜索字符串显示符合条件的密码）
 const loadShowPassword = async () => {
-  // 搜索条件为空，直接复制密码列表
-  if (!searchText.value) {
+  // 搜索条件与分组选择为空，直接复制密码列表
+  if (!searchText.value && !groupCheckNodes.value) {
     showPasswordArray.value = passwordArray.value
     return
   }
@@ -53,13 +67,27 @@ const loadShowPassword = async () => {
     let remark = passwordArray.value[i].remark || ''
     let password = passwordArray.value[i].password || ''
 
-    if (
-        name.includes(searchText.value)
-        || userName.includes(searchText.value)
-        || address.includes(searchText.value)
-        || remark.includes(searchText.value)
-        || password.includes(searchText.value)
-    ) {
+    let searchVis = !searchText.value
+
+    if (searchText.value) {
+      searchVis = name.includes(searchText.value)
+          || userName.includes(searchText.value)
+          || address.includes(searchText.value)
+          || remark.includes(searchText.value)
+          || password.includes(searchText.value)
+    }
+
+    let groupCheckVis = groupCheckNodes.value.length === 0;
+    if (groupCheckNodes.value.length > 0) {
+      for (let j = 0; j < groupCheckNodes.value.length; j++) {
+        let checkedNode = groupCheckNodes.value[j];
+        if (checkedNode.id === passwordArray.value[i].group) {
+          groupCheckVis = true
+        }
+      }
+    }
+
+    if (searchVis && groupCheckVis) {
       array.push(passwordArray.value[i]);
     }
   }
@@ -228,7 +256,6 @@ const loadPasswordByOSS = () => {
     }
   }).catch(e => {
     ElNotification.error(e.code)
-    console.log(e)
   })
 }
 
@@ -249,6 +276,41 @@ const showDeleteAccount = () => {
   deleteAccountRef.value.showDeleteAccount(verifyValue.value)
 }
 
+// 分组选中
+const groupCheckChange = (groupTreeCheckNodes) => {
+  groupCheckNodes.value = groupTreeCheckNodes
+  loadShowPassword()
+}
+
+// 分组数据变化
+const groupTreeChange = (groupTreeData) => {
+  groupTree.value = groupTreeData
+}
+
+// 根据分组id获取分组名
+const getGroupNameById = (id) => {
+  if (!id) {
+    return ''
+  }
+  console.log(JSON.stringify(groupTree.value))
+  return getGroupNameByIdRecursion(groupTree.value, id);
+}
+
+// 根据分组id获取分组名
+const getGroupNameByIdRecursion = (array, id) => {
+  for (let i = 0; i < array.length; i++) {
+    console.log(array[i].id,id)
+    if (array[i].id === id) {
+      return array[i].label
+    } else if (array[i].children && array[i].children.length > 0) {
+      let value = getGroupNameByIdRecursion(array[i].children, id)
+      if (value) {
+        return value
+      }
+    }
+  }
+}
+
 // 页面加载完成后事件
 onMounted(() => {
 
@@ -265,140 +327,157 @@ onMounted(() => {
 
 <template>
   <el-row id="passwordBody">
-    <el-col :lg="{span:20,offset:2}" id="passwordList">
-      <el-row style="padding: 10px 10px 0 10px;">
-        <el-col :sm="{span:8}" class="hidden-xs-only" style="font-weight: bold;">
-          <el-text v-if="passwordArray" class="password-table-title">
-            {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
-          </el-text>
-        </el-col>
-        <el-col :sm="{span:16}" :xs="{span:24}" style="text-align: right">
-          <el-input
-              v-model="searchText"
-              style="width: 50%;max-width: 300px"
-              :placeholder="t('index.title.search')"
-              :prefix-icon="Search"
-              :disabled="!mainPassword"
-              @keyup.enter="loadShowPassword"
-          />
-          <!--          添加密码-->
-          <el-button
-              :disabled="!mainPassword || !passwordSyncStatus"
-              @click="showAddPassword()"
-              style="margin-left: 15px">
-            {{ t('index.title.addPassword') }}
-          </el-button>
-          <!--          解锁密码-->
-          <el-tooltip
-              :content="t('index.title.unlock')"
-              effect="dark"
-              placement="top"
-          >
-            <el-button
-                v-if="!mainPassword"
-                :disabled="!passwordCiphertext"
-                :icon="Unlock"
-                @click="unlockMainPassword"
-            >
-            </el-button>
-          </el-tooltip>
-          <!--          锁定密码-->
-          <el-tooltip
-              :content="t('index.title.lock')"
-              effect="dark"
-              placement="top"
-          >
-            <el-button
-                v-if="mainPassword"
-                :icon="Lock"
-                @click="lockMainPassword"
-            >
-            </el-button>
-          </el-tooltip>
-          <!--          系统设置-->
-          <el-tooltip
-              :content="t('index.title.setting')"
-              effect="dark"
-              placement="top"
-          >
-            <el-button
-                :icon="Setting"
-                @click="openSystemSetting"
-            ></el-button>
-          </el-tooltip>
-        </el-col>
-      </el-row>
-      <el-divider style="margin-bottom: 5px;"></el-divider>
-      <el-row>
-        <el-col style="padding: 15px">
-          <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
-            <template #empty>
-              <!--              密码列表为空时展示-->
-              {{ t('index.table.empty') }}
+    <el-col :xl="{span:16,offset:2}" :lg="{span:18}" :md="{span:18}">
+      <el-card>
+        <template #header>
+          <div style="display: flex;justify-content: space-between;">
+            <div>
+              <el-text v-if="passwordArray" class="password-table-title hidden-xs-only">
+                {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
+              </el-text>
+            </div>
+            <div style="display: flex;justify-content: end" class="password-title-right">
+              <div>
+                <el-input
+                    v-model="searchText"
+                    style="max-width: 300px"
+                    :placeholder="t('index.title.search')"
+                    :prefix-icon="Search"
+                    :disabled="!mainPassword"
+                    @keyup.enter="loadShowPassword"
+                    @keyup="searchKeyup"
+                />
+              </div>
+              <!--          添加密码-->
+              <div>
+                <el-button
+                    :disabled="!mainPassword || !passwordSyncStatus"
+                    @click="showAddPassword()"
+                >
+                  {{ t('index.title.addPassword') }}
+                </el-button>
+              </div>
+              <!--          解锁/锁定密码-->
+              <div>
+                <el-tooltip
+                    :content="t('index.title.unlock')"
+                    effect="dark"
+                    placement="top"
+                >
+                  <el-button
+                      v-if="!mainPassword"
+                      :disabled="!passwordCiphertext"
+                      :icon="Unlock"
+                      @click="unlockMainPassword"
+                  >
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip
+                    :content="t('index.title.lock')"
+                    effect="dark"
+                    placement="top"
+                >
+                  <el-button
+                      v-if="mainPassword"
+                      :icon="Lock"
+                      @click="lockMainPassword"
+                  >
+                  </el-button>
+                </el-tooltip>
+              </div>
+              <!--          系统设置-->
+              <div>
+                <el-tooltip
+                    :content="t('index.title.setting')"
+                    effect="dark"
+                    placement="top"
+                >
+                  <el-button
+                      :icon="Setting"
+                      @click="openSystemSetting"
+                  ></el-button>
+                </el-tooltip>
+              </div>
+            </div>
+          </div>
+        </template>
+        <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
+          <template #empty>
+            <!--              密码列表为空时展示-->
+            {{ t('index.table.empty') }}
+          </template>
+          <el-table-column :label="t('password.name')" min-width="100px" prop="name"></el-table-column>
+          <el-table-column :label="t('password.address')" min-width="150px" prop="address">
+            <template #default="scope">
+              <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
+                {{ scope.row.address }}
+              </el-link>
+              <el-text v-else>
+                {{ scope.row.address }}
+              </el-text>
             </template>
-            <el-table-column :label="t('password.name')" prop="name"></el-table-column>
-            <el-table-column :label="t('password.address')" prop="address">
-              <template #default="scope">
-                <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
-                  {{ scope.row.address }}
-                </el-link>
-                <el-text v-else>
-                  {{ scope.row.address }}
-                </el-text>
-              </template>
-            </el-table-column>
-            <el-table-column width="200px" :label="t('password.userName')" prop="userName"></el-table-column>
-            <el-table-column width="250px" :label="t('password.password')">
-              <template #default="scope">
-                <div v-if="scope.row.password">
+          </el-table-column>
+          <el-table-column :label="t('password.userName')" min-width="100px" prop="userName"></el-table-column>
+          <el-table-column :label="t('password.password')" min-width="160px">
+            <template #default="scope">
+              <div v-if="scope.row.password">
                   <span class="password-text">
                     <template v-if="!scope.row.show">••••••••••</template>
                     <template v-if="scope.row.show">{{ scope.row.password }}</template>
                   </span>
-                  <div class="pass-action-div">
-                    <!-- 显示/隐藏密码-->
-                    <View v-if="!scope.row.show" @click="scope.row.show = !scope.row.show"></View>
-                    <Hide v-if="scope.row.show" @click="scope.row.show = !scope.row.show"></Hide>
-                    <!-- 复制密码-->
-                    <CopyDocument @click="copyText(scope.row.password)"></CopyDocument>
-                  </div>
+                <div class="pass-action-div">
+                  <!-- 显示/隐藏密码-->
+                  <View v-if="!scope.row.show" @click="scope.row.show = !scope.row.show"></View>
+                  <Hide v-if="scope.row.show" @click="scope.row.show = !scope.row.show"></Hide>
+                  <!-- 复制密码-->
+                  <CopyDocument @click="copyText(scope.row.password)"></CopyDocument>
                 </div>
-              </template>
-            </el-table-column>
-            <el-table-column :label="t('password.remark')" width="200px" prop="remark"></el-table-column>
-            <el-table-column :label="t('index.table.operation')" width="150px">
-              <template #default="scope">
-                <!--                分享-->
-                <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
-                  {{ t('index.table.share') }}
-                </el-link>
-                <!--                编辑-->
-                <el-link :underline="false" style="margin-left: 10px" type="primary"
-                         @click="showUpdatePassword(scope.row)">
-                  {{ t('index.table.edit') }}
-                </el-link>
-                <!--                删除-->
-                <el-popconfirm
-                    :title="t('index.table.operation.affirmDelete')"
-                    :confirm-button-text="t('index.table.operation.affirm')"
-                    :cancel-button-text="t('index.table.operation.cancel')"
-                    @confirm="deletePassword(scope.row)">
-                  <template #reference>
-                    <el-link style="margin-left: 10px" :underline="false" type="danger">
-                      {{ t('index.table.operation.delete') }}
-                    </el-link>
-                  </template>
-                </el-popconfirm>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-col>
-      </el-row>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column :label="t('index.table.group')" min-width="100px">
+            <template #default="scope">
+              {{ getGroupNameById(scope.row.group) }}
+            </template>
+          </el-table-column>
+          <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
+          <el-table-column :label="t('index.table.operation')" min-width="130px">
+            <template #default="scope">
+              <!--                分享-->
+              <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
+                {{ t('index.table.share') }}
+              </el-link>
+              <!--                编辑-->
+              <el-link :underline="false" style="margin-left: 10px" type="primary"
+                       @click="showUpdatePassword(scope.row)">
+                {{ t('index.table.edit') }}
+              </el-link>
+              <!--                删除-->
+              <el-popconfirm
+                  :title="t('index.table.operation.affirmDelete')"
+                  :confirm-button-text="t('index.table.operation.affirm')"
+                  :cancel-button-text="t('index.table.operation.cancel')"
+                  @confirm="deletePassword(scope.row)">
+                <template #reference>
+                  <el-link style="margin-left: 10px" :underline="false" type="danger">
+                    {{ t('index.table.operation.delete') }}
+                  </el-link>
+                </template>
+              </el-popconfirm>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
     </el-col>
+    <el-col :xl="{span:4}" :lg="{span:6}" :md="{span:6}" class="hidden-sm-and-down" style="padding-left: 15px">
+      <GroupTree @groupCheckChange="groupCheckChange" @groupTreeChange="groupTreeChange"></GroupTree>
+    </el-col>
+
   </el-row>
 
   <!--  密码表单-->
-  <PasswordForm ref="passwordFormRef" @addPassword="addPassword" @updatePassword="updatePassword"></PasswordForm>
+  <PasswordForm ref="passwordFormRef" :groupTree="groupTree" @addPassword="addPassword"
+                @updatePassword="updatePassword"></PasswordForm>
 
   <!--  验证主密码-->
   <MainPasswordVerify ref="mainPasswordVerifyRef" @verifyPass="mainPasswordLoadSucceed"></MainPasswordVerify>
@@ -420,15 +499,6 @@ onMounted(() => {
     padding: 15px;
   }
 
-  #passwordList {
-    border-radius: 5px;
-  }
-}
-
-#passwordList {
-  background-color: white;
-  padding-top: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.13), 0 0 3px rgba(0, 0, 0, 0.11);
 }
 
 .pass-action-div {
@@ -457,4 +527,10 @@ onMounted(() => {
   font-size: 105%;
   cursor: default;
 }
+
+.password-title-right > div {
+  padding: 0 4px;
+}
+
+
 </style>

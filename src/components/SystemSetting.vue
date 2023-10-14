@@ -5,6 +5,10 @@ import {useRouter} from "vue-router";
 import {loadConfig, updateConfig} from "@/utils/global.js";
 import store from "@/store/index.js";
 
+import { useDark, useToggle } from '@vueuse/core'
+
+const darkMode = useDark()
+
 const router = useRouter()
 
 const {t, locale} = useI18n()
@@ -21,6 +25,7 @@ const settingForm = reactive({
   language: 'zh-cn',
   cacheMainPassword: true,
   autoGeneratePassword: true,
+  darkMode: false,
   defaultPasswordRule: {
     length: 16,
     number: true,
@@ -68,6 +73,8 @@ const saveSetting = () => {
   }
   // 设置系统语言
   locale.value = settingForm.language;
+  // 暗黑模式
+  darkMode.value = settingForm.darkMode
   // 关闭密码弹框
   alertVisStatus.setting = false
 }
@@ -123,6 +130,9 @@ defineExpose({
       </el-form-item>
       <el-form-item :label="t('systemSetting.cacheMainPassword')">
         <el-switch v-model="settingForm.cacheMainPassword"></el-switch>
+      </el-form-item>
+      <el-form-item :label="t('systemSetting.darkMode')">
+        <el-switch v-model="settingForm.darkMode"/>
       </el-form-item>
       <el-form-item :label="t('passwordForm.autoGeneratePassword')">
         <el-switch v-model="settingForm.autoGeneratePassword" clearable/>

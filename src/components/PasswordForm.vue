@@ -4,6 +4,10 @@ import {useI18n} from "vue-i18n";
 
 import {copyText, getSystemConfig, randomText} from "@/utils/global.js";
 
+defineProps({
+  groupTree: Array,
+})
+
 // 声明此组件可能调用的事件
 const emit = defineEmits(['addPassword', 'updatePassword'])
 
@@ -34,7 +38,8 @@ const defaultPassword = () => {
     address: '',
     userName: '',
     password: '',
-    remark: ''
+    remark: '',
+    group: ''
   }
 }
 
@@ -98,11 +103,12 @@ const savePassword = async (passwordFormRef) => {
       // 新增密码设置id为时间戳
       passwordForm.id = Date.now()
       // 触发密码新增事件
-      emit('addPassword', passwordForm);
+      emit('addPassword', JSON.parse(JSON.stringify(passwordForm)));
     } else {
       // 触发密码修改事件
-      emit('updatePassword', passwordForm);
+      emit('updatePassword', JSON.parse(JSON.stringify(passwordForm)));
     }
+
   })
 }
 
@@ -144,7 +150,7 @@ const showAddPassword = () => {
 const showUpdatePassword = (password) => {
   // 初始化系统配置中的默认密码规则
   initRuleConfig()
-
+  console.log(password)
   for (let key in password) {
     passwordForm[key] = password[key]
   }
@@ -186,7 +192,7 @@ defineExpose({
             <el-col>
               <el-input v-model="passwordForm.password" clearable>
                 <template #append>
-                  <el-button @click="copyText(passwordForm.password)">复制</el-button>
+                  <el-button @click="copyText(passwordForm.password)">{{t('passwordForm.generateForm.password.copy')}}</el-button>
                 </template></el-input>
             </el-col>
           </el-row>
@@ -216,6 +222,16 @@ defineExpose({
             </el-col>
           </el-row>
         </el-card>
+      </el-form-item>
+      <el-form-item :label="t('password.group')">
+        <el-tree-select
+            v-model="passwordForm.group"
+            value-key="id"
+            :data="groupTree"
+            check-strictly
+            :placeholder="t('password.group.placeholder')"
+            filterable
+        />
       </el-form-item>
       <el-form-item :label="t('password.remark')">
         <el-input type="textarea" :placeholder="t('passwordForm.generateForm.remark')" :rows="4"
