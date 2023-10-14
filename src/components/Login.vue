@@ -22,8 +22,8 @@ const ruleFormRef = ref()
 // oss 配置
 const ossForm = reactive({
   region: 'oss-cn-beijing',
-  accessKeyId: 'LTAI5tNtsokaNJXbfpCDYmAc',
-  accessKeySecret: 'vdsdduX2iMNoVrkjIDOG4SRCLUM4QR',
+  accessKeyId: 'LTAI5tRPBc5sY6KbZd1Vc1jU',
+  accessKeySecret: '4OORS9GloeAn2Jd4Tvluw1Lt0YIj21',
   bucket: 'password-x',
 })
 
