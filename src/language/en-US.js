@@ -18,6 +18,7 @@ export default {
     'index.table.operation.delete': 'delete',
     'index.table.delete.success': 'delete success',
     'index.mainPassword.changeSuccess': 'setting success',
+    'index.table.lock': 'Locked',
     'login.form.title': 'Ali cloud oss config',
     'login.form.region.verify': 'please input region',
     'login.form.accessKeyId.verify': 'please input accessKeyId',

@@ -1,7 +1,11 @@
-# Vue 3 + Vite
+# password-x
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+&emsp;&emsp;password-x 是一个非常安全且强大的密码管理项目，采用各大云服务商的对象存储服务作为数据仓库，支持静态页面部署，无需拥有云服务器、数据库即可部署使用。
 
-## Recommended IDE Setup
+&emsp;&emsp;支持保存各种网站、服务器、数据库、应用等密码，内置的的密码生成器可以帮您快速生成安全性较高的随机密码，支持密码分组功能帮您归类整理不同场景不同类型的密码。
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+#### 安全性
+&emsp;&emsp;password-x 默认使用阿里云对象存储服务作为数据库，用户自行在阿里云开通对象存储服务后使用存储桶配置信息即可登录password-x，后续保存的密码均通过用户主密码加密后存储在阿里oss中，他人无法获取密码文件，即使阿里云密钥泄露或被他人截获密码文件也只能获取到未解密的密码，无主密码情况下无法解密查看，充分保护使用者密码安全。
+
+#### 系统框架简介
+&emsp;&emsp;password-x 基于 vite + vue3 + element plus 等主流框架搭建，稳定性强，页面美观，使用了vue router进行路由管理，密码文件通过AES对称加密技术处理安全性高、速度快，用户的oss、主密码等关键配置信息使用浏览器指纹加密后存储在localStorage中充分保障密码安全。

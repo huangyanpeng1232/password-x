@@ -55,7 +55,7 @@ export function isUrl(str) {
 
 // 随机密码
 export function randomText(pool, length) {
-    console.log(pool)
+
     // 随机出来的密码
     let password = ''
     // 密码池下标
@@ -82,6 +82,5 @@ export function randomText(pool, length) {
         arr[i - 1] = arr[j];
         arr[j] = tmp;
     }
-    console.log(arr)
     return arr.join('')
 }

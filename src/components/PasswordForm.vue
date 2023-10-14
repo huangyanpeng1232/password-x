@@ -3,6 +3,7 @@
 import {useI18n} from "vue-i18n";
 
 import {copyText, getSystemConfig, randomText} from "@/utils/global.js";
+import moment from "moment";
 
 defineProps({
   groupTree: Array,
@@ -39,7 +40,9 @@ const defaultPassword = () => {
     userName: '',
     password: '',
     remark: '',
-    group: ''
+    group: '',
+    insertTime: '',
+    updateTime: ''
   }
 }
 
@@ -102,9 +105,11 @@ const savePassword = async (passwordFormRef) => {
     if (passwordAlertMode.value === 'add') {
       // 新增密码设置id为时间戳
       passwordForm.id = Date.now()
+      passwordForm.insertTime = moment().format("YYYY-MM-DD HH:mm:ss")
       // 触发密码新增事件
       emit('addPassword', JSON.parse(JSON.stringify(passwordForm)));
     } else {
+      passwordForm.updateTime = moment().format("YYYY-MM-DD HH:mm:ss")
       // 触发密码修改事件
       emit('updatePassword', JSON.parse(JSON.stringify(passwordForm)));
     }
@@ -150,7 +155,7 @@ const showAddPassword = () => {
 const showUpdatePassword = (password) => {
   // 初始化系统配置中的默认密码规则
   initRuleConfig()
-  console.log(password)
+
   for (let key in password) {
     passwordForm[key] = password[key]
   }

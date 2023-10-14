@@ -47,7 +47,7 @@ const searchKeyup = () => {
   if(delaySearch){
     clearTimeout(delaySearch)
   }
-  delaySearch = setTimeout(loadShowPassword,400)
+  delaySearch = setTimeout(loadShowPassword, 300)
 }
 
 // 搜索（根据搜索字符串显示符合条件的密码）
@@ -292,14 +292,12 @@ const getGroupNameById = (id) => {
   if (!id) {
     return ''
   }
-  console.log(JSON.stringify(groupTree.value))
   return getGroupNameByIdRecursion(groupTree.value, id);
 }
 
 // 根据分组id获取分组名
 const getGroupNameByIdRecursion = (array, id) => {
   for (let i = 0; i < array.length; i++) {
-    console.log(array[i].id,id)
     if (array[i].id === id) {
       return array[i].label
     } else if (array[i].children && array[i].children.length > 0) {
@@ -404,7 +402,12 @@ onMounted(() => {
         <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
           <template #empty>
             <!--              密码列表为空时展示-->
-            {{ t('index.table.empty') }}
+            <el-empty :description="mainPassword?t('index.table.empty'):t('index.table.lock')">
+              <template v-if="!mainPassword" #image>
+                <Lock />
+              </template>
+              <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
+            </el-empty>
           </template>
           <el-table-column :label="t('password.name')" min-width="100px" prop="name"></el-table-column>
           <el-table-column :label="t('password.address')" min-width="150px" prop="address">
