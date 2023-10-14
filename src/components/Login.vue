@@ -8,8 +8,11 @@ import {ElNotification} from 'element-plus'
 import store from "@/store/index.js";
 import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
+import {useDark} from "@vueuse/core";
 
 const {t,locale} = useI18n()
+
+const darkMode = useDark()
 
 const router = useRouter()
 
@@ -100,16 +103,35 @@ const changeLanguage = (language) => {
   setSystemConfig('language', language)
 }
 
-// 初始化语言配置
-const initLanguageConfig = () => {
+// 初始化系统配置
+const initSystemConfig = () => {
+  // 语言
   let language = getSystemConfig('language');
   if (language) {
     changeLanguage(language)
+  } else {
+    // 浏览器非中文则设置界面语言为英文
+    if (navigator.language.toLowerCase() !== 'zh-cn') {
+      locale.value = 'en-us'
+      setSystemConfig('language', 'en-us')
+    }
+  }
+
+  // 暗黑模式
+  let sysDarkMode = getSystemConfig('darkMode');
+  if (sysDarkMode) {
+    darkMode.value = sysDarkMode
+  } else {
+    let isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    if (isDarkTheme && isDarkTheme.matches) {
+      darkMode.value = true
+      setSystemConfig('darkMode', true)
+    }
   }
 }
 
-// 初始化语言配置
-initLanguageConfig()
+// 初始化系统配置
+initSystemConfig()
 </script>
 
 <template>

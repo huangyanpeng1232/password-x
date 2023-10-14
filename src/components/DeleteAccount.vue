@@ -27,6 +27,8 @@ const affirmDeleteAccount = () => {
   if (value && value === 'password-x') {
     // 删除密码文件
     delFile('password.json')
+    // 删除分组文件
+    delFile('groupTree.json')
     // 删除oss登录信息
     localStorage.removeItem('ossForm')
     // 删除主密码缓存
