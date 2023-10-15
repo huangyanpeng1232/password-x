@@ -6,6 +6,7 @@ import routes from './routes'
 
 // 路由参数配置
 const router = createRouter({
+    base:'/password-x',
     history: createWebHistory(),
     routes: routes,
 })
