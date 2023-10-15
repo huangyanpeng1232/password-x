@@ -5,7 +5,7 @@
 &emsp;&emsp;支持保存各种网站、服务器、数据库、应用等密码，内置的的密码生成器可以帮您快速生成安全性较高的随机密码，支持密码分组功能帮您归类整理不同场景不同类型的密码。
 
 #### 演示地址
-https://password-x.gitee.io
+https://password-x.gitee.io 主密码：456
 
 #### 系统框架简介
 &emsp;&emsp;password-x 基于 vite + vue3 + element plus 等主流框架搭建，稳定性强，页面美观，使用了vue router进行路由管理，密码文件通过AES对称加密技术处理安全性高、速度快，用户的oss、主密码等关键配置信息使用浏览器指纹加密后存储在localStorage中充分保障密码安全。
