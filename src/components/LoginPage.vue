@@ -22,9 +22,9 @@ const ruleFormRef = ref()
 // oss 配置
 const ossForm = reactive({
   region: 'oss-cn-beijing',
-  accessKeyId: 'LTAI5tRPBc5sY6KbZd1Vc1jU',
-  accessKeySecret: '4OORS9GloeAn2Jd4Tvluw1Lt0YIj21',
-  bucket: 'password-x-demo',
+  accessKeyId: '',
+  accessKeySecret: '',
+  bucket: 'password-x',
 })
 
 // 表单校验规则
