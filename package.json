@@ -23,8 +23,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "eslint": "^8.51.0",
-    "eslint-plugin-vue": "^9.17.0",
+    "prettier": "^3.0.3",
     "unplugin-auto-import": "^0.16.6",
     "unplugin-icons": "^0.17.0",
     "unplugin-vue-components": "^0.25.2",

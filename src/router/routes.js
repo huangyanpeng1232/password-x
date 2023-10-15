@@ -2,12 +2,12 @@ const routes = [
     {
         path: '/',
         name: 'Index',
-        component: () => import('@/components/Index.vue'),
+        component: () => import('@/components/IndexPage.vue'),
     },
     {
         path: '/login',
         name: 'Login',
-        component: () => import('@/components/Login.vue'),
+        component: () => import('@/components/LoginPage.vue'),
     }
 ]
 export default routes

@@ -18,11 +18,11 @@ https://password-x.gitee.io
 password-x 支持静态页面部署，如Gitee Pages、Github Pages或nginx、tomcat服务甚至直接部署到阿里oss、腾讯cos也可直接使用，数据存储方面对接阿里云oss，每人5GB免费额度足够保存各种密码，还支持文件版本控制功能，如您想进一步降低数据丢失隐患，可开启阿里云跨区域复制服务，计费请参考阿里云官网。
 
 #### 页面展示
-![首页](/doc/首页.png)
-![登录页](/doc/登录页.png)
-![设置页](/doc/设置页.png)
-![暗黑模式首页](/doc/首页-暗黑模式.png)
-![英文版首页](/doc/首页-英语.png)
+![首页](/doc/images/首页.png)
+![登录页](/doc/images/登录页.png)
+![设置页](/doc/images/设置页.png)
+![暗黑模式首页](/doc/images/首页-暗黑模式.png)
+![英文版首页](/doc/images/首页-英语.png)
 
 ### 即将支持的功能
 - 配置信息token导出

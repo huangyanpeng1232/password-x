@@ -25,6 +25,7 @@ const ossForm = reactive({
   accessKeyId: 'LTAI5tRPBc5sY6KbZd1Vc1jU',
   accessKeySecret: '4OORS9GloeAn2Jd4Tvluw1Lt0YIj21',
   bucket: 'password-x-demo',
+
 })
 
 // 表单校验规则
