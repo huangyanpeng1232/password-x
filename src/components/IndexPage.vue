@@ -325,7 +325,7 @@ onMounted(() => {
 
 <template>
   <el-row id="passwordBody">
-    <el-col :xl="{span:16,offset:2}" :lg="{span:18}" :md="{span:18}">
+    <el-col :xl="{span:16,offset:2}" :lg="{span:19}" :md="{span:19}">
       <el-card>
         <template #header>
           <div style="display: flex;justify-content: space-between;">
@@ -350,6 +350,8 @@ onMounted(() => {
               <div>
                 <el-button
                     :disabled="!mainPassword || !passwordSyncStatus"
+                    type="primary"
+                    plain
                     @click="showAddPassword()"
                 >
                   {{ t('index.title.addPassword') }}
@@ -409,7 +411,7 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
-          <el-table-column :label="t('password.name')" min-width="100px" prop="name"></el-table-column>
+          <el-table-column :label="t('password.name')" prop="name"></el-table-column>
           <el-table-column :label="t('password.address')" min-width="150px" prop="address">
             <template #default="scope">
               <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
@@ -420,8 +422,8 @@ onMounted(() => {
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.userName')" min-width="100px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="160px">
+          <el-table-column :label="t('password.userName')" prop="userName"></el-table-column>
+          <el-table-column :label="t('password.password')" min-width="120px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
@@ -438,13 +440,13 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column :label="t('index.table.group')" min-width="100px">
+          <el-table-column :label="t('index.table.group')">
             <template #default="scope">
               {{ getGroupNameById(scope.row.group) }}
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
-          <el-table-column :label="t('index.table.operation')" min-width="130px">
+          <el-table-column :label="t('password.remark')" prop="remark"></el-table-column>
+          <el-table-column :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->
               <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
@@ -472,7 +474,7 @@ onMounted(() => {
         </el-table>
       </el-card>
     </el-col>
-    <el-col :xl="{span:4}" :lg="{span:6}" :md="{span:6}" class="hidden-sm-and-down" style="padding-left: 15px">
+    <el-col :xl="{span:4}" :lg="{span:5}" :md="{span:5}" class="hidden-sm-and-down" style="padding-left: 15px">
       <GroupTree @groupCheckChange="groupCheckChange" @groupTreeChange="groupTreeChange"></GroupTree>
     </el-col>
 

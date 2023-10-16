@@ -156,7 +156,7 @@ const showUpdatePassword = (password) => {
   // 初始化系统配置中的默认密码规则
   initRuleConfig()
 
-  for (let key in password) {
+  for (let key in passwordForm) {
     passwordForm[key] = password[key]
   }
 
