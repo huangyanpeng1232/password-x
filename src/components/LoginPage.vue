@@ -21,10 +21,10 @@ const ruleFormRef = ref()
 
 // oss 配置
 const ossForm = reactive({
-  region: 'oss-cn-beijing',
+  region: '',
   accessKeyId: '',
   accessKeySecret: '',
-  bucket: 'password-x',
+  bucket: '',
 })
 
 // 表单校验规则

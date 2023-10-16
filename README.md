@@ -67,7 +67,7 @@ https://gitee.com/password-x/password-x
 ![box](/doc/images/打赏码.png)
 
 
-欢迎各位大佬指点，禁止用于商业用途
+未经作者许可禁止将此项目用于盈利用途或基于此项目开发后付费使用，可个人或团队内部部署使用
 
 <style>
     img[alt="box"]{
