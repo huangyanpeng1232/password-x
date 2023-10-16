@@ -234,6 +234,7 @@ defineExpose({
             value-key="id"
             :data="groupTree"
             check-strictly
+            default-expand-all
             :placeholder="t('password.group.placeholder')"
             filterable
         />

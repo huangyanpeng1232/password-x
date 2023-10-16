@@ -114,6 +114,7 @@ loadGroupTreeByOSS()
           :filter-node-method="groupFilterNode"
           :expand-on-click-node="false"
           :allow-drag="groupDrag"
+          default-expand-all
       >
         <template #empty>
           <el-button size="small" type="primary" plain @click="createGroup">{{ t('groupTree.firstAddGroup') }}
