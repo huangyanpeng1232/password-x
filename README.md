@@ -39,15 +39,15 @@ bucket: password-x-demo
 
 ### 页面展示
 首页
-![首页](/doc/images/首页.png)
+![首页](https://foruda.gitee.com/images/1697444435953637196/a09e625d_9560465.png)
 登录页
-![登录页](/doc/images/登录页.png)
+![登录页](https://foruda.gitee.com/images/1697444453927256991/3d10cc46_9560465.png)
 设置页
-![设置页](/doc/images/设置页.png)
+![设置页](https://foruda.gitee.com/images/1697444469375771522/4b0da978_9560465.png)
 暗黑模式
-![暗黑模式首页](/doc/images/首页-暗黑模式.png)
+![暗黑模式首页](https://foruda.gitee.com/images/1697444481071950198/30813274_9560465.png)
 多语言支持
-![英文版首页](/doc/images/首页-英语.png)
+![多语言首页](https://foruda.gitee.com/images/1697444495394421109/6eaa0dfc_9560465.png)
 
 ### 开源地址
 https://gitee.com/password-x/password-x
@@ -60,12 +60,11 @@ https://gitee.com/password-x/password-x
 
 ### 作者微信
 如您有任何问题欢迎随时反馈
-![box](https://hyp-admin.oss-cn-beijing.aliyuncs.com/password-x/%E4%BD%9C%E8%80%85%E5%BE%AE%E4%BF%A1.png)
+![作者微信](https://foruda.gitee.com/images/1697444535317416303/de05c1a5_9560465.png)
 
 ### 打赏
 作为一个开源项目，在开发和维护过程中面临着诸多困难和挑战。为了能够持续为大家提供更好的服务，希望大家能够伸出援手，给予一些经济上的支持
-![box](/doc/images/打赏码.png)
-
+![赞赏码](https://foruda.gitee.com/images/1697444547014836574/613e0117_9560465.png)
 
 未经作者许可禁止将此项目用于盈利用途或基于此项目开发后付费使用，可个人或团队内部部署使用
 

@@ -1,7 +1,7 @@
 {
   "name": "password-x",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,6 @@
     "ali-oss": "^6.18.1",
     "crypto-js": "^4.1.1",
     "element-plus": "^2.3.14",
-    "fingerprintjs2": "^2.1.4",
     "js-md5": "^0.8.3",
     "moment": "^2.29.4",
     "vue": "^3.3.4",
@@ -23,7 +22,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "prettier": "^3.0.3",
     "unplugin-auto-import": "^0.16.6",
     "unplugin-icons": "^0.17.0",
     "unplugin-vue-components": "^0.25.2",
