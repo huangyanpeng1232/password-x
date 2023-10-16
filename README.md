@@ -49,6 +49,9 @@ bucket: password-x-demo
 多语言支持
 ![英文版首页](/doc/images/首页-英语.png)
 
+### 开源地址
+https://gitee.com/password-x/password-x
+
 ### 即将支持的功能
 - 配置信息token导出
 - 对接腾讯云cos存储
