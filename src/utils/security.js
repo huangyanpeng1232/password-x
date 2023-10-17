@@ -13,10 +13,16 @@ export function getBowerId() {
     let gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
 
     let brandsStr = ''
-    let brands = navigator.userAgentData.brands
-    for (let i = 0; i < brands.length; i++) {
-        brandsStr += brands[i].brand
+    let userAgentData = navigator.userAgentData
+    if (userAgentData) {
+        let brands = userAgentData.brands
+        if (brands) {
+            for (let i = 0; i < brands.length; i++) {
+                brandsStr += brands[i].brand;
+            }
+        }
     }
+
     return md5(height + width + language + pixelDepth + gpu + brandsStr)
 }
 

@@ -77,6 +77,7 @@ const loginSucceed = (oss) => {
 
 // 登录失败
 const loginFail = (err) => {
+  console.error(err)
   let message = err.code;
   if (err.code === 'RequestError') {
     message = t('login.form.error.RequestError')
@@ -86,6 +87,8 @@ const loginFail = (err) => {
     message = t('login.form.error.SignatureDoesNotMatch')
   } else if (err.code === 'AccessDenied') {
     message = t('login.form.error.AccessDenied')
+  } else{
+    message = err.code
   }
   // 提示失败原因
   ElNotification({
