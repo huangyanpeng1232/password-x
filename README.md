@@ -62,7 +62,7 @@ https://gitee.com/password-x/password-x
 - 密码文件压缩
 
 ### 作者微信
-如您有任何问题欢迎随时反馈
+如您有任何问题欢迎随时反馈  
 ![box](https://foruda.gitee.com/images/1697444535317416303/de05c1a5_9560465.png)
 
 ### 打赏
