@@ -7,11 +7,17 @@ password-x 不仅支持保存各种网站、服务器、数据库、应用等密
 通过使用 password-x，您可以轻松地管理和保护您的密码，确保您的信息安全无忧。无论是个人用户还是企业用户，password-x 都是一个理想的选择。
 
 #### 试用地址
+
 https://password-x.gitee.io
+
 region: oss-cn-beijing
+
 accessKeyId: LTAI5tRPBc5sY6KbZd1Vc1jU
+
 accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21
+
 bucket: password-x-demo
+
 主密码：456
 
 #### 系统架构简介
