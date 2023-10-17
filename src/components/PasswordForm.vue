@@ -166,6 +166,11 @@ const showUpdatePassword = (password) => {
   alertVisStatus.password = true
 }
 
+// 获取窗口宽度
+const getWindowWidth = () => {
+  return document.documentElement.clientWidth
+}
+
 // 导出的方法
 defineExpose({
   showAddPassword,
@@ -178,9 +183,9 @@ defineExpose({
       v-model="alertVisStatus.password"
       :title="passwordAlertMode === 'add'?t('passwordForm.form.addPassword'):t('passwordForm.form.editPassword')"
       size="620px"
-      direction="rtl"
+      :direction="getWindowWidth() > 768?'rtl':'btt'"
   >
-    <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="100px"
+    <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="70px"
              style="padding-right: 30px">
       <el-form-item :label="t('password.name')" prop="name">
         <el-input v-model="passwordForm.name" clearable></el-input>
@@ -202,16 +207,16 @@ defineExpose({
             </el-col>
           </el-row>
           <el-row style="margin-top: 15px">
-            <el-col :span="6" style="text-align: center">
+            <el-col :xs="{span:12}" :md="{span:6}" style="text-align: center">
               <el-checkbox size="small" v-model="generateForm.uppercase" :label="t('passwordForm.generateForm.uppercase')" border/>
             </el-col>
-            <el-col :span="6" style="text-align: center">
+            <el-col :xs="{span:12}" :md="{span:6}" style="text-align: center">
               <el-checkbox size="small" v-model="generateForm.lowercase" :label="t('passwordForm.generateForm.lowercase')" border/>
             </el-col>
-            <el-col :span="6" style="text-align: center">
+            <el-col :xs="{span:12}" :md="{span:6}" style="text-align: center">
               <el-checkbox size="small" v-model="generateForm.number" :label="t('passwordForm.generateForm.number')" border/>
             </el-col>
-            <el-col :span="6" style="text-align: center">
+            <el-col :xs="{span:12}" :md="{span:6}" style="text-align: center">
               <el-checkbox size="small" v-model="generateForm.symbol" :label="t('passwordForm.generateForm.symbol')" border/>
             </el-col>
           </el-row>

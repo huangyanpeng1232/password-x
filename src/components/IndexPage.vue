@@ -411,8 +411,8 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
-          <el-table-column :label="t('password.name')" prop="name"></el-table-column>
-          <el-table-column :label="t('password.address')" min-width="150px" prop="address">
+          <el-table-column :label="t('password.name')" min-width="180px" prop="name"></el-table-column>
+          <el-table-column :label="t('password.address')" min-width="250px" prop="address">
             <template #default="scope">
               <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
                 {{ scope.row.address }}
@@ -422,8 +422,8 @@ onMounted(() => {
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.userName')" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="120px">
+          <el-table-column :label="t('password.userName')" min-width="170px" prop="userName"></el-table-column>
+          <el-table-column :label="t('password.password')" min-width="200px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
@@ -440,13 +440,13 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column :label="t('index.table.group')">
+          <el-table-column :label="t('index.table.group')" min-width="100px">
             <template #default="scope">
               {{ getGroupNameById(scope.row.group) }}
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.remark')" prop="remark"></el-table-column>
-          <el-table-column :label="t('index.table.operation')">
+          <el-table-column :label="t('password.remark')" min-width="150px" prop="remark"></el-table-column>
+          <el-table-column min-width="140px" :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->
               <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
