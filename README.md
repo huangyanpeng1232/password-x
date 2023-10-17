@@ -70,9 +70,3 @@ https://gitee.com/password-x/password-x
 ![box](https://foruda.gitee.com/images/1697444547014836574/613e0117_9560465.png)
 
 未经作者许可禁止将此项目用于盈利用途或基于此项目开发后付费使用，可个人或团队内部部署使用  
-
-<style>
-    img[alt="box"]{
-        width:400px;
-    }
-</style>
