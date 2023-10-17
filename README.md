@@ -17,6 +17,9 @@ accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21
 bucket: password-x-demo  
 主密码：456  
 
+### 阿里云账号注册指引
+[点我查看](https://gitee.com/password-x/password-x/wikis/%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%A6%E5%8F%B7%E6%93%8D%E4%BD%9C%E6%8C%87%E5%BC%95)
+
 ### 系统架构简介
 &emsp;&emsp;password-x 是一款基于 Vite、Vue3 和 Element Plus 等主流框架精心打造的密码管理工具，稳定性卓越，页面设计美观大方。我们采用先进的 AES 对称加密技术对密码文件进行处理，确保安全性和速度的双重优势。
 
