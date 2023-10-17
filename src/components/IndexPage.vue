@@ -423,7 +423,7 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.userName')" min-width="170px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="200px">
+          <el-table-column :label="t('password.password')" min-width="230px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
