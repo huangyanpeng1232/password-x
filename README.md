@@ -10,15 +10,12 @@ password-x 不仅支持保存各种网站、服务器、数据库、应用等密
 
 https://password-x.gitee.io
 
-region: oss-cn-beijing
-
-accessKeyId: LTAI5tRPBc5sY6KbZd1Vc1jU
-
-accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21
-
-bucket: password-x-demo
-
-主密码：456
+登录信息  
+region: oss-cn-beijing  
+accessKeyId: LTAI5tRPBc5sY6KbZd1Vc1jU  
+accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21  
+bucket: password-x-demo  
+主密码：456  
 
 ### 系统架构简介
 &emsp;&emsp;password-x 是一款基于 Vite、Vue3 和 Element Plus 等主流框架精心打造的密码管理工具，稳定性卓越，页面设计美观大方。我们采用先进的 AES 对称加密技术对密码文件进行处理，确保安全性和速度的双重优势。
