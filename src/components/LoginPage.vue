@@ -6,7 +6,7 @@ import {encrypt, getBowerId} from '@/utils/security.js'
 import {getSystemConfig, setSystemConfig} from '@/utils/global.js'
 import {ElNotification} from 'element-plus'
 import store from "@/store/index.js";
-import {useRouter} from "vue-router";
+import {useRouter,useRoute } from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useDark} from "@vueuse/core";
 
@@ -15,6 +15,8 @@ const {t,locale} = useI18n()
 const darkMode = useDark()
 
 const router = useRouter()
+
+const route = useRoute ()
 
 // 登录表单规则校验
 const ruleFormRef = ref()
@@ -42,6 +44,11 @@ const formRules = reactive({
     {required: true, message: t('login.form.bucket.verify'), trigger: 'blur'}
   ]
 })
+
+// 打开oss注册指引
+const openOssRegisterDoc = async () => {
+  window.open(import.meta.env.VITE_OSS_REGISTER_DOC)
+}
 
 // 登录
 const submitForm = async (ruleFormRef) => {
@@ -98,7 +105,6 @@ const loginFail = (err) => {
   })
 }
 
-
 // 修改语言
 const changeLanguage = (language) => {
   locale.value = language
@@ -133,8 +139,19 @@ const initSystemConfig = () => {
   }
 }
 
+
+// 初始化登录参数
+const initLoginConfig = () => {
+  ossForm.region = route.query.region || ''
+  ossForm.accessKeyId = route.query.accessKeyId || ''
+  ossForm.accessKeySecret = route.query.accessKeySecret || ''
+  ossForm.bucket = route.query.bucket || ''
+}
+
 // 初始化系统配置
 initSystemConfig()
+// 初始化登录参数
+initLoginConfig()
 </script>
 
 <template>
@@ -177,7 +194,11 @@ initSystemConfig()
       <div class="content-button">
         <el-button type="primary" style="width: 100%;" @click="submitForm(ruleFormRef)">登录</el-button>
       </div>
+      <div class="oss-register-doc">
+        <el-link type="primary" @click="openOssRegisterDoc">阿里云OSS注册指引</el-link>
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -193,7 +214,7 @@ initSystemConfig()
 
 .content {
   width: 500px;
-  height: 400px;
+  height: 420px;
   box-sizing: border-box;
   padding: 0 50px;
   border-radius: 5px;
@@ -214,7 +235,7 @@ initSystemConfig()
   }
 
   100% {
-    height: 400px;
+    height: 420px;
   }
 }
 
@@ -245,6 +266,13 @@ initSystemConfig()
   position: fixed;
   right: 0;
   padding: 10px;
+  color: #999;
+}
+
+.oss-register-doc {
+  text-align: center;
+  padding: 10px;
+  margin-top: 15px;
   color: #999;
 }
 </style>

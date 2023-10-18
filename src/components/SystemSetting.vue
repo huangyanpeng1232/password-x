@@ -3,9 +3,10 @@
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import {loadConfig, updateConfig} from "@/utils/global.js";
+import {decrypt, getBowerId} from '@/utils/security.js'
 import store from "@/store/index.js";
 
-import { useDark, useToggle } from '@vueuse/core'
+import {useDark} from '@vueuse/core'
 
 const darkMode = useDark()
 
@@ -93,6 +94,16 @@ const logout = () => {
 
 // 显示修改主密码弹框
 const showUpdateMainPassword = () => {
+
+  // 获取缓存配置
+  let ciphertext = localStorage.getItem('ossForm')
+  let ossFormContent = decrypt(getBowerId(), ciphertext);
+  let ossForm = JSON.parse(ossFormContent);
+
+  if (ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
+    ElMessage.error('演示账号不能修改主密码')
+    return
+  }
   alertVisStatus.setting = false
   emit('updateMainPassword')
 }
