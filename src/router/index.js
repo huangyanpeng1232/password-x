@@ -6,7 +6,8 @@ import routes from './routes'
 
 // 路由参数配置
 const router = createRouter({
-    history: createWebHistory(),
+    // history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: routes,
 })
 
