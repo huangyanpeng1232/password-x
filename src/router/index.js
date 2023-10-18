@@ -12,7 +12,7 @@ const router = createRouter({
 
 // 全局前置守卫，用户登录判断
 router.beforeEach((to, from, next) => {
-
+    console.log('router change：', to.path)
     if (to.path === "/login") {
         next()
         return
