@@ -35,10 +35,10 @@ const verifyValue = ref('')
 const showPasswordArray = ref([])
 // 全部的密码列表
 const passwordArray = ref([])
-// 选中的分组
-const groupCheckNodes = ref([])
-// 分组数据
-const groupTree = ref([])
+// 选中的标签
+const labelCheckNodes = ref([])
+// 标签数据
+const labelTree = ref([])
 
 let delaySearch = null;
 
@@ -52,8 +52,8 @@ const searchKeyup = () => {
 
 // 搜索（根据搜索字符串显示符合条件的密码）
 const loadShowPassword = async () => {
-  // 搜索条件与分组选择为空，直接复制密码列表
-  if (!searchText.value && !groupCheckNodes.value) {
+  // 搜索条件与标签选择为空，直接复制密码列表
+  if (!searchText.value && !labelCheckNodes.value) {
     showPasswordArray.value = passwordArray.value
     return
   }
@@ -77,17 +77,19 @@ const loadShowPassword = async () => {
           || password.includes(searchText.value)
     }
 
-    let groupCheckVis = groupCheckNodes.value.length === 0;
-    if (groupCheckNodes.value.length > 0) {
-      for (let j = 0; j < groupCheckNodes.value.length; j++) {
-        let checkedNode = groupCheckNodes.value[j];
-        if (checkedNode.id === passwordArray.value[i].group) {
-          groupCheckVis = true
+    let labelCheckVis = labelCheckNodes.value.length === 0;
+    if (labelCheckNodes.value.length > 0) {
+
+      for (let j = 0; j < labelCheckNodes.value.length; j++) {
+        let checkedNode = labelCheckNodes.value[j];
+
+        if (passwordArray.value[i].label && passwordArray.value[i].label.includes(checkedNode.id)) {
+          labelCheckVis = true
         }
       }
     }
 
-    if (searchVis && groupCheckVis) {
+    if (searchVis && labelCheckVis) {
       array.push(passwordArray.value[i]);
     }
   }
@@ -375,35 +377,34 @@ const showDeleteAccount = () => {
   deleteAccountRef.value.showDeleteAccount(verifyValue.value)
 }
 
-// 分组选中
-const groupCheckChange = (groupTreeCheckNodes) => {
-  groupCheckNodes.value = groupTreeCheckNodes
+// 标签选中
+const labelCheckChange = (labelTreeCheckNodes) => {
+  labelCheckNodes.value = labelTreeCheckNodes
   loadShowPassword()
 }
 
-// 分组数据变化
-const groupTreeChange = (groupTreeData) => {
-  groupTree.value = groupTreeData
+// 标签数据变化
+const labelTreeChange = (labelTreeData) => {
+  labelTree.value = labelTreeData
 }
 
-// 根据分组id获取分组名
-const getGroupNameById = (id) => {
-  if (!id) {
+// 根据标签id获取标签名
+const getLabelNameById = (ids) => {
+  if (!ids) {
     return ''
   }
-  return getGroupNameByIdRecursion(groupTree.value, id);
+  let result = []
+  getLabelNameByIdRecursion(labelTree.value, ids, result);
+  return result;
 }
 
-// 根据分组id获取分组名
-const getGroupNameByIdRecursion = (array, id) => {
+// 根据标签id获取标签名
+const getLabelNameByIdRecursion = (array, ids, result) => {
   for (let i = 0; i < array.length; i++) {
-    if (array[i].id === id) {
-      return array[i].label
+    if (ids.includes(array[i].id)) {
+      result.push(array[i].label)
     } else if (array[i].children && array[i].children.length > 0) {
-      let value = getGroupNameByIdRecursion(array[i].children, id)
-      if (value) {
-        return value
-      }
+      getLabelNameByIdRecursion(array[i].children, ids, result)
     }
   }
 }
@@ -549,8 +550,8 @@ onMounted(() => {
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.name')" min-width="180px" prop="name"></el-table-column>
-          <el-table-column :label="t('password.address')" min-width="250px" prop="address">
+          <el-table-column :label="t('password.name')" min-width="140px" prop="name"></el-table-column>
+          <el-table-column :label="t('password.address')" min-width="200px" prop="address">
             <template #default="scope">
               <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
                 {{ scope.row.address }}
@@ -560,8 +561,8 @@ onMounted(() => {
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.userName')" min-width="170px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="230px">
+          <el-table-column :label="t('password.userName')" min-width="120px" prop="userName"></el-table-column>
+          <el-table-column :label="t('password.password')" min-width="180px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
@@ -578,12 +579,14 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column :label="t('index.table.group')" min-width="100px">
+          <el-table-column :label="t('index.table.label')" min-width="130px">
             <template #default="scope">
-              {{ getGroupNameById(scope.row.group) }}
+              <el-tag style="margin: 3px" v-for="label in getLabelNameById(scope.row.label)" :key="label">
+                {{label}}
+              </el-tag>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.remark')" min-width="150px" prop="remark"></el-table-column>
+          <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
           <el-table-column min-width="140px" :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->
@@ -613,13 +616,13 @@ onMounted(() => {
       </el-card>
     </el-col>
     <el-col :xl="{span:4}" :lg="{span:5}" :md="{span:5}" class="hidden-sm-and-down" style="padding-left: 15px">
-      <GroupTree @groupCheckChange="groupCheckChange" @groupTreeChange="groupTreeChange"></GroupTree>
+      <LabelTree @labelCheckChange="labelCheckChange" @labelTreeChange="labelTreeChange"></LabelTree>
     </el-col>
 
   </el-row>
 
   <!--  密码表单-->
-  <PasswordForm ref="passwordFormRef" :groupTree="groupTree" @addPassword="addPassword"
+  <PasswordForm ref="passwordFormRef" :labelTree="labelTree" @addPassword="addPassword"
                 @updatePassword="updatePassword"></PasswordForm>
 
   <!--  验证主密码-->

@@ -6,7 +6,7 @@ import {copyText, getSystemConfig, randomText} from "@/utils/global.js";
 import moment from "moment";
 
 defineProps({
-  groupTree: Array,
+  labelTree: Array,
 })
 
 // 声明此组件可能调用的事件
@@ -40,7 +40,7 @@ const defaultPassword = () => {
     userName: '',
     password: '',
     remark: '',
-    group: '',
+    label: '',
     insertTime: '',
     updateTime: ''
   }
@@ -233,14 +233,15 @@ defineExpose({
           </el-row>
         </el-card>
       </el-form-item>
-      <el-form-item :label="t('password.group')">
+      <el-form-item :label="t('password.label')">
         <el-tree-select
-            v-model="passwordForm.group"
+            v-model="passwordForm.label"
             value-key="id"
-            :data="groupTree"
+            :data="labelTree"
             check-strictly
+            multiple
             default-expand-all
-            :placeholder="t('password.group.placeholder')"
+            :placeholder="t('password.label.placeholder')"
             filterable
         />
       </el-form-item>
