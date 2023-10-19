@@ -430,19 +430,21 @@ onMounted(() => {
         <template #header>
           <div style="display: flex;justify-content: space-between;">
             <div>
-              <el-text v-if="passwordArray" class="password-table-title hidden-xs-only">
-                {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
-              </el-text>
-              <br>
-              <div>
-                <el-text class="password-table-strength">{{ t('index.title.strength') }}（
-                  <el-text type="success">{{ t('index.title.strength.strong') }}</el-text>
-                  : {{ getPasswordStrengthCount(3) }}
-                  <el-text style="margin-left: 5px" type="warning">{{ t('index.title.strength.medium') }}</el-text>
-                  : {{ getPasswordStrengthCount(2) }}
-                  <el-text style="margin-left: 5px" type="danger">{{ t('index.title.strength.weak') }}</el-text>
-                  : {{ getPasswordStrengthCount(1) }}）
+              <div class="hidden-xs-only">
+                <el-text v-if="passwordArray" class="password-table-title">
+                  {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
                 </el-text>
+                <br>
+                <div >
+                  <el-text class="password-table-strength">{{ t('index.title.strength') }}（
+                    <el-text type="success">{{ t('index.title.strength.strong') }}</el-text>
+                    : {{ getPasswordStrengthCount(3) }}
+                    <el-text style="margin-left: 5px" type="warning">{{ t('index.title.strength.medium') }}</el-text>
+                    : {{ getPasswordStrengthCount(2) }}
+                    <el-text style="margin-left: 5px" type="danger">{{ t('index.title.strength.weak') }}</el-text>
+                    : {{ getPasswordStrengthCount(1) }}）
+                  </el-text>
+                </div>
               </div>
             </div>
             <div style="display: flex;justify-content: end" class="password-title-right">
