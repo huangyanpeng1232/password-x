@@ -564,11 +564,11 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.userName')" min-width="120px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="180px">
+          <el-table-column :label="t('password.password')" min-width="200px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
-                    <template v-if="!scope.row.show">••••••••••</template>
+                    <template v-if="!scope.row.show">•••••••</template>
                     <template v-if="scope.row.show">{{ scope.row.password }}</template>
                   </span>
                 <div class="pass-action-div">
