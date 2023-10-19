@@ -43,7 +43,7 @@ bucket: password-x-demo
 - 将password-x静态页面部署在自己的Gitee pages、私有服务器或是本地电脑上
 
 ### 部署方式
-&emsp;&emsp;password-x 不仅支持静态页面部署，如 Gitee Pages、Github Pages 和 Nginx 服务，还可以直接部署到阿里 OSS、腾讯 Cos 等平台。此外，您还可以选择将项目编译后的文件下载到本地，实现独立部署，无需依赖任何第三方服务，随时为您提供最可靠的服务。
+&emsp;&emsp;password-x 支持静态页面部署，如 Gitee Pages、Github Pages 和 Nginx 服务，也可以直接部署到阿里 OSS、腾讯 Cos 等平台。此外，您还可以选择将项目编译后的文件下载到本地直接使用，无需依赖任何第三方服务，随时为您提供最可靠的服务。
 
 ### 页面展示
 首页
