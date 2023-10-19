@@ -19,6 +19,10 @@ export default {
     'index.table.delete.success': 'delete success',
     'index.mainPassword.changeSuccess': 'setting success',
     'index.table.lock': 'Locked',
+    'index.title.strength': 'password strength',
+    'index.title.strength.strong': 'Strong',
+    'index.title.strength.medium': 'medium',
+    'index.title.strength.weak': 'weak',
     'login.form.title': 'Ali cloud oss config',
     'login.form.region.verify': 'please input region',
     'login.form.accessKeyId.verify': 'please input accessKeyId',
@@ -67,6 +71,10 @@ export default {
     'systemSetting.updateMainPassword': 'update main password',
     'systemSetting.passwordRuleVerify': 'You must select a password character type',
     'systemSetting.darkMode': 'dark mode',
+    'systemSetting.sort': 'sort by',
+    'systemSetting.sort.insertTimeAsc': 'insert time asc',
+    'systemSetting.sort.insertTimeDesc': 'insert time desc',
+    'systemSetting.sort.name': 'name',
     'passwordForm.autoGeneratePassword': 'automatically generated a password',
     'index.title.unlock': 'unlock',
     'index.title.lock': 'lock',
@@ -80,4 +88,5 @@ export default {
     'groupTree.search.placeholder': 'Search',
     'groupTree.tree.add': 'add',
     'groupTree.tree.remove': 'delete',
+
 }

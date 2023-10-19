@@ -221,6 +221,105 @@ const showUpdateMainPassword = () => {
   mainPasswordSettingRef.value.showUpdateMainPassword(verifyValue.value)
 }
 
+// 排序规则改变
+const sortChange = (sort) => {
+  console.log(sort)
+  if (sort === 'insertTimeDesc') {
+    sortPasswordArray('insertTime', -1)
+  } else if (sort === 'insertTimeAsc') {
+    sortPasswordArray('insertTime', 1)
+  } else if (sort === 'name') {
+    sortPasswordArray('name', 1)
+  }
+  // 同步数据
+  syncPasswordToOSS()
+  // 显示排序结果
+  loadShowPassword()
+}
+
+// 获取密码强度
+const getPasswordStrength = (password) => {
+  let lvl = 0
+  // 数字
+  if (/[0-9]/.test(password)) {
+    lvl++;
+  }
+  // 小写字母
+  if (/[a-z]/.test(password)) {
+    lvl++;
+  }
+  // 大写字母
+  if (/[A-Z]/.test(password)) {
+    lvl++;
+  }
+  // 特殊符号
+  if (/[^0-9a-zA-Z_]/.test(password)) {
+    lvl++;
+  }
+
+  // 长度小于6位
+  if (password.length < 6) {
+    if (lvl > 2) {
+      lvl = 2;
+    }
+  }
+
+  // 密码重复使用
+  let useCount = getPasswordUseCount();
+  if (useCount > 2) {
+    if (lvl > 2) {
+      lvl = 2;
+    }
+  }
+
+  // 最高3分
+  if (lvl > 3) {
+    return 3
+  } else {
+    return lvl;
+  }
+}
+
+// 获取密码使用次数
+const getPasswordUseCount = (password) => {
+  let count = 0
+  for (let i = 0; i < passwordArray.value.length; i++) {
+    if (passwordArray.value[i].password === password) {
+      count++;
+    }
+  }
+  return count;
+}
+
+const getPasswordStrengthCount = (strength) => {
+  let count = 0;
+  for (let i = 0; i < passwordArray.value.length; i++) {
+    if (!passwordArray.value[i].password) {
+      continue
+    }
+    let passwordStreng = getPasswordStrength(passwordArray.value[i].password)
+    if (strength === passwordStreng) {
+      count++
+    }
+  }
+  return count;
+}
+
+// 密码排序
+const sortPasswordArray = (attr, rev) => {
+  passwordArray.value.sort((a, b) => {
+    a = a[attr];
+    b = b[attr];
+    if (a < b) {
+      return rev * -1
+    }
+    if (a > b) {
+      return rev * 1
+    }
+    return 0;
+  })
+}
+
 // 同步密码列表到oss
 const syncPasswordToOSS = () => {
   if (!passwordSyncStatus.value) {
@@ -333,6 +432,17 @@ onMounted(() => {
               <el-text v-if="passwordArray" class="password-table-title hidden-xs-only">
                 {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
               </el-text>
+              <br>
+              <div>
+                <el-text class="password-table-strength">{{ t('index.title.strength') }}（
+                  <el-text type="success">{{ t('index.title.strength.strong') }}</el-text>
+                  : {{ getPasswordStrengthCount(3) }}
+                  <el-text style="margin-left: 5px" type="warning">{{ t('index.title.strength.medium') }}</el-text>
+                  : {{ getPasswordStrengthCount(2) }}
+                  <el-text style="margin-left: 5px" type="danger">{{ t('index.title.strength.weak') }}</el-text>
+                  : {{ getPasswordStrengthCount(1) }}）
+                </el-text>
+              </div>
             </div>
             <div style="display: flex;justify-content: end" class="password-title-right">
               <div>
@@ -411,6 +521,34 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
+          <el-table-column width="30px">
+            <template #default="scope">
+              <el-tooltip v-if="getPasswordStrength(scope.row.password) === 3">
+                <template #content>
+                  {{ t('index.title.strength') + '：' + t('index.title.strength.strong') }}
+                </template>
+                <div class="password-strength"
+                     style="background-color: #67C23A"
+                ></div>
+              </el-tooltip>
+              <el-tooltip v-if="getPasswordStrength(scope.row.password) === 2">
+                <template #content>
+                  {{ t('index.title.strength') + '：' + t('index.title.strength.medium') }}
+                </template>
+                <div class="password-strength"
+                     style="background-color: #E6A23C"
+                ></div>
+              </el-tooltip>
+              <el-tooltip v-if="getPasswordStrength(scope.row.password) === 1">
+                <template #content>
+                  {{ t('index.title.strength') + '：' + t('index.title.strength.weak') }}
+                </template>
+                <div class="password-strength"
+                     style="background-color: #F56C6C"
+                ></div>
+              </el-tooltip>
+            </template>
+          </el-table-column>
           <el-table-column :label="t('password.name')" min-width="180px" prop="name"></el-table-column>
           <el-table-column :label="t('password.address')" min-width="250px" prop="address">
             <template #default="scope">
@@ -491,8 +629,12 @@ onMounted(() => {
   <MainPasswordSetting ref="mainPasswordSettingRef" @mainPasswordChange="mainPasswordChange"></MainPasswordSetting>
 
   <!--  系统设置-->
-  <SystemSetting ref="systemSettingRef" @deleteAccount="showDeleteAccount"
-                 @updateMainPassword="showUpdateMainPassword"></SystemSetting>
+  <SystemSetting
+      ref="systemSettingRef"
+      @deleteAccount="showDeleteAccount"
+      @updateMainPassword="showUpdateMainPassword"
+      @sortChange="sortChange"
+  ></SystemSetting>
 
   <!--  注销账户-->
   <DeleteAccount ref="deleteAccountRef" @affirmDeleteAccount="affirmDeleteAccount"></DeleteAccount>
@@ -533,9 +675,21 @@ onMounted(() => {
   cursor: default;
 }
 
+.password-table-strength {
+  padding-left: 5px;
+  font-size: 85%;
+  color: #888;
+  cursor: default;
+}
+
 .password-title-right > div {
   padding: 0 4px;
 }
 
+.password-strength {
+  height: 13px;
+  width: 13px;
+  border-radius: 50%;
+}
 
 </style>

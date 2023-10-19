@@ -15,18 +15,20 @@ const router = useRouter()
 const {t, locale} = useI18n()
 
 // 声明此组件可能调用的事件
-const emit = defineEmits(['updateMainPassword', 'deleteAccount'])
+const emit = defineEmits(['updateMainPassword', 'deleteAccount','sortChange'])
 
 // 弹框显示控制
 const alertVisStatus = reactive({
   setting: false
 })
+
 // 系统设置表单
 const settingForm = reactive({
   language: 'zh-cn',
   cacheMainPassword: true,
   autoGeneratePassword: true,
   darkMode: false,
+  sortRule: 'insertTimeDesc',
   defaultPasswordRule: {
     length: 16,
     number: true,
@@ -40,6 +42,13 @@ const settingForm = reactive({
 const languages = reactive([
   {key: 'zh-cn', label: '简体中文',},
   {key: 'en-us', label: 'English',}
+])
+
+// 排序规则列表
+const sorts = reactive([
+  {key: 'insertTimeDesc', label: t('systemSetting.sort.insertTimeDesc')},
+  {key: 'insertTimeAsc', label: t('systemSetting.sort.insertTimeAsc')},
+  {key: 'name', label: t('systemSetting.sort.name')},
 ])
 
 // 打开系统设置
@@ -68,6 +77,7 @@ const saveSetting = () => {
 
   // 更新系统配置
   updateConfig(settingForm)
+
   // 若设置不缓存主密码则立即删除缓存中的主密码
   if (settingForm.cacheMainPassword === false) {
     localStorage.removeItem('mainPasswordCiphertext')
@@ -76,6 +86,8 @@ const saveSetting = () => {
   locale.value = settingForm.language;
   // 暗黑模式
   darkMode.value = settingForm.darkMode
+  // 排序规则改变
+  emit('sortChange',settingForm.sortRule)
   // 关闭密码弹框
   alertVisStatus.setting = false
 }
@@ -136,6 +148,16 @@ defineExpose({
               :key="language.key"
               :label="language.label"
               :value="language.key"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="t('systemSetting.sort')">
+        <el-select v-model="settingForm.sortRule">
+          <el-option
+              v-for="sort in sorts"
+              :key="sort.key"
+              :label="sort.label"
+              :value="sort.key"
           />
         </el-select>
       </el-form-item>
