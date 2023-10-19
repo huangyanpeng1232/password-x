@@ -75,6 +75,7 @@ export default  {
     'systemSetting.sort.insertTimeAsc': '添加时间正序',
     'systemSetting.sort.insertTimeDesc': '添加时间倒叙',
     'systemSetting.sort.name': '名称',
+    'systemSetting.showPasswordStrength': '显示密码强度',
     'passwordForm.autoGeneratePassword': '自动生成密码',
     'index.title.unlock': '解锁',
     'index.title.lock': '锁定',

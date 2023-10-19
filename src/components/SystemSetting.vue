@@ -15,7 +15,7 @@ const router = useRouter()
 const {t, locale} = useI18n()
 
 // 声明此组件可能调用的事件
-const emit = defineEmits(['updateMainPassword', 'deleteAccount','sortChange'])
+const emit = defineEmits(['updateMainPassword', 'deleteAccount', 'sortChange', 'passwordStrengthChange'])
 
 // 弹框显示控制
 const alertVisStatus = reactive({
@@ -29,6 +29,7 @@ const settingForm = reactive({
   autoGeneratePassword: true,
   darkMode: false,
   sortRule: 'insertTimeDesc',
+  showPasswordStrength: false,
   defaultPasswordRule: {
     length: 16,
     number: true,
@@ -51,6 +52,8 @@ const sorts = reactive([
   {key: 'name', label: t('systemSetting.sort.name')},
 ])
 
+let oldSystemSetting = null;
+
 // 打开系统设置
 const openSystemSetting = () => {
   // 读取系统配置
@@ -60,14 +63,22 @@ const openSystemSetting = () => {
       settingForm[key] = config[key]
     }
   }
+
   // 设置界面语言
-  settingForm.language = locale.value;
+  if (settingForm.language !== locale.value) {
+    settingForm.language = locale.value;
+  }
+
+  // 保存现有配置
+  oldSystemSetting = JSON.stringify(settingForm)
+
   // 显示设置弹框
   alertVisStatus.setting = true
 }
 
 // 保存设置
 const saveSetting = () => {
+
   let generateForm = settingForm.defaultPasswordRule;
   // 密码规则校验
   if (!generateForm.number && !generateForm.symbol && !generateForm.lowercase && !generateForm.uppercase) {
@@ -78,16 +89,39 @@ const saveSetting = () => {
   // 更新系统配置
   updateConfig(settingForm)
 
+
   // 若设置不缓存主密码则立即删除缓存中的主密码
   if (settingForm.cacheMainPassword === false) {
     localStorage.removeItem('mainPasswordCiphertext')
   }
+
+  // 原有配置
+  let oldSetting = JSON.parse(oldSystemSetting)
+
   // 设置系统语言
-  locale.value = settingForm.language;
+  if (settingForm.language !== locale.value) {
+    locale.value = settingForm.language;
+    console.log('系统语言设置为：', settingForm.language)
+  }
+
   // 暗黑模式
-  darkMode.value = settingForm.darkMode
+  if (darkMode.value !== settingForm.darkMode) {
+    darkMode.value = settingForm.darkMode
+    console.log('暗黑模式设置为：', settingForm.darkMode)
+  }
+
   // 排序规则改变
-  emit('sortChange',settingForm.sortRule)
+  if (settingForm.sortRule !== oldSetting.sortRule) {
+    emit('sortChange', settingForm.sortRule);
+    console.log('排序规则设置为：', settingForm.sortRule)
+  }
+
+  // 是否显示密码强度改变
+  if (settingForm.showPasswordStrength !== oldSetting.showPasswordStrength) {
+    emit('passwordStrengthChange', settingForm.showPasswordStrength)
+    console.log('是否显示密码强度设置为：', settingForm.showPasswordStrength)
+  }
+
   // 关闭密码弹框
   alertVisStatus.setting = false
 }
@@ -168,7 +202,10 @@ defineExpose({
         <el-switch v-model="settingForm.darkMode"/>
       </el-form-item>
       <el-form-item :label="t('passwordForm.autoGeneratePassword')">
-        <el-switch v-model="settingForm.autoGeneratePassword" clearable/>
+        <el-switch v-model="settingForm.autoGeneratePassword"/>
+      </el-form-item>
+      <el-form-item :label="t('systemSetting.showPasswordStrength')">
+        <el-switch v-model="settingForm.showPasswordStrength"/>
       </el-form-item>
       <el-form-item :label="t('systemSetting.defaultPasswordRule')">
         <el-row style="margin-top: 15px">

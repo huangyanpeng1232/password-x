@@ -75,6 +75,7 @@ export default {
     'systemSetting.sort.insertTimeAsc': 'insert time asc',
     'systemSetting.sort.insertTimeDesc': 'insert time desc',
     'systemSetting.sort.name': 'name',
+    'systemSetting.showPasswordStrength': 'show password strength',
     'passwordForm.autoGeneratePassword': 'automatically generated a password',
     'index.title.unlock': 'unlock',
     'index.title.lock': 'lock',

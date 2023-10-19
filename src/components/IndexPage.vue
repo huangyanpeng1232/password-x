@@ -20,6 +20,8 @@ const mainPasswordSettingRef = ref()
 const systemSettingRef = ref()
 // 注销账户组件对象
 const deleteAccountRef = ref()
+// 显示密码强度
+const showPasswordStrength = ref(false)
 
 // 搜索文本内容
 const searchText = ref('')
@@ -224,8 +226,13 @@ const showUpdateMainPassword = () => {
 }
 
 // 排序规则改变
+const passwordStrengthChange = (show) => {
+  showPasswordStrength.value = show
+}
+
+// 排序规则改变
 const sortChange = (sort) => {
-  console.log(sort)
+
   if (sort === 'insertTimeDesc') {
     sortPasswordArray('insertTime', -1)
   } else if (sort === 'insertTimeAsc') {
@@ -418,6 +425,12 @@ onMounted(() => {
     locale.value = language
   }
 
+  // 设置是否显示密码强度
+  let passwordStrength = getSystemConfig('showPasswordStrength')
+  if (passwordStrength) {
+    showPasswordStrength.value = passwordStrength
+  }
+
   // 从oss加载密码文件
   loadPasswordByOSS();
 })
@@ -435,7 +448,7 @@ onMounted(() => {
                   {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
                 </el-text>
                 <br>
-                <div >
+                <div v-if="showPasswordStrength">
                   <el-text class="password-table-strength">{{ t('index.title.strength') }}（
                     <el-text type="success">{{ t('index.title.strength.strong') }}</el-text>
                     : {{ getPasswordStrengthCount(3) }}
@@ -524,7 +537,7 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
-          <el-table-column width="30px">
+          <el-table-column width="30px" v-if="showPasswordStrength">
             <template #default="scope">
               <el-tooltip v-if="getPasswordStrength(scope.row.password) === 3">
                 <template #content>
@@ -639,6 +652,7 @@ onMounted(() => {
       @deleteAccount="showDeleteAccount"
       @updateMainPassword="showUpdateMainPassword"
       @sortChange="sortChange"
+      @passwordStrengthChange="passwordStrengthChange"
   ></SystemSetting>
 
   <!--  注销账户-->
