@@ -4,6 +4,7 @@ import {useI18n} from "vue-i18n";
 import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
 import {ElMessage} from "element-plus";
 import {getSystemConfig} from "@/utils/global.js";
+import store from "@/store/index.js";
 
 const {t} = useI18n()
 // 声明此组件可能调用的事件
@@ -11,8 +12,6 @@ const emit = defineEmits(['verifyPass'])
 
 // 主密码
 const mainPassword = ref('')
-// 验证主密码是否正确的密文
-const ciphertext = ref('')
 // 弹框显示控制
 const alertVisStatus = reactive({
   verifyMainPassword: false
@@ -21,7 +20,7 @@ const alertVisStatus = reactive({
 // 保存主密码
 const saveMainPassword = () => {
   // 验证主密码是否正确
-  let value = decrypt(mainPassword.value, ciphertext.value)
+  let value = decrypt(mainPassword.value, store.state.verifyCode)
   if (value && value === 'password-x') {
     // 触发验证通过事件
     emit('verifyPass', mainPassword.value)
@@ -81,11 +80,7 @@ const getLocalMainPassword = () => {
 }
 
 // 验证主密码
-const verifyMainPassword = (text) => {
-
-  // 验证主密码是否正确的密文
-  ciphertext.value = text
-
+const verifyMainPassword = () => {
   // 获取本地缓存中的主密码
   let localMainPassword = getLocalMainPassword();
 
@@ -95,7 +90,7 @@ const verifyMainPassword = (text) => {
     return
   }
   // 验证缓存中的主密码是否正确
-  let value = decrypt(localMainPassword, text)
+  let value = decrypt(localMainPassword, store.state.verifyCode)
   if (value && value === 'password-x') {
     // 触发验证通过事件
     emit('verifyPass', localMainPassword)

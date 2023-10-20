@@ -4,6 +4,7 @@ import {ElMessage} from 'element-plus'
 import {useI18n} from "vue-i18n";
 import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
 import {getSystemConfig} from "@/utils/global.js";
+import store from "@/store/index.js";
 
 const {t} = useI18n()
 
@@ -16,8 +17,6 @@ const oldMainPassword = ref('')
 const mainPassword = ref('')
 // 确认主密码
 const affirmMainPassword = ref('')
-// 验证主密码是否正确的密文
-const ciphertext = ref('')
 // 弹框显示控制
 const alertVisStatus = reactive({
   mainPassword: false
@@ -31,7 +30,7 @@ const saveMainPassword = () => {
   // 修改主密码验证原密码是否正确
   if(alertMode.value === 'update'){
     // 验证主密码
-    let value = decrypt(oldMainPassword.value, ciphertext.value)
+    let value = decrypt(oldMainPassword.value, store.state.verifyCode)
     if (!value || value !== 'password-x') {
       ElMessage.error(t('mainPasswordSetting.form.mainPasswordError'))
       return
@@ -71,8 +70,7 @@ const initMainPassword = () => {
 }
 
 // 修改主密码
-const showUpdateMainPassword = (text) => {
-  ciphertext.value = text
+const showUpdateMainPassword = () => {
   alertMode.value = 'update'
   alertVisStatus.mainPassword = true
 }

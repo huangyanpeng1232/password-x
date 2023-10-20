@@ -2,11 +2,11 @@
 <script setup>
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
-import {copyText, getSystemConfig, isUrl} from "@/utils/global.js";
+import {copyText, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/utils/oss.js";
 import {ElMessage, ElNotification} from "element-plus";
 import {decrypt, encrypt} from "@/utils/security.js";
-
+import store from "@/store/index.js";
 
 const {t, locale} = useI18n()
 
@@ -18,11 +18,9 @@ const mainPasswordVerifyRef = ref()
 const mainPasswordSettingRef = ref()
 // 系统设置组件对象
 const systemSettingRef = ref()
-// 注销账户组件对象
-const deleteAccountRef = ref()
-// 显示密码强度
-const showPasswordStrength = ref(false)
 
+// 系统配置
+const systemConfig = reactive({})
 // 搜索文本内容
 const searchText = ref('')
 // 主密码
@@ -31,26 +29,14 @@ const mainPassword = ref('')
 const passwordSyncStatus = ref(false)
 // 密码列表未解密的密文
 const passwordCiphertext = ref('')
-// 主密码正确性验证参数
-const verifyValue = ref('')
-// 页面显示的密码列表
-const showPasswordArray = ref([])
 // 全部的密码列表
 const passwordArray = ref([])
+// 页面显示的密码列表
+const showPasswordArray = ref([])
 // 选中的标签
 const labelCheckNodes = ref([])
-// 标签数据
+// 标签树数据
 const labelTree = ref([])
-
-let delaySearch = null;
-
-// 搜索录入事件
-const searchKeyup = () => {
-  if(delaySearch){
-    clearTimeout(delaySearch)
-  }
-  delaySearch = setTimeout(loadShowPassword, 300)
-}
 
 // 搜索（根据搜索字符串显示符合条件的密码）
 const loadShowPassword = async () => {
@@ -69,19 +55,17 @@ const loadShowPassword = async () => {
     let remark = passwordArray.value[i].remark || ''
     let password = passwordArray.value[i].password || ''
 
-    let searchVis = !searchText.value
 
-    if (searchText.value) {
-      searchVis = name.includes(searchText.value)
-          || userName.includes(searchText.value)
-          || address.includes(searchText.value)
-          || remark.includes(searchText.value)
-          || password.includes(searchText.value)
-    }
+    let searchVis = !searchText.value || (name.includes(searchText.value)
+        || userName.includes(searchText.value)
+        || address.includes(searchText.value)
+        || remark.includes(searchText.value)
+        || password.includes(searchText.value))
 
-    let labelCheckVis = labelCheckNodes.value.length === 0;
+
+    let labelCheckVis = false;
+
     if (labelCheckNodes.value.length > 0) {
-
       for (let j = 0; j < labelCheckNodes.value.length; j++) {
         let checkedNode = labelCheckNodes.value[j];
 
@@ -89,6 +73,8 @@ const loadShowPassword = async () => {
           labelCheckVis = true
         }
       }
+    } else {
+      labelCheckVis = true
     }
 
     if (searchVis && labelCheckVis) {
@@ -151,7 +137,7 @@ const lockMainPassword = () => {
 
 // 解锁密码（通过输入主密码解密密码字符串并显示到密码列表）
 const unlockMainPassword = () => {
-  mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
+  mainPasswordVerifyRef.value.verifyMainPassword()
 }
 
 // 分享密码（按照一定格式将密码拼接并复制到剪切板）
@@ -179,16 +165,15 @@ const deletePassword = (password) => {
   for (let i = 0; i < passwordArray.value.length; i++) {
     if (passwordArray.value[i].id === password.id) {
       passwordArray.value.splice(i, 1)
+      // 同步密码列表到oss
+      syncPasswordToOSS()
+      // 重新刷新搜索结果
+      loadShowPassword()
+      // 删除成功提示
+      ElMessage.success(t('index.table.delete.success'))
       break
     }
   }
-
-  // 同步密码列表到oss
-  syncPasswordToOSS()
-  // 重新刷新搜索结果
-  loadShowPassword()
-  // 删除成功提示
-  ElMessage.success(t('index.table.delete.success'))
 }
 
 // 主密码加载成功事件
@@ -222,17 +207,19 @@ const openSystemSetting = () => {
 
 // 修改主密码
 const showUpdateMainPassword = () => {
-  mainPasswordSettingRef.value.showUpdateMainPassword(verifyValue.value)
+  mainPasswordSettingRef.value.showUpdateMainPassword()
+}
+
+// 系统配置改变
+const systemChangeChange = (key, value) => {
+  systemConfig[key] = value
+  if (key === 'sortChange') {
+    passwordSort(value)
+  }
 }
 
 // 排序规则改变
-const passwordStrengthChange = (show) => {
-  showPasswordStrength.value = show
-}
-
-// 排序规则改变
-const sortChange = (sort) => {
-
+const passwordSort = (sort) => {
   if (sort === 'insertTimeDesc') {
     sortPasswordArray('insertTime', -1)
   } else if (sort === 'insertTimeAsc') {
@@ -300,6 +287,7 @@ const getPasswordUseCount = (password) => {
   return count;
 }
 
+// 获取指定强度的密码数量
 const getPasswordStrengthCount = (strength) => {
   let count = 0;
   for (let i = 0; i < passwordArray.value.length; i++) {
@@ -338,10 +326,11 @@ const syncPasswordToOSS = () => {
   // 使用主密码加密密码列表
   passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
   // 使用主密码加密密码验证字符
-  verifyValue.value = encrypt(mainPassword.value, 'password-x')
+  let verifyCode = encrypt(mainPassword.value, 'password-x')
+  store.commit('setVerifyCode', verifyCode)
   // 上传文件
   putFile('password.json', {
-    verifyValue: verifyValue.value,
+    verifyValue: verifyCode,
     passwordCiphertext: passwordCiphertext.value
   })
 }
@@ -351,11 +340,12 @@ const loadPasswordByOSS = () => {
   getFile('password.json').then(res => {
     if (res.verifyValue) {
       // 设置验证字符串
-      verifyValue.value = res.verifyValue;
+      let verifyCode = res.verifyValue;
+      store.commit('setVerifyCode', verifyCode)
       // 密码列表密文
       passwordCiphertext.value = res.passwordCiphertext
       // 验证主密码（主密码验证通过后会将密文解密并更新到密码列表）
-      mainPasswordVerifyRef.value.verifyMainPassword(verifyValue.value)
+      mainPasswordVerifyRef.value.verifyMainPassword()
     } else {
       // 设置同步状态为可同步
       passwordSyncStatus.value = true
@@ -363,25 +353,9 @@ const loadPasswordByOSS = () => {
       mainPasswordSettingRef.value.initMainPassword()
     }
   }).catch(e => {
-    ElNotification.error(e.code)
+    console.error(e)
+    ElNotification.error('error-1000：' + e)
   })
-}
-
-// 注销账户事件
-const affirmDeleteAccount = () => {
-  // 清除加密的密码列表
-  passwordCiphertext.value = null
-  // 设置同步状态为不可同步
-  passwordSyncStatus.value = false
-  // 提示注销成功
-  ElNotification.success(t('systemSetting.deleteAccount.success'));
-  // 退出登录
-  systemSettingRef.value.logout()
-}
-
-// 注销账户
-const showDeleteAccount = () => {
-  deleteAccountRef.value.showDeleteAccount(verifyValue.value)
 }
 
 // 标签选中
@@ -419,16 +393,13 @@ const getLabelNameByIdRecursion = (array, ids, result) => {
 // 页面加载完成后事件
 onMounted(() => {
 
-  // 设置系统语言
-  let language = getSystemConfig('language')
-  if (language) {
-    locale.value = language
+  let config = loadConfig();
+  for (let key in config) {
+    systemConfig[key] = config[key]
   }
 
-  // 设置是否显示密码强度
-  let passwordStrength = getSystemConfig('showPasswordStrength')
-  if (passwordStrength) {
-    showPasswordStrength.value = passwordStrength
+  if (systemConfig.language && systemConfig.language !== locale.value) {
+    locale.value = systemConfig.language;
   }
 
   // 从oss加载密码文件
@@ -448,7 +419,7 @@ onMounted(() => {
                   {{ passwordArray.length }} {{ t('index.title.passwordCount') }}
                 </el-text>
                 <br>
-                <div v-if="showPasswordStrength">
+                <div v-if="systemConfig.showPasswordStrength">
                   <el-text class="password-table-strength">{{ t('index.title.strength') }}（
                     <el-text type="success">{{ t('index.title.strength.strong') }}</el-text>
                     : {{ getPasswordStrengthCount(3) }}
@@ -469,7 +440,6 @@ onMounted(() => {
                     :prefix-icon="Search"
                     :disabled="!mainPassword"
                     @keyup.enter="loadShowPassword"
-                    @keyup="searchKeyup"
                 />
               </div>
               <!--          添加密码-->
@@ -537,7 +507,7 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
-          <el-table-column width="30px" v-if="showPasswordStrength">
+          <el-table-column v-if="systemConfig.showPasswordStrength" width="30px">
             <template #default="scope">
               <el-tooltip v-if="getPasswordStrength(scope.row.password) === 3">
                 <template #content>
@@ -649,14 +619,10 @@ onMounted(() => {
   <!--  系统设置-->
   <SystemSetting
       ref="systemSettingRef"
-      @deleteAccount="showDeleteAccount"
       @updateMainPassword="showUpdateMainPassword"
-      @sortChange="sortChange"
-      @passwordStrengthChange="passwordStrengthChange"
+      @systemChangeChange="systemChangeChange"
   ></SystemSetting>
 
-  <!--  注销账户-->
-  <DeleteAccount ref="deleteAccountRef" @affirmDeleteAccount="affirmDeleteAccount"></DeleteAccount>
 </template>
 
 <style scoped>

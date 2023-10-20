@@ -4,11 +4,12 @@ import {useI18n} from "vue-i18n";
 import {decrypt} from "@/utils/security.js";
 import {ElMessage} from "element-plus";
 import {delFile} from "@/utils/oss.js";
+import store from "@/store/index.js";
+
+const {t} = useI18n()
 
 // 声明此组件可能调用的事件
 const emit = defineEmits(['deleteAccount'])
-
-const {t} = useI18n()
 
 // 弹框显示控制
 const alertVisStatus = reactive({
@@ -17,34 +18,30 @@ const alertVisStatus = reactive({
 
 // 主密码
 const mainPassword = ref('')
-// 密码验证字符串
-const ciphertext = ref('')
 
 // 确认注销账号
 const affirmDeleteAccount = () => {
   // 验证主密码
-  let value = decrypt(mainPassword.value, ciphertext.value)
+  let value = decrypt(mainPassword.value, store.state.verifyCode)
   if (value && value === 'password-x') {
     // 删除密码文件
     delFile('password.json')
     // 删除分组文件
     delFile('groupTree.json')
-    // 删除oss登录信息
-    localStorage.removeItem('ossForm')
-    // 删除主密码缓存
-    localStorage.removeItem('mainPasswordCiphertext')
+
     // 删除系统配置
     localStorage.removeItem('systemConfig')
-    // 触发注销事件
-    emit('affirmDeleteAccount')
+    // 提示注销成功
+    ElMessage.success(t('systemSetting.deleteAccount.success'));
+    // 退出登录
+    emit('deleteAccount')
   } else {
     ElMessage.error(t('systemSetting.deleteAccount.mainPasswordError'))
   }
 }
 
 // 注销账号
-const showDeleteAccount = (text) => {
-  ciphertext.value = text
+const showDeleteAccount = () => {
   alertVisStatus.deleteAccount = true
 }
 

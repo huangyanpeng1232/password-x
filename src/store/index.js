@@ -1,10 +1,13 @@
 import {createStore} from 'vuex'
 import {login as loginOSS} from "@/utils/oss";
 import {decrypt, getBowerId} from "@/utils/security";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 export default createStore({
     state: {
-        oss: null
+        oss: null,
+        verifyCode: null,
     },
     mutations: {
         setOss(state, oss) {
@@ -12,6 +15,12 @@ export default createStore({
         },
         delOss(state) {
             state.oss = null
+        },
+        setVerifyCode(state, code) {
+            state.verifyCode = code
+        },
+        delVerifyCode(state) {
+            state.verifyCode = null
         }
     },
     actions: {

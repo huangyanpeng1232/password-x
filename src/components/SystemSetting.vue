@@ -14,8 +14,11 @@ const router = useRouter()
 
 const {t, locale} = useI18n()
 
+// 注销账户组件对象
+const deleteAccountRef = ref()
+
 // 声明此组件可能调用的事件
-const emit = defineEmits(['updateMainPassword', 'deleteAccount', 'sortChange', 'passwordStrengthChange'])
+const emit = defineEmits(['updateMainPassword', 'deleteAccount', 'systemChangeChange'])
 
 // 弹框显示控制
 const alertVisStatus = reactive({
@@ -112,13 +115,13 @@ const saveSetting = () => {
 
   // 排序规则改变
   if (settingForm.sortRule !== oldSetting.sortRule) {
-    emit('sortChange', settingForm.sortRule);
+    emit('systemChangeChange', 'sortChange', settingForm.sortRule)
     console.log('排序规则设置为：', settingForm.sortRule)
   }
 
   // 是否显示密码强度改变
   if (settingForm.showPasswordStrength !== oldSetting.showPasswordStrength) {
-    emit('passwordStrengthChange', settingForm.showPasswordStrength)
+    emit('systemChangeChange', 'showPasswordStrength', settingForm.showPasswordStrength)
     console.log('是否显示密码强度设置为：', settingForm.showPasswordStrength)
   }
 
@@ -165,14 +168,14 @@ const showDeleteAccount = () => {
     return
   }
   alertVisStatus.setting = false
-  emit('deleteAccount')
+
+  deleteAccountRef.value.showDeleteAccount()
 }
 
 // 导出的方法
 defineExpose({
   openSystemSetting,
-  showUpdateMainPassword,
-  logout
+  showUpdateMainPassword
 });
 </script>
 
@@ -257,6 +260,8 @@ defineExpose({
     </template>
   </el-dialog>
 
+  <!--  注销账户-->
+  <DeleteAccount ref="deleteAccountRef" @deleteAccount="logout"></DeleteAccount>
 </template>
 
 <style scoped>
