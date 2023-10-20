@@ -5,20 +5,21 @@ import {useRouter} from "vue-router";
 import {loadConfig, updateConfig} from "@/utils/global.js";
 import {decrypt, getBowerId} from '@/utils/security.js'
 import store from "@/store/index.js";
-
 import {useDark} from '@vueuse/core'
-
-const darkMode = useDark()
 
 const router = useRouter()
 
-const {t, locale} = useI18n()
+// 暗黑模式
+const darkMode = useDark()
 
-// 注销账户组件对象
-const deleteAccountRef = ref()
+// 多语言
+const {t, locale} = useI18n()
 
 // 声明此组件可能调用的事件
 const emit = defineEmits(['updateMainPassword', 'deleteAccount', 'systemChangeChange'])
+
+// 注销账户组件对象
+const deleteAccountRef = ref()
 
 // 弹框显示控制
 const alertVisStatus = reactive({
@@ -91,7 +92,6 @@ const saveSetting = () => {
 
   // 更新系统配置
   updateConfig(settingForm)
-
 
   // 若设置不缓存主密码则立即删除缓存中的主密码
   if (settingForm.cacheMainPassword === false) {
