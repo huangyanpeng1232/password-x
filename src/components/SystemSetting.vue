@@ -56,6 +56,30 @@ const sorts = reactive([
   {key: 'name', label: t('systemSetting.sort.name')},
 ])
 
+// 主题列表
+const topics = reactive([
+  {key: false, label: t('systemSetting.topic.light')},
+  {key: true, label: t('systemSetting.topic.dark')}
+])
+
+// 是否缓存主密码列表
+const cacheMains = reactive([
+  {key: true, label: t('systemSetting.cacheMainPassword.enable')},
+  {key: false, label: t('systemSetting.cacheMainPassword.disabled')}
+])
+
+// 是否自动生成密码选项
+const autoGeneratePasswords = reactive([
+  {key: true, label: t('passwordForm.autoGeneratePassword.enable')},
+  {key: false, label: t('passwordForm.autoGeneratePassword.disabled')}
+])
+
+// 密码强度提示
+const showPasswordStrengths = reactive([
+  {key: true, label: t('systemSetting.showPasswordStrength.enable')},
+  {key: false, label: t('systemSetting.showPasswordStrength.disabled')}
+])
+
 let oldSystemSetting = null;
 
 // 打开系统设置
@@ -206,17 +230,45 @@ defineExpose({
           />
         </el-select>
       </el-form-item>
-      <el-form-item :label="t('systemSetting.cacheMainPassword')">
-        <el-switch v-model="settingForm.cacheMainPassword"></el-switch>
+      <el-form-item :label="t('systemSetting.topic')">
+        <el-select v-model="settingForm.darkMode">
+          <el-option
+              v-for="topic in topics"
+              :key="topic.key"
+              :label="topic.label"
+              :value="topic.key"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item :label="t('systemSetting.darkMode')">
-        <el-switch v-model="settingForm.darkMode"/>
+      <el-form-item :label="t('systemSetting.cacheMainPassword')">
+        <el-select v-model="settingForm.cacheMainPassword">
+          <el-option
+              v-for="cacheMain in cacheMains"
+              :key="cacheMain.key"
+              :label="cacheMain.label"
+              :value="cacheMain.key"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item :label="t('passwordForm.autoGeneratePassword')">
-        <el-switch v-model="settingForm.autoGeneratePassword"/>
+        <el-select v-model="settingForm.autoGeneratePassword">
+          <el-option
+              v-for="autoGenerate in autoGeneratePasswords"
+              :key="autoGenerate.key"
+              :label="autoGenerate.label"
+              :value="autoGenerate.key"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item :label="t('systemSetting.showPasswordStrength')">
-        <el-switch v-model="settingForm.showPasswordStrength"/>
+        <el-select v-model="settingForm.showPasswordStrength">
+          <el-option
+              v-for="showPasswordStrength in showPasswordStrengths"
+              :key="showPasswordStrength.key"
+              :label="showPasswordStrength.label"
+              :value="showPasswordStrength.key"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item :label="t('systemSetting.defaultPasswordRule')">
         <el-row style="margin-top: 15px">

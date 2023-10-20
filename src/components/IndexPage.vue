@@ -384,7 +384,8 @@ const getLabelNameByIdRecursion = (array, ids, result) => {
   for (let i = 0; i < array.length; i++) {
     if (ids.includes(array[i].id)) {
       result.push(array[i].label)
-    } else if (array[i].children && array[i].children.length > 0) {
+    }
+    if (array[i].children && array[i].children.length > 0) {
       getLabelNameByIdRecursion(array[i].children, ids, result)
     }
   }
