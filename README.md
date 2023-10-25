@@ -46,16 +46,12 @@ bucket: password-x-demo
 &emsp;&emsp;password-x 支持静态页面部署，如 Gitee Pages、Github Pages 和 Nginx 服务，也可以直接部署到阿里 OSS、腾讯 Cos 等平台。此外，您还可以选择将项目编译后的文件下载到本地直接使用，无需依赖任何第三方服务，随时为您提供最可靠的服务。
 
 ### 页面展示
-首页
-![首页](https://foruda.gitee.com/images/1697444435953637196/a09e625d_9560465.png)
-登录页
-![登录页](https://foruda.gitee.com/images/1697444453927256991/3d10cc46_9560465.png)
-设置页
-![设置页](https://foruda.gitee.com/images/1697444469375771522/4b0da978_9560465.png)
-暗黑模式
-![暗黑模式首页](https://foruda.gitee.com/images/1697444481071950198/30813274_9560465.png)
-多语言支持
-![多语言首页](https://foruda.gitee.com/images/1697444495394421109/6eaa0dfc_9560465.png)
+![](https://foruda.gitee.com/images/1698030803794194252/78f7a2ac_9560465.png)
+![](https://foruda.gitee.com/images/1698030803931340178/b7661e95_9560465.png)
+![](https://foruda.gitee.com/images/1698030803915600594/7c66fe43_9560465.png)
+![](https://foruda.gitee.com/images/1698030803902131457/95adad8e_9560465.png)
+![](https://foruda.gitee.com/images/1698030803955678967/be65f17f_9560465.png)
+![](https://foruda.gitee.com/images/1698030803805570778/b6ad6361_9560465.png)
 
 ### 开源地址
 https://gitee.com/password-x/password-x
