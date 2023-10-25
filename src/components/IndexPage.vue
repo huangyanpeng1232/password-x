@@ -1,6 +1,6 @@
 <!--密码首页-->
 <script setup>
-import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
+import {CopyDocument, Hide, Lock, More, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
 import {copyText, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/utils/oss.js";
@@ -18,6 +18,10 @@ const mainPasswordVerifyRef = ref()
 const mainPasswordSettingRef = ref()
 // 系统设置组件对象
 const systemSettingRef = ref()
+// 导入导出组件对象
+const importExportRef = ref()
+// 标签组件对象
+const labelTreeRef = ref()
 
 // 系统配置
 const systemConfig = reactive({})
@@ -391,6 +395,39 @@ const getLabelNameByIdRecursion = (array, ids, result) => {
   }
 }
 
+// 下载excel模板
+const downloadExcelTemplate = () => {
+  importExportRef.value.downloadExcelTemplate()
+}
+
+// 导入excel
+const importExcel = () => {
+  importExportRef.value.importExcel(labelTree.value)
+}
+
+// 导出excel
+const exportExcel = () => {
+  importExportRef.value.exportExcel(passwordArray.value, labelTree.value)
+}
+
+// 导入密码事件
+const importPasswordData = (dataArray, labelArray) => {
+  if (dataArray.length === 0) {
+    return
+  }
+
+  for (let i = dataArray.length - 1; i >= 0; i--) {
+    passwordArray.value.unshift(dataArray[i]);
+  }
+
+  // 更新标签
+  labelTreeRef.value.setLabelTree(labelArray)
+  // 同步密码
+  syncPasswordToOSS()
+  // 显示密码
+  loadShowPassword()
+}
+
 // 页面加载完成后事件
 onMounted(() => {
 
@@ -437,6 +474,7 @@ onMounted(() => {
                 <el-input
                     v-model="searchText"
                     style="max-width: 300px"
+                    clearable
                     :placeholder="t('index.title.search')"
                     :prefix-icon="Search"
                     :disabled="!mainPassword"
@@ -494,6 +532,33 @@ onMounted(() => {
                       @click="openSystemSetting"
                   ></el-button>
                 </el-tooltip>
+              </div>
+              <!--          导入导出-->
+              <div>
+                <el-popover
+                    placement="bottom"
+                    :width="150"
+                    trigger="click"
+                >
+                  <template #reference>
+                    <el-button
+                        :icon="More"
+                    ></el-button>
+                  </template>
+                  <template #default>
+                    <el-row>
+                      <el-col>
+                        <el-button @click="downloadExcelTemplate" style="width: 100%;" text>{{t('index.title.importExport.download')}}</el-button>
+                      </el-col>
+                      <el-col>
+                        <el-button @click="importExcel" style="width: 100%;" text>{{t('index.title.importExport.import')}}</el-button>
+                      </el-col>
+                      <el-col>
+                        <el-button @click="exportExcel" style="width: 100%;" text>{{t('index.title.importExport.export')}}</el-button>
+                      </el-col>
+                    </el-row>
+                  </template>
+                </el-popover>
               </div>
             </div>
           </div>
@@ -602,7 +667,7 @@ onMounted(() => {
       </el-card>
     </el-col>
     <el-col :xl="{span:4}" :lg="{span:5}" :md="{span:5}" class="hidden-sm-and-down" style="padding-left: 15px">
-      <LabelTree @labelCheckChange="labelCheckChange" @labelTreeChange="labelTreeChange"></LabelTree>
+      <LabelTree ref="labelTreeRef" @labelCheckChange="labelCheckChange" @labelTreeChange="labelTreeChange"></LabelTree>
     </el-col>
 
   </el-row>
@@ -623,6 +688,8 @@ onMounted(() => {
       @updateMainPassword="showUpdateMainPassword"
       @systemChangeChange="systemChangeChange"
   ></SystemSetting>
+
+  <ImportExport ref="importExportRef" :labelTree="labelTree" @importComplete="importPasswordData"></ImportExport>
 
 </template>
 

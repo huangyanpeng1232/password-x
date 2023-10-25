@@ -69,6 +69,11 @@ const syncLabelTree = () => {
   putFile('labelTree.json', {'labelTree': labelTree.value})
 }
 
+// 设置标签树
+const setLabelTree = (tree) => {
+  labelTree.value = tree
+}
+
 watch(labelFilterText, (val) => {
   labelTreeRef.value.filter(val)
 })
@@ -94,6 +99,11 @@ const loadLabelTreeByOSS = () => {
 }
 
 loadLabelTreeByOSS()
+
+// 导出的方法
+defineExpose({
+  setLabelTree
+});
 </script>
 
 <template>

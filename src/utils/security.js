@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 
 // 获取浏览器指纹
 export function getBowerId() {
+
     let height = window.screen.height;
     let width = window.screen.width;
     let language = navigator.language;

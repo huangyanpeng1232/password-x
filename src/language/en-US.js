@@ -6,6 +6,8 @@ export default {
     'password.password': 'password',
     'password.remark': 'remark',
     'password.label': 'label',
+    'password.insertTime': 'add time',
+    'password.updateTime': 'update time',
     'password.label.placeholder': 'Select',
     'index.table.operation': 'operations',
     'index.table.share': 'share',
@@ -23,6 +25,10 @@ export default {
     'index.title.strength.strong': 'Strong',
     'index.title.strength.medium': 'medium',
     'index.title.strength.weak': 'weak',
+    'index.title.importExport': 'backup/recover',
+    'index.title.importExport.download': 'download password template',
+    'index.title.importExport.import': 'import password',
+    'index.title.importExport.export': 'export password',
     'login.form.title': 'Ali cloud oss config',
     'login.form.region.verify': 'please input region',
     'login.form.accessKeyId.verify': 'please input accessKeyId',
@@ -97,5 +103,7 @@ export default {
     'labelTree.search.placeholder': 'Search',
     'labelTree.tree.add': 'add',
     'labelTree.tree.remove': 'delete',
-
+    'importExport.data.empty': 'Add the password data according to the downloaded template and then import the password',
+    'importExport.exportName': 'password export',
+    'importExport.importTemplateName': 'password import template',
 }
