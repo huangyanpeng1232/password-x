@@ -26,7 +26,7 @@ export default {
     'index.title.strength.medium': 'medium',
     'index.title.strength.weak': 'weak',
     'index.title.importExport': 'backup/recover',
-    'index.title.importExport.download': 'download password template',
+    'index.title.importExport.download': 'download template',
     'index.title.importExport.import': 'import password',
     'index.title.importExport.export': 'export password',
     'login.form.title': 'Ali cloud oss config',

@@ -1,6 +1,6 @@
 <!--密码首页-->
 <script setup>
-import {CopyDocument, Hide, Lock, More, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
+import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
 import {copyText, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/utils/oss.js";
@@ -29,7 +29,7 @@ const systemConfig = reactive({})
 const searchText = ref('')
 // 主密码
 const mainPassword = ref('')
-// 是否允许同步数据到oss（若为成功同步oss内容就更新oss会造成密码丢失）
+// 是否允许同步数据到oss（若未成功同步oss内容就更新oss会造成密码丢失）
 const passwordSyncStatus = ref(false)
 // 密码列表未解密的密文
 const passwordCiphertext = ref('')
@@ -431,13 +431,15 @@ const importPasswordData = (dataArray, labelArray) => {
 // 页面加载完成后事件
 onMounted(() => {
 
+  // 加载系统设置
   let config = loadConfig();
   for (let key in config) {
     systemConfig[key] = config[key]
   }
 
-  if (systemConfig.language && systemConfig.language !== locale.value) {
-    locale.value = systemConfig.language;
+  // 设置系统语言
+  if (systemConfig['language'] && systemConfig['language'] !== locale.value) {
+    locale.value = systemConfig['language'];
   }
 
   // 从oss加载密码文件
@@ -520,19 +522,6 @@ onMounted(() => {
                   </el-button>
                 </el-tooltip>
               </div>
-              <!--          系统设置-->
-              <div>
-                <el-tooltip
-                    :content="t('index.title.setting')"
-                    effect="dark"
-                    placement="top"
-                >
-                  <el-button
-                      :icon="Setting"
-                      @click="openSystemSetting"
-                  ></el-button>
-                </el-tooltip>
-              </div>
               <!--          导入导出-->
               <div>
                 <el-popover
@@ -542,19 +531,22 @@ onMounted(() => {
                 >
                   <template #reference>
                     <el-button
-                        :icon="More"
+                        :icon="Setting"
                     ></el-button>
                   </template>
                   <template #default>
                     <el-row>
                       <el-col>
-                        <el-button @click="downloadExcelTemplate" style="width: 100%;" text>{{t('index.title.importExport.download')}}</el-button>
+                        <el-button @click="openSystemSetting" style="width: 100%;" text>系统设置</el-button>
                       </el-col>
                       <el-col>
                         <el-button @click="importExcel" style="width: 100%;" text>{{t('index.title.importExport.import')}}</el-button>
                       </el-col>
                       <el-col>
                         <el-button @click="exportExcel" style="width: 100%;" text>{{t('index.title.importExport.export')}}</el-button>
+                      </el-col>
+                      <el-col>
+                        <el-button @click="downloadExcelTemplate" style="width: 100%;" text>{{t('index.title.importExport.download')}}</el-button>
                       </el-col>
                     </el-row>
                   </template>
@@ -689,6 +681,7 @@ onMounted(() => {
       @systemChangeChange="systemChangeChange"
   ></SystemSetting>
 
+  <!--  导入导出-->
   <ImportExport ref="importExportRef" :labelTree="labelTree" @importComplete="importPasswordData"></ImportExport>
 
 </template>
@@ -698,7 +691,6 @@ onMounted(() => {
   #passwordBody {
     padding: 15px;
   }
-
 }
 
 .pass-action-div {
@@ -744,5 +736,4 @@ onMounted(() => {
   width: 13px;
   border-radius: 50%;
 }
-
 </style>

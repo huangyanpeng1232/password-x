@@ -26,7 +26,7 @@ export default  {
     'index.title.strength.medium': '中',
     'index.title.strength.weak': '弱',
     'index.title.importExport': '备份/恢复',
-    'index.title.importExport.download': '下载导入模板',
+    'index.title.importExport.download': '下载模板',
     'index.title.importExport.import': '导入密码',
     'index.title.importExport.export': '导出密码',
     'login.form.title': '阿里云OSS配置',

@@ -10,6 +10,7 @@ import {useRouter,useRoute } from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useDark} from "@vueuse/core";
 
+
 const {t,locale} = useI18n()
 
 const darkMode = useDark()
@@ -85,7 +86,7 @@ const loginSucceed = (oss) => {
 // 登录失败
 const loginFail = (err) => {
   console.error(err)
-  let message = err.code;
+  let message;
   if (err.code === 'RequestError') {
     message = t('login.form.error.RequestError')
   } else if (err.code === 'InvalidAccessKeyId') {

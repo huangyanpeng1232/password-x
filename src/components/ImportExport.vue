@@ -78,6 +78,9 @@ const startImport = async () => {
       // 清空选择文件
       fileUploadInput.value.value = ''
     });
+  }).catch(e =>{
+    ElMessage.error(e)
+    fileUploadInput.value.value = ''
   })
 }
 
