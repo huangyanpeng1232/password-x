@@ -2,7 +2,6 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {decrypt} from "@/utils/security.js";
-import {ElMessage} from "element-plus";
 import {delFile} from "@/utils/oss.js";
 import store from "@/store/index.js";
 

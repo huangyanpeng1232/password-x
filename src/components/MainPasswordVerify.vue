@@ -2,7 +2,7 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {decrypt, encrypt, getBowerId} from "@/utils/security.js";
-import {ElMessage} from "element-plus";
+
 import {getSystemConfig} from "@/utils/global.js";
 import store from "@/store/index.js";
 

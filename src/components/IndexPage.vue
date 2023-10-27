@@ -4,7 +4,6 @@ import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-
 import {useI18n} from "vue-i18n";
 import {copyText, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/utils/oss.js";
-import {ElMessage, ElNotification} from "element-plus";
 import {decrypt, encrypt} from "@/utils/security.js";
 import store from "@/store/index.js";
 
