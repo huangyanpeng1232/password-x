@@ -80,7 +80,8 @@ defineExpose({
   initMainPassword,
   showUpdateMainPassword
 });
-
+alertMode.value = 'update'
+alertVisStatus.mainPassword = true
 </script>
 
 <template>
@@ -92,7 +93,7 @@ defineExpose({
       :close-on-press-escape="alertMode === 'update'"
       :show-close="alertMode === 'update'"
   >
-    <el-form :inline="true" label-width="100px">
+    <el-form :inline="true" label-width="100px" style="margin-top: 20px">
       <el-form-item v-if="alertMode === 'update'" :label="t('mainPasswordSetting.form.currentPassword')">
         <el-input type="password" v-model="oldMainPassword"
                   style="width: 231px"></el-input>
@@ -106,10 +107,9 @@ defineExpose({
                   style="width: 231px"></el-input>
       </el-form-item>
     </el-form>
-    <el-text type="danger">
+    <el-alert type="error" style="position: relative;top: 10px" :closable="false">
       {{ t('mainPasswordSetting.forget.message') }}
-    </el-text>
-
+    </el-alert>
     <template #footer>
           <span class="dialog-footer">
             <el-button type="primary" :disabled="!mainPassword" @click="saveMainPassword">{{ t('mainPasswordSetting.form.save')}}</el-button>
