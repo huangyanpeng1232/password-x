@@ -32,6 +32,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElTree: typeof import('element-plus/es')['ElTree']
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
+    GesturePassword: typeof import('./components/GesturePassword.vue')['default']
     ImportExport: typeof import('./components/ImportExport.vue')['default']
     IndexPage: typeof import('./components/IndexPage.vue')['default']
     LabelTree: typeof import('./components/LabelTree.vue')['default']
