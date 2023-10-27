@@ -80,8 +80,7 @@ defineExpose({
   initMainPassword,
   showUpdateMainPassword
 });
-alertMode.value = 'update'
-alertVisStatus.mainPassword = true
+
 </script>
 
 <template>
