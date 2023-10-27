@@ -52,7 +52,9 @@ defineExpose({
 
 <template>
   <el-dialog v-model="alertVisStatus.deleteAccount" :title="t('systemSetting.deleteAccount')" width="400px">
-    <el-text type="danger">{{ t('systemSetting.deleteAccount.text') }}</el-text>
+    <el-alert type="error" :closable="false">
+      {{ t('systemSetting.deleteAccount.text') }}
+    </el-alert>
     <el-input v-model="mainPassword" style="margin-top: 20px"></el-input>
     <template #footer>
           <span class="dialog-footer">
