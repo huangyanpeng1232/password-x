@@ -167,32 +167,13 @@ const logout = () => {
 
 // 显示修改主密码弹框
 const showUpdateMainPassword = () => {
-
-  // 获取缓存配置
-  let ciphertext = localStorage.getItem('ossForm')
-  let ossFormContent = decrypt(getBowerId(), ciphertext);
-  let ossForm = JSON.parse(ossFormContent);
-
-  if (ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
-    ElMessage.error('演示账号不能修改主密码')
-    return
-  }
   alertVisStatus.setting = false
   emit('updateMainPassword')
 }
 
 // 显示注销账号弹框
 const showDeleteAccount = () => {
-  // 获取缓存配置
-  let ciphertext = localStorage.getItem('ossForm')
-  let ossFormContent = decrypt(getBowerId(), ciphertext);
-  let ossForm = JSON.parse(ossFormContent);
-  if (ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
-    ElMessage.error('演示账号不能注销')
-    return
-  }
   alertVisStatus.setting = false
-
   deleteAccountRef.value.showDeleteAccount()
 }
 

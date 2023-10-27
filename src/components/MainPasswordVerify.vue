@@ -12,10 +12,18 @@ const emit = defineEmits(['verifyPass'])
 
 // 主密码
 const mainPassword = ref('')
+// 密码类型
+const mainPasswordType = ref('')
 // 弹框显示控制
 const alertVisStatus = reactive({
   verifyMainPassword: false
 })
+
+// 手势密码输入完成
+const gestureComplete = (password) => {
+  mainPassword.value = password
+  saveMainPassword()
+}
 
 // 保存主密码
 const saveMainPassword = () => {
@@ -80,7 +88,17 @@ const getLocalMainPassword = () => {
 }
 
 // 验证主密码
-const verifyMainPassword = () => {
+const verifyMainPassword = (cache = true) => {
+
+  // 设置密码类型
+  mainPasswordType.value = store.state.mainPasswordType
+
+  if (!cache) {
+    // 不适用本地缓存中的密码进行自动验证
+    alertVisStatus.verifyMainPassword = true
+    return
+  }
+
   // 获取本地缓存中的主密码
   let localMainPassword = getLocalMainPassword();
 
@@ -114,19 +132,21 @@ defineExpose({
       :title="t('mainPasswordVerify.form.title')"
       width="400px"
   >
-    <el-form style="padding: 10px">
-      <el-form-item>
-        <el-input
-            v-model="mainPassword"
-            :placeholder="t('mainPasswordVerify.form.mainPassword')"
-            type="password"
-            @keyup.enter="saveMainPassword"
-        >
-        </el-input>
-      </el-form-item>
-    </el-form>
-
-    <template #footer>
+    <div style="text-align: center">
+      <GesturePassword v-if="mainPasswordType === 'gesture'" @complete="gestureComplete"></GesturePassword>
+      <el-form style="padding: 10px" v-if="mainPasswordType === 'common'">
+        <el-form-item>
+          <el-input
+              v-model="mainPassword"
+              :placeholder="t('mainPasswordVerify.form.mainPassword')"
+              type="password"
+              @keyup.enter="saveMainPassword"
+          >
+          </el-input>
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer v-if="mainPasswordType === 'common'">
           <span class="dialog-footer">
             <el-button type="primary" :disabled="!mainPassword" @click="saveMainPassword">{{t('mainPasswordVerify.form.save')}}</el-button>
           </span>

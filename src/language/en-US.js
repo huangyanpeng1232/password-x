@@ -42,7 +42,6 @@ export default {
     'login.form.successMessage': 'login success',
     'mainPasswordSetting.form.passwordsDiff': 'The two passwords are different',
     'mainPasswordSetting.form.setMainPassword': 'set main password',
-    'mainPasswordSetting.form.currentPassword': 'verify current password',
     'mainPasswordSetting.form.newMainPassword': 'new main password',
     'mainPasswordSetting.form.newMainPasswordAffirm': 'new main password affirm',
     'mainPasswordSetting.form.save': 'save',

@@ -1,4 +1,9 @@
 <script setup>
+import md5 from "js-md5";
+
+// 声明此组件可能调用的事件
+const emit = defineEmits(['complete'])
+
 const canvasRef = ref()
 
 // 配置参数
@@ -40,13 +45,13 @@ const config = reactive({
       // 选中范围
       range: param.size * 0.07,
       // 选中后圆心颜色
-      color: '#333',
+      color: '#409EFF',
       // 选中后圆心大小
       size: param.size * 0.023,
       // 选中后外圈配置
       madding: {
         // 选中后外圈颜色
-        color: '#00bbff',
+        color: '#409EFF',
         // 选中后外圈大小
         size: param.size * 0.1,
         // 选中后外圈线粗细
@@ -57,7 +62,7 @@ const config = reactive({
   // 手势线配置
   line: {
     // 颜色
-    color: '#49b1d7',
+    color: '#409EFF',
     // 粗细
     width: 2
   }
@@ -120,14 +125,21 @@ const draw = () => {
 
 // 画点
 const drawPoint = (point) => {
-  // 画圆心
-  ctx.beginPath();
-  ctx.fillStyle = config.point.color
-  ctx.arc(point.x, point.y, config.point.size, 0, Math.PI * 2);
-  ctx.fill();
 
   // 判断该点是否选中
   let selected = isSelected(point)
+
+  // 画圆心
+  ctx.beginPath();
+  if(selected){
+    ctx.fillStyle = config.point.selected.color
+    ctx.arc(point.x, point.y, config.point.selected.size, 0, Math.PI * 2);
+  }else{
+    ctx.fillStyle = config.point.color
+    ctx.arc(point.x, point.y, config.point.size, 0, Math.PI * 2);
+  }
+  ctx.fill();
+
 
   // 绘制外圈
   ctx.beginPath();
@@ -150,14 +162,18 @@ const canvasDown = () => {
   entering.value = true
 }
 
-// 滑动抬起
+// 鼠标抬起
 const canvasUp = () => {
   entering.value = false
 
   let selectedPoint = getSelectedPoint()
-  console.log(selectedPoint)
-  // 清空选中的点
-  selectData.value = []
+
+  if (selectedPoint) {
+    let password = md5(selectedPoint);
+    emit('complete', password)
+    // 清空选中的点
+    selectData.value = []
+  }
 
   // 重新绘制
   draw()
@@ -280,7 +296,6 @@ onMounted(() => {
 
 <template>
   <canvas
-      style="margin-left: 300px"
       v-if="param.size"
       :width="param.size"
       :height="param.size"

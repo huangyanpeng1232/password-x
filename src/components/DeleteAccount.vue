@@ -1,7 +1,7 @@
 <!--注销账号-->
 <script setup>
 import {useI18n} from "vue-i18n";
-import {decrypt} from "@/utils/security.js";
+import {decrypt, getBowerId} from "@/utils/security.js";
 import {delFile} from "@/utils/oss.js";
 import store from "@/store/index.js";
 
@@ -23,6 +23,16 @@ const affirmDeleteAccount = () => {
   // 验证主密码
   let value = decrypt(mainPassword.value, store.state.verifyCode)
   if (value && value === 'password-x') {
+
+    // 演示账号不能注销
+    let ciphertext = localStorage.getItem('ossForm')
+    let ossFormContent = decrypt(getBowerId(), ciphertext);
+    let ossForm = JSON.parse(ossFormContent);
+    if (ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
+      ElMessage.error('演示账号不能注销')
+      return
+    }
+
     // 删除密码文件
     delFile('password.json')
     // 删除分组文件

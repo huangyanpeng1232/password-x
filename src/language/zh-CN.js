@@ -42,7 +42,6 @@ export default  {
     'login.form.successMessage': '登录成功',
     'mainPasswordSetting.form.passwordsDiff': '两次输入的密码不一致',
     'mainPasswordSetting.form.setMainPassword': '设置主密码',
-    'mainPasswordSetting.form.currentPassword': '验证当前密码',
     'mainPasswordSetting.form.newMainPassword': '新密码',
     'mainPasswordSetting.form.newMainPasswordAffirm': '确认新密码',
     'mainPasswordSetting.form.save': '保存',

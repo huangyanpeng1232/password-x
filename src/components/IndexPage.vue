@@ -28,6 +28,8 @@ const systemConfig = reactive({})
 const searchText = ref('')
 // 主密码
 const mainPassword = ref('')
+// 主密码类型 普通：common、手势gesture
+const mainPasswordType = ref('')
 // 是否允许同步数据到oss（若未成功同步oss内容就更新oss会造成密码丢失）
 const passwordSyncStatus = ref(false)
 // 密码列表未解密的密文
@@ -194,9 +196,11 @@ const mainPasswordLoadSucceed = (password) => {
 }
 
 // 主密码变更
-const mainPasswordChange = (password) => {
+const mainPasswordChange = (password,passwordType) => {
   // 更新主密码
   mainPassword.value = password
+  // 更新主密码
+  mainPasswordType.value = passwordType
   // 同步到oss
   syncPasswordToOSS()
   // 提示变更成功
@@ -210,7 +214,7 @@ const openSystemSetting = () => {
 
 // 修改主密码
 const showUpdateMainPassword = () => {
-  mainPasswordSettingRef.value.showUpdateMainPassword()
+  mainPasswordSettingRef.value.updateMainPassword()
 }
 
 // 系统配置改变
@@ -334,6 +338,7 @@ const syncPasswordToOSS = () => {
   // 上传文件
   putFile('password.json', {
     verifyValue: verifyCode,
+    mainPasswordType: mainPasswordType.value,
     passwordCiphertext: passwordCiphertext.value
   })
 }
@@ -344,16 +349,19 @@ const loadPasswordByOSS = () => {
     if (res.verifyValue) {
       // 设置验证字符串
       let verifyCode = res.verifyValue;
-      store.commit('setVerifyCode', verifyCode)
+      let mainPasswordType = res.mainPasswordType || 'common';
+
+      store.commit('setVerifyCode', verifyCode);
+      store.commit('setMainPasswordType', mainPasswordType)
       // 密码列表密文
       passwordCiphertext.value = res.passwordCiphertext
       // 验证主密码（主密码验证通过后会将密文解密并更新到密码列表）
-      mainPasswordVerifyRef.value.verifyMainPassword()
+      mainPasswordVerifyRef.value.verifyMainPassword(true)
     } else {
       // 设置同步状态为可同步
       passwordSyncStatus.value = true
       // 验证字符串未空，第一次使用，初始化主密码
-      mainPasswordSettingRef.value.initMainPassword()
+      mainPasswordSettingRef.value.settingMainPassword()
     }
   }).catch(e => {
     console.error(e)
@@ -521,36 +529,29 @@ onMounted(() => {
                   </el-button>
                 </el-tooltip>
               </div>
+
               <!--          导入导出-->
-              <div>
-                <el-popover
-                    placement="bottom"
-                    :width="150"
-                    trigger="click"
-                >
-                  <template #reference>
-                    <el-button
-                        :icon="Setting"
-                    ></el-button>
-                  </template>
-                  <template #default>
-                    <el-row>
-                      <el-col>
-                        <el-button @click="openSystemSetting" style="width: 100%;" text>系统设置</el-button>
-                      </el-col>
-                      <el-col>
-                        <el-button @click="importExcel" style="width: 100%;" text>{{t('index.title.importExport.import')}}</el-button>
-                      </el-col>
-                      <el-col>
-                        <el-button @click="exportExcel" style="width: 100%;" text>{{t('index.title.importExport.export')}}</el-button>
-                      </el-col>
-                      <el-col>
-                        <el-button @click="downloadExcelTemplate" style="width: 100%;" text>{{t('index.title.importExport.download')}}</el-button>
-                      </el-col>
-                    </el-row>
-                  </template>
-                </el-popover>
-              </div>
+              <el-dropdown>
+                <el-button
+                    :icon="Setting"
+                ></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="openSystemSetting">
+                      {{ t('systemSetting.title') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="importExcel">
+                      {{ t('index.title.importExport.import') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="exportExcel">
+                      {{ t('index.title.importExport.export') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="downloadExcelTemplate">
+                      {{ t('index.title.importExport.download') }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </div>
           </div>
         </template>

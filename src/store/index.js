@@ -8,6 +8,7 @@ export default createStore({
     state: {
         oss: null,
         verifyCode: null,
+        mainPasswordType: null,
     },
     mutations: {
         setOss(state, oss) {
@@ -19,8 +20,12 @@ export default createStore({
         setVerifyCode(state, code) {
             state.verifyCode = code
         },
+        setMainPasswordType(state, code) {
+            state.mainPasswordType = code
+        },
         delVerifyCode(state) {
             state.verifyCode = null
+            state.mainPasswordType = null
         }
     },
     actions: {
