@@ -24,25 +24,21 @@ let param = defineProps({
 const config = reactive({
   // 组件内边框
   padding: param.size * 0.18,
+  // 背景色
   background: '#fff',
+  // 验证失败后的颜色
+  failColor: '#F56C6C',
+  // 验证通过后的颜色
+  passColor: '#67C23A',
   // 手势点配置
   point: {
     // 圆心颜色
-    color: '#333',
+    color: '#409EFF',
     // 圆心大小
     size: param.size * 0.023,
-    // 外圈配置
-    madding: {
-      // 外圈颜色
-      color: '#333',
-      // 外圈大小
-      size: param.size * 0.1,
-      // 外圈线粗细
-      lineWidth: 0.5
-    },
-    // 选中配置
+    // 选中后的配置
     selected: {
-      // 选中范围
+      // 可选中范围
       range: param.size * 0.07,
       // 选中后圆心颜色
       color: '#409EFF',
@@ -53,7 +49,7 @@ const config = reactive({
         // 选中后外圈颜色
         color: '#409EFF',
         // 选中后外圈大小
-        size: param.size * 0.1,
+        size: param.size * 0.07,
         // 选中后外圈线粗细
         lineWidth: 1
       }
@@ -74,6 +70,8 @@ const baseData = ref({})
 const selectData = ref([])
 // 鼠标是否按下
 const entering = ref(false)
+// 验证状态
+const verifyStatus = ref('')
 
 // 画笔
 let ctx = null
@@ -102,6 +100,7 @@ const draw = () => {
       let y = config.padding + i * step;
       let halfStep = step / 2
 
+      // 手势点对象
       let point = {
         id: number,
         x: x,
@@ -129,32 +128,39 @@ const drawPoint = (point) => {
   // 判断该点是否选中
   let selected = isSelected(point)
 
+  // 绘制外圈
+  if (selected) {
+    ctx.beginPath();
+    // 不同状态的颜色
+    if (verifyStatus.value === 'fail') {
+      ctx.strokeStyle = config.failColor
+    } else if (verifyStatus.value === 'pass') {
+      ctx.strokeStyle = config.passColor
+    } else {
+      ctx.strokeStyle = config.point.selected.madding.color;
+    }
+
+    ctx.lineWidth = config.point.selected.madding.lineWidth
+    ctx.arc(point.x, point.y, config.point.selected.madding.size, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
   // 画圆心
   ctx.beginPath();
   if(selected){
-    ctx.fillStyle = config.point.selected.color
+    if (verifyStatus.value === 'fail') {
+      ctx.fillStyle = config.failColor
+    } else if (verifyStatus.value === 'pass') {
+      ctx.fillStyle = config.passColor
+    } else {
+      ctx.fillStyle = config.point.selected.madding.color;
+    }
     ctx.arc(point.x, point.y, config.point.selected.size, 0, Math.PI * 2);
   }else{
     ctx.fillStyle = config.point.color
     ctx.arc(point.x, point.y, config.point.size, 0, Math.PI * 2);
   }
   ctx.fill();
-
-
-  // 绘制外圈
-  ctx.beginPath();
-  if (selected) {
-    // 选中情况
-    ctx.strokeStyle = config.point.selected.madding.color;
-    ctx.lineWidth = config.point.selected.madding.lineWidth
-    ctx.arc(point.x, point.y, config.point.selected.madding.size, 0, Math.PI * 2);
-  } else {
-    // 未选中情况
-    ctx.strokeStyle = config.point.madding.color;
-    ctx.lineWidth = config.point.madding.lineWidth
-    ctx.arc(point.x, point.y, config.point.madding.size, 0, Math.PI * 2);
-  }
-  ctx.stroke();
 }
 
 // 鼠标按下
@@ -164,20 +170,40 @@ const canvasDown = () => {
 
 // 鼠标抬起
 const canvasUp = () => {
-  entering.value = false
+  if (!entering.value) {
+    return
+  }
+  entering.value = false;
 
   let selectedPoint = getSelectedPoint()
 
   if (selectedPoint) {
     let password = md5(selectedPoint);
     emit('complete', password)
-    // 清空选中的点
-    selectData.value = []
   }
 
   // 重新绘制
   draw()
   drawSelectLine()
+}
+
+// 设置验证状态
+const setVerifyStatus = (status) => {
+  verifyStatus.value = status
+  // 重新绘制
+  draw()
+  drawSelectLine()
+  // 状态不为空0.5秒后清空
+  if (status) {
+    setTimeout(() => {
+      verifyStatus.value = ''
+      selectData.value = []
+      draw()
+    }, 500);
+  } else {
+    selectData.value = []
+    draw()
+  }
 }
 
 // 获取选中的点字符串
@@ -233,7 +259,8 @@ const drawSelectLine = (moveX, moveY) => {
 
   // 获取鼠标当先所在点
   let point = getPoint(moveX, moveY);
-  if (point) {
+  // 有悬浮的点且非通过及失败状态
+  if (point && verifyStatus.value === '') {
     // 鼠标悬浮到手势点上绘制有颜色的点
     ctx.beginPath();
     ctx.strokeStyle = config.point.selected.madding.color;
@@ -249,7 +276,14 @@ const drawSelectLine = (moveX, moveY) => {
 
   // 准备绘制连接线
   ctx.beginPath();
-  ctx.strokeStyle = config.line.color;
+  if (verifyStatus.value === 'fail') {
+    ctx.strokeStyle = config.failColor
+  } else if (verifyStatus.value === 'pass') {
+    ctx.strokeStyle = config.passColor
+  } else {
+    ctx.strokeStyle = config.line.color
+  }
+
   ctx.lineWidth = config.line.width;
   ctx.lineCap = 'round';
 
@@ -258,7 +292,8 @@ const drawSelectLine = (moveX, moveY) => {
   for (let i = 1; i < selectData.value.length; i++) {
     ctx.lineTo(selectData.value[i].x, selectData.value[i].y);
   }
-  if (moveX && moveY) {
+  // 鼠标按下且有坐标且无通过或失败状态
+  if (entering.value && moveX && moveY && verifyStatus.value === '') {
     ctx.lineTo(moveX, moveY);
   }
   ctx.stroke();
@@ -289,9 +324,22 @@ const getPoint = (x, y) => {
   }
 }
 
+// 手指移动
+const touchmove = (e) => {
+  let x = e.touches[0].clientX - canvasRef.value.offsetLeft
+  let y = e.touches[0].clientY - canvasRef.value.offsetTop
+  canvasMove({offsetX: x, offsetY: y})
+}
+
+// 初始化
 onMounted(() => {
   init()
 })
+
+// 导出方法
+defineExpose({
+  setVerifyStatus
+});
 </script>
 
 <template>
@@ -303,6 +351,11 @@ onMounted(() => {
       @mousedown="canvasDown"
       @mouseup="canvasUp"
       @mousemove="canvasMove($event)"
+      @mouseleave="canvasUp"
+
+      @touchstart="canvasDown"
+      @touchend="canvasUp"
+      @touchmove="touchmove"
   ></canvas>
 </template>
 

@@ -13,6 +13,8 @@ const emit = defineEmits(['mainPasswordChange'])
 
 // 主密码验证组件对象
 const mainPasswordVerifyRef = ref()
+// 手势密码组件对象
+const gesturePasswordRef = ref()
 
 // 密码类型
 const passwordType = ref('gesture')
@@ -33,6 +35,7 @@ const gestureComplete = (password) => {
   if (passwordStep.value === 'setting') {
     mainPassword.value = password
     passwordStep.value = 'affirm'
+    gesturePasswordRef.value.setVerifyStatus('')
   } else if (passwordStep.value === 'affirm') {
     affirmMainPassword.value = password
     saveMainPassword()
@@ -102,6 +105,13 @@ const tabClick = () => {
   }
 }
 
+// 全屏
+const fullscreen = ref(document.documentElement.clientWidth < 728)
+
+window.addEventListener('resize', function(){
+  fullscreen.value = document.documentElement.clientWidth < 728
+});
+
 // 导出方法
 defineExpose({
   settingMainPassword,
@@ -112,6 +122,7 @@ defineExpose({
 
 <template>
   <el-dialog
+      :fullscreen="fullscreen"
       v-model="alertVisStatus.mainPassword"
       :title="t('mainPasswordSetting.form.setMainPassword')"
       width="470px"
@@ -130,7 +141,7 @@ defineExpose({
           <el-text v-if="passwordStep === 'setting'">请绘制主密码</el-text>
           <el-text v-if="passwordStep === 'affirm'">请再次绘制确认</el-text>
         </div>
-        <GesturePassword @complete="gestureComplete"></GesturePassword>
+        <GesturePassword ref="gesturePasswordRef" @complete="gestureComplete"></GesturePassword>
         <div>
           <el-link :underline="false" type="primary" style="position: relative;top: -2px;" @click="passwordStep = 'setting'">重新绘制</el-link>
         </div>

@@ -10,6 +10,8 @@ const {t} = useI18n()
 // 声明此组件可能调用的事件
 const emit = defineEmits(['verifyPass'])
 
+// 手势密码组件
+const gesturePasswordRef = ref()
 // 主密码
 const mainPassword = ref('')
 // 密码类型
@@ -30,6 +32,10 @@ const saveMainPassword = () => {
   // 验证主密码是否正确
   let value = decrypt(mainPassword.value, store.state.verifyCode)
   if (value && value === 'password-x') {
+    if(mainPasswordType.value === 'gesture'){
+      gesturePasswordRef.value.setVerifyStatus('pass')
+    }
+
     // 触发验证通过事件
     emit('verifyPass', mainPassword.value)
     // 缓存密码到本地
@@ -40,7 +46,11 @@ const saveMainPassword = () => {
     alertVisStatus.verifyMainPassword = false
   } else {
     // 主密码验证未通过
-    ElMessage.error(t('mainPasswordVerify.form.verify'))
+    if(mainPasswordType.value === 'common'){
+      ElMessage.error(t('mainPasswordVerify.form.verify'))
+    } else{
+      gesturePasswordRef.value.setVerifyStatus('fail')
+    }
   }
 }
 
@@ -118,6 +128,14 @@ const verifyMainPassword = (cache = true) => {
   }
 }
 
+
+// 全屏
+const fullscreen = ref(document.documentElement.clientWidth < 728)
+
+window.addEventListener('resize', function () {
+  fullscreen.value = document.documentElement.clientWidth < 728
+});
+
 // 导出的方法
 defineExpose({
   verifyMainPassword,
@@ -128,12 +146,13 @@ defineExpose({
 
 <template>
   <el-dialog
+      :fullscreen="fullscreen"
       v-model="alertVisStatus.verifyMainPassword"
       :title="t('mainPasswordVerify.form.title')"
       width="400px"
   >
     <div style="text-align: center">
-      <GesturePassword v-if="mainPasswordType === 'gesture'" @complete="gestureComplete"></GesturePassword>
+      <GesturePassword v-if="mainPasswordType === 'gesture'" ref="gesturePasswordRef" @complete="gestureComplete"></GesturePassword>
       <el-form style="padding: 10px" v-if="mainPasswordType === 'common'">
         <el-form-item>
           <el-input
