@@ -16,7 +16,8 @@ region: oss-cn-beijing
 accessKeyId: LTAI5tRPBc5sY6KbZd1Vc1jU  
 accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21  
 bucket: password-x-demo  
-主密码：456  
+主密码：456 或 图案密码:  
+![](https://foruda.gitee.com/images/1698466035681541011/230bc1c8_9560465.png)
 
 ### 阿里云账号注册指引
 [点我查看](https://gitee.com/password-x/password-x/wikis/%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%A6%E5%8F%B7%E6%93%8D%E4%BD%9C%E6%8C%87%E5%BC%95)
