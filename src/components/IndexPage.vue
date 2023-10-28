@@ -349,10 +349,11 @@ const loadPasswordByOSS = () => {
     if (res.verifyValue) {
       // 设置验证字符串
       let verifyCode = res.verifyValue;
-      let mainPasswordType = res.mainPasswordType || 'common';
+      mainPasswordType.value = res.mainPasswordType || 'common';
 
       store.commit('setVerifyCode', verifyCode);
-      store.commit('setMainPasswordType', mainPasswordType)
+      store.commit('setMainPasswordType', mainPasswordType.value)
+
       // 密码列表密文
       passwordCiphertext.value = res.passwordCiphertext
       // 验证主密码（主密码验证通过后会将密文解密并更新到密码列表）
