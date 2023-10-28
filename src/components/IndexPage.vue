@@ -509,12 +509,12 @@ onMounted(() => {
               <!--          解锁/锁定密码-->
               <div>
                 <el-tooltip
+                    v-if="!mainPassword"
                     :content="t('index.title.unlock')"
                     effect="dark"
                     placement="top"
                 >
                   <el-button
-                      v-if="!mainPassword"
                       :disabled="!passwordCiphertext"
                       :icon="Unlock"
                       @click="unlockMainPassword"
@@ -522,12 +522,12 @@ onMounted(() => {
                   </el-button>
                 </el-tooltip>
                 <el-tooltip
+                    v-if="mainPassword"
                     :content="t('index.title.lock')"
                     effect="dark"
                     placement="top"
                 >
                   <el-button
-                      v-if="mainPassword"
                       :icon="Lock"
                       @click="lockMainPassword"
                   >

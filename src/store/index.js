@@ -1,9 +1,7 @@
 import {createStore} from 'vuex'
 import {login as loginOSS} from "@/utils/oss";
 import {decrypt, getBowerId} from "@/utils/security";
-import {useRouter} from "vue-router";
 
-const router = useRouter()
 export default createStore({
     state: {
         oss: null,
