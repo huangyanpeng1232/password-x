@@ -1,5 +1,10 @@
 <script setup>
 import md5 from "js-md5";
+import {useDark} from "@vueuse/core";
+
+// 暗黑模式
+const darkMode = useDark()
+
 
 // 声明此组件可能调用的事件
 const emit = defineEmits(['complete'])
@@ -25,7 +30,7 @@ const config = reactive({
   // 组件内边框
   padding: param.size * 0.18,
   // 背景色
-  background: '#fff',
+  background: darkMode.value ? 'rgb(20,20,20)' : '#fff',
   // 验证失败后的颜色
   failColor: '#F56C6C',
   // 验证通过后的颜色
@@ -78,6 +83,7 @@ let ctx = null
 
 // 初始化
 const init = () => {
+  config.background = darkMode.value ? 'rgb(20,20,20)' : '#fff',
   ctx = canvasRef.value.getContext('2d')
   draw()
 }

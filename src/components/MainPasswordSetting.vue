@@ -99,10 +99,12 @@ const updateMainPassword = () => {
 }
 
 // 点击tab
-const tabClick = () => {
+const tabChange = () => {
   if (passwordType.value === 'gesture') {
     passwordStep.value = 'setting';
   }
+  mainPassword.value = ''
+  affirmMainPassword.value = ''
 }
 
 // 全屏
@@ -134,19 +136,22 @@ defineExpose({
         v-model="passwordType"
         style="margin-top: 10px"
         type="card"
-        @tabClick="tabClick"
+        @tabChange="tabChange"
     >
-      <el-tab-pane label="手势" name="gesture" style="text-align: center">
+      <el-tab-pane :label="t('mainPasswordSetting.passwordType.gesture')" name="gesture" style="text-align: center">
         <div>
-          <el-text v-if="passwordStep === 'setting'">请绘制主密码</el-text>
-          <el-text v-if="passwordStep === 'affirm'">请再次绘制确认</el-text>
+          <el-text v-if="passwordStep === 'setting'">{{ t('mainPasswordSetting.gesture.first') }}</el-text>
+          <el-text v-if="passwordStep === 'affirm'">{{ t('mainPasswordSetting.gesture.affirm') }}</el-text>
         </div>
-        <GesturePassword ref="gesturePasswordRef" @complete="gestureComplete"></GesturePassword>
+        <GesturePassword v-if="alertVisStatus.mainPassword && passwordType === 'gesture'" ref="gesturePasswordRef"
+                         @complete="gestureComplete"></GesturePassword>
         <div>
-          <el-link :underline="false" type="primary" style="position: relative;top: -2px;" @click="passwordStep = 'setting'">重新绘制</el-link>
+          <el-link :underline="false" style="position: relative;top: -2px;" type="primary"
+                   @click="passwordStep = 'setting'">{{ t('mainPasswordSetting.gesture.reset') }}
+          </el-link>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="标准" name="common" style="text-align: center">
+      <el-tab-pane :label="t('mainPasswordSetting.passwordType.common')" name="common" style="text-align: center">
         <el-form :inline="true" label-width="100px" style="margin-top: 20px">
           <el-form-item :label="t('mainPasswordSetting.form.newMainPassword')">
             <el-input type="password" v-model="mainPassword"

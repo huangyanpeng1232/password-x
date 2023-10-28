@@ -199,7 +199,7 @@ const mainPasswordLoadSucceed = (password) => {
 const mainPasswordChange = (password,passwordType) => {
   // 更新主密码
   mainPassword.value = password
-  // 更新主密码
+  // 更新主密码类型
   mainPasswordType.value = passwordType
   // 同步到oss
   syncPasswordToOSS()
@@ -435,6 +435,11 @@ const importPasswordData = (dataArray, labelArray) => {
   loadShowPassword()
 }
 
+// 退出登录
+const logout = () => {
+  systemSettingRef.value.logout()
+}
+
 // 页面加载完成后事件
 onMounted(() => {
 
@@ -530,7 +535,7 @@ onMounted(() => {
                 </el-tooltip>
               </div>
 
-              <!--          导入导出-->
+              <!--          更多设置-->
               <el-dropdown>
                 <el-button
                     :icon="Setting"
@@ -540,7 +545,7 @@ onMounted(() => {
                     <el-dropdown-item @click="openSystemSetting">
                       {{ t('systemSetting.title') }}
                     </el-dropdown-item>
-                    <el-dropdown-item @click="importExcel">
+                    <el-dropdown-item divided @click="importExcel">
                       {{ t('index.title.importExport.import') }}
                     </el-dropdown-item>
                     <el-dropdown-item @click="exportExcel">
@@ -548,6 +553,9 @@ onMounted(() => {
                     </el-dropdown-item>
                     <el-dropdown-item @click="downloadExcelTemplate">
                       {{ t('index.title.importExport.download') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item divided @click="logout">
+                      {{ t('index.title.logout') }}
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>

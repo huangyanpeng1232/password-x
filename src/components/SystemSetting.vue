@@ -179,6 +179,7 @@ const showDeleteAccount = () => {
 
 // 导出的方法
 defineExpose({
+  logout,
   openSystemSetting,
   showUpdateMainPassword
 });
