@@ -1,3 +1,4 @@
+<!--手势解锁-->
 <script setup>
 import md5 from "js-md5";
 import {useDark} from "@vueuse/core";

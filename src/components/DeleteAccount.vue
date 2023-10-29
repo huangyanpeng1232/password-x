@@ -75,6 +75,12 @@ const gestureComplete = (password) => {
   affirmDeleteAccount()
 }
 
+// 全屏
+const fullscreen = ref(document.documentElement.clientWidth < 728)
+
+window.addEventListener('resize', function () {
+  fullscreen.value = document.documentElement.clientWidth < 728
+});
 
 // 导出方法
 defineExpose({
@@ -83,7 +89,12 @@ defineExpose({
 </script>
 
 <template>
-  <el-dialog v-model="alertVisStatus.deleteAccount" :title="t('systemSetting.deleteAccount')" width="400px">
+  <el-dialog
+      :fullscreen="fullscreen"
+      v-model="alertVisStatus.deleteAccount"
+      :title="t('systemSetting.deleteAccount')"
+      width="400px"
+  >
     <el-alert type="error" :closable="false">
       {{ t('systemSetting.deleteAccount.text') }}
     </el-alert>

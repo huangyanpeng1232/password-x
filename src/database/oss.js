@@ -1,3 +1,4 @@
+// 阿里云oss
 import OSS from 'ali-oss'
 import store from "@/store/index.js";
 

@@ -4,9 +4,13 @@ import {decrypt, getBowerId} from "@/utils/security";
 
 export default createStore({
     state: {
+        // oss、cos对象
         database: null,
+        // 数据库配置信息
         databaseForm: null,
+        // 主密码校验码
         verifyCode: null,
+        // 主密码类型 手势 gesture、普通 common
         mainPasswordType: null,
     },
     mutations: {
@@ -25,12 +29,12 @@ export default createStore({
         setVerifyCode(state, code) {
             state.verifyCode = code
         },
-        setMainPasswordType(state, code) {
-            state.mainPasswordType = code
-        },
         delVerifyCode(state) {
             state.verifyCode = null
             state.mainPasswordType = null
+        },
+        setMainPasswordType(state, code) {
+            state.mainPasswordType = code
         }
     },
     actions: {

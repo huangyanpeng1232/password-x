@@ -178,6 +178,13 @@ const showDeleteAccount = () => {
   deleteAccountRef.value.showDeleteAccount()
 }
 
+// 全屏
+const fullscreen = ref(document.documentElement.clientWidth < 728)
+
+window.addEventListener('resize', function () {
+  fullscreen.value = document.documentElement.clientWidth < 728
+});
+
 // 导出的方法
 defineExpose({
   logout,
@@ -188,6 +195,7 @@ defineExpose({
 
 <template>
   <el-dialog
+      :fullscreen="fullscreen"
       v-model="alertVisStatus.setting"
       :title="t('systemSetting.title')"
       width="600px"
@@ -255,23 +263,23 @@ defineExpose({
       </el-form-item>
       <el-form-item :label="t('systemSetting.defaultPasswordRule')">
         <el-row style="margin-top: 15px">
-          <el-col :span="8">
+          <el-col :span="12">
             <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.uppercase"
                          :label="t('passwordForm.generateForm.uppercase')" border/>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.lowercase"
                          :label="t('passwordForm.generateForm.lowercase')" border/>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.number"
                          :label="t('passwordForm.generateForm.number')" border/>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
                          :label="t('passwordForm.generateForm.symbol')" border/>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <div>
               <el-input size="small" style="position: relative;top:3px"
                         v-model="settingForm.defaultPasswordRule.length">
@@ -281,12 +289,10 @@ defineExpose({
           </el-col>
         </el-row>
       </el-form-item>
-      <el-form-item>
-        <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
-        <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
-        <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
-      </el-form-item>
     </el-form>
+    <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
+    <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
+    <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
 
     <template #footer>
           <span class="dialog-footer">

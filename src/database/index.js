@@ -1,10 +1,11 @@
+// 数据存储
 import store from "@/store/index.js";
 import * as cos from "@/database/cos.js";
 import * as oss from "@/database/oss.js";
 
 const databases = {
-    cos: cos,
-    oss: oss,
+    cos: cos,// 腾讯cos
+    oss: oss,// 阿里oss
 }
 
 // 配置数据库信息并登录

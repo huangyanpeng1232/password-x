@@ -1,3 +1,4 @@
+// 腾讯云cos
 import COS from 'cos-js-sdk-v5'
 import store from "@/store/index.js";
 
