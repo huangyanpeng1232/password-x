@@ -3,7 +3,7 @@
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
 import {copyText, isUrl, loadConfig} from "@/utils/global.js";
-import {getFile, putFile} from "@/utils/oss.js";
+import {getFile, putFile} from "@/database/index.js";
 import {decrypt, encrypt} from "@/utils/security.js";
 import store from "@/store/index.js";
 
@@ -30,7 +30,7 @@ const searchText = ref('')
 const mainPassword = ref('')
 // 主密码类型 普通：common、手势gesture
 const mainPasswordType = ref('')
-// 是否允许同步数据到oss（若未成功同步oss内容就更新oss会造成密码丢失）
+// 是否允许同步数据到database（若未成功同步database内容就更新database会造成密码丢失）
 const passwordSyncStatus = ref(false)
 // 密码列表未解密的密文
 const passwordCiphertext = ref('')
@@ -103,8 +103,8 @@ const showUpdatePassword = (password) => {
 const addPassword = (password) => {
   // 新增在密码列表的第一位
   passwordArray.value.unshift(password)
-  // 同步到oss
-  syncPasswordToOSS()
+  // 同步到database
+  syncPasswordToDatabase()
   // 更新到显示列表
   loadShowPassword()
 }
@@ -115,8 +115,8 @@ const updatePassword = (password) => {
     if (passwordArray.value[i].id === password.id) {
       // 修改密码
       passwordArray.value[i] = password
-      // 同步到oss
-      syncPasswordToOSS()
+      // 同步到database
+      syncPasswordToDatabase()
       // 更新到显示列表
       loadShowPassword()
       break
@@ -170,8 +170,8 @@ const deletePassword = (password) => {
   for (let i = 0; i < passwordArray.value.length; i++) {
     if (passwordArray.value[i].id === password.id) {
       passwordArray.value.splice(i, 1)
-      // 同步密码列表到oss
-      syncPasswordToOSS()
+      // 同步密码列表到database
+      syncPasswordToDatabase()
       // 重新刷新搜索结果
       loadShowPassword()
       // 删除成功提示
@@ -201,8 +201,8 @@ const mainPasswordChange = (password,passwordType) => {
   mainPassword.value = password
   // 更新主密码类型
   mainPasswordType.value = passwordType
-  // 同步到oss
-  syncPasswordToOSS()
+  // 同步到database
+  syncPasswordToDatabase()
   // 提示变更成功
   ElMessage.success(t('index.mainPassword.changeSuccess'))
 }
@@ -235,7 +235,7 @@ const passwordSort = (sort) => {
     sortPasswordArray('name', 1)
   }
   // 同步数据
-  syncPasswordToOSS()
+  syncPasswordToDatabase()
   // 显示排序结果
   loadShowPassword()
 }
@@ -324,8 +324,8 @@ const sortPasswordArray = (attr, rev) => {
   })
 }
 
-// 同步密码列表到oss
-const syncPasswordToOSS = () => {
+// 同步密码列表到database
+const syncPasswordToDatabase = () => {
   if (!passwordSyncStatus.value) {
     // 不允许同步
     return
@@ -343,8 +343,8 @@ const syncPasswordToOSS = () => {
   })
 }
 
-// 从oss加载密码文件
-const loadPasswordByOSS = () => {
+// 从database加载密码文件
+const loadPasswordByDatabase = () => {
   getFile('password.json').then(res => {
     if (res.verifyValue) {
       // 设置验证字符串
@@ -431,7 +431,7 @@ const importPasswordData = (dataArray, labelArray) => {
   // 更新标签
   labelTreeRef.value.setLabelTree(labelArray)
   // 同步密码
-  syncPasswordToOSS()
+  syncPasswordToDatabase()
   // 显示密码
   loadShowPassword()
 }
@@ -455,8 +455,8 @@ onMounted(() => {
     locale.value = systemConfig['language'];
   }
 
-  // 从oss加载密码文件
-  loadPasswordByOSS();
+  // 从database加载密码文件
+  loadPasswordByDatabase();
 })
 </script>
 

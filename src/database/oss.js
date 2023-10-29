@@ -6,7 +6,12 @@ let prefix = 'password-x/'
 // 设置oss信息并验证是否正确
 export async function login(form) {
     return new Promise((resolve, reject) => {
-        const client = new OSS(form)
+        const client = new OSS({
+            accessKeyId: form.keyId,
+            accessKeySecret: form.keySecret,
+            region: form.region,
+            bucket: form.bucket,
+        })
 
         // 获取文件列表验证权限是否正确
         client.list({'max-keys': 1}).then(() => {
@@ -27,7 +32,7 @@ export function putFile(ossKey, json) {
     };
     return new Promise((resolve, reject) => {
         let buffer = new OSS.Buffer(JSON.stringify(json));
-        store.state.oss.put(prefix + ossKey, buffer, headers).then(res => {
+        store.state.database.put(prefix + ossKey, buffer, headers).then(res => {
             resolve(res)
         }).catch((err) => {
             reject(err)
@@ -38,7 +43,7 @@ export function putFile(ossKey, json) {
 // 获取文件
 export function getFile(ossKey) {
     return new Promise((resolve, reject) => {
-        store.state.oss.get(prefix + ossKey).then(res => {
+        store.state.database.get(prefix + ossKey).then(res => {
             resolve(JSON.parse(res.content))
         }).catch((err) => {
             if (err.status === 404) {
@@ -52,6 +57,6 @@ export function getFile(ossKey) {
 
 // 删除文件
 export function delFile(ossKey) {
-    return store.state.oss.delete(prefix + ossKey)
+    return store.state.database.delete(prefix + ossKey)
 }
 

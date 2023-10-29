@@ -3,7 +3,6 @@
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import {loadConfig, updateConfig} from "@/utils/global.js";
-import {decrypt, getBowerId} from '@/utils/security.js'
 import store from "@/store/index.js";
 import {useDark} from '@vueuse/core'
 
@@ -155,12 +154,14 @@ const saveSetting = () => {
 
 // 退出登录
 const logout = () => {
-  // 删除oss配置信息
-  localStorage.removeItem('ossForm')
+  // 删除database配置信息
+  localStorage.removeItem('databaseForm')
   // 删除本地缓存的主密码
   localStorage.removeItem('mainPasswordCiphertext')
-  // 删除oss对象
-  store.commit('delOss')
+  // 删除database对象
+  store.commit('delDatabase')
+  // 删除database表单对象
+  store.commit('delDatabaseForm')
   // 重定向到登录界面
   router.push('/login')
 }

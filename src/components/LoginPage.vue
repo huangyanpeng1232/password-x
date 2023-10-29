@@ -1,12 +1,11 @@
 <!--登录页-->
 <script setup>
 import {reactive} from 'vue'
-import {login as loginOSS} from '@/utils/oss.js'
+import {login as loginDatabase} from '@/database/index.js'
 import {encrypt, getBowerId} from '@/utils/security.js'
 import {getSystemConfig, setSystemConfig} from '@/utils/global.js'
 import {ElNotification} from 'element-plus'
-import store from "@/store/index.js";
-import {useRouter,useRoute } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useDark} from "@vueuse/core";
 
@@ -22,11 +21,12 @@ const route = useRoute ()
 // 登录表单规则校验
 const ruleFormRef = ref()
 
-// oss 配置
-const ossForm = reactive({
+// database 配置
+const databaseForm = reactive({
+  type: 'cos',
   region: '',
-  accessKeyId: '',
-  accessKeySecret: '',
+  keyId: '',
+  keySecret: '',
   bucket: '',
 })
 
@@ -35,10 +35,10 @@ const formRules = reactive({
   region: [
     {required: true, message: t('login.form.region.verify'), trigger: 'blur'}
   ],
-  accessKeyId: [
+  keyId: [
     {required: true, message: t('login.form.accessKeyId.verify'), trigger: 'blur'}
   ],
-  accessKeySecret: [
+  keySecret: [
     {required: true, message: t('login.form.accessKeySecret.verify'), trigger: 'blur'}
   ],
   bucket: [
@@ -58,9 +58,9 @@ const submitForm = async (ruleFormRef) => {
       return
     }
 
-    // 登录阿里oss
-    loginOSS(ossForm).then(oss => {
-      loginSucceed(oss)
+    // 登录数据库
+    loginDatabase(databaseForm).then(database => {
+      loginSucceed(database)
     }).catch((err) => {
       loginFail(err)
     })
@@ -68,15 +68,13 @@ const submitForm = async (ruleFormRef) => {
 }
 
 // 登录成功
-const loginSucceed = (oss) => {
-  // 保存全局状态
-  store.commit('setOss', oss)
+const loginSucceed = () => {
   // 获取浏览器指纹
   let bowerId = getBowerId();
-  // 使用浏览器指纹加密oss配置信息
-  let ciphertext = encrypt(bowerId, JSON.stringify(ossForm))
+  // 使用浏览器指纹加密database配置信息
+  let ciphertext = encrypt(bowerId, JSON.stringify(databaseForm))
   // 保存到localStorage用于下次登录
-  localStorage.setItem('ossForm', ciphertext)
+  localStorage.setItem('databaseForm', ciphertext)
   // 提示登录成功
   ElNotification.success(t('login.form.successMessage'));
   // 重定向到首页
@@ -143,10 +141,11 @@ const initSystemConfig = () => {
 
 // 初始化登录参数
 const initLoginConfig = () => {
-  ossForm.region = route.query.region || ''
-  ossForm.accessKeyId = route.query.accessKeyId || ''
-  ossForm.accessKeySecret = route.query.accessKeySecret || ''
-  ossForm.bucket = route.query.bucket || ''
+  databaseForm.type = route.query.type || 'oss'
+  databaseForm.region = route.query.region || ''
+  databaseForm.keyId = route.query.keyId || ''
+  databaseForm.keySecret = route.query.keySecret || ''
+  databaseForm.bucket = route.query.bucket || ''
 }
 
 // 初始化系统配置
@@ -177,18 +176,24 @@ initLoginConfig()
       <div class="title">
         {{t('login.form.title')}}
       </div>
-      <el-form ref="ruleFormRef" :rules="formRules" :model="ossForm">
+      <el-form ref="ruleFormRef" :model="databaseForm" :rules="formRules">
+        <el-form-item prop="type">
+          <el-radio-group v-model="databaseForm.type" style="margin: 0 auto">
+            <el-radio-button label="oss">阿里OSS</el-radio-button>
+            <el-radio-button label="cos">腾讯COS</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item prop="region">
-          <el-input v-model="ossForm.region" clearable placeholder="OSS region"></el-input>
+          <el-input v-model="databaseForm.region" clearable placeholder="region"></el-input>
         </el-form-item>
-        <el-form-item prop="accessKeyId">
-          <el-input v-model="ossForm.accessKeyId" clearable placeholder="OSS accessKeyId"></el-input>
+        <el-form-item prop="keyId">
+          <el-input v-model="databaseForm.keyId" clearable placeholder="keyId"></el-input>
         </el-form-item>
-        <el-form-item prop="accessKeySecret">
-          <el-input v-model="ossForm.accessKeySecret" clearable placeholder="OSS accessKeySecret"></el-input>
+        <el-form-item prop="keySecret">
+          <el-input v-model="databaseForm.keySecret" clearable placeholder="keySecret"></el-input>
         </el-form-item>
         <el-form-item prop="bucket">
-          <el-input v-model="ossForm.bucket" clearable placeholder="OSS bucket"></el-input>
+          <el-input v-model="databaseForm.bucket" clearable placeholder="bucket"></el-input>
         </el-form-item>
       </el-form>
 
@@ -215,7 +220,7 @@ initLoginConfig()
 
 .content {
   width: 500px;
-  height: 420px;
+  height: 450px;
   box-sizing: border-box;
   padding: 0 50px;
   border-radius: 5px;
@@ -236,12 +241,12 @@ initLoginConfig()
   }
 
   100% {
-    height: 420px;
+    height: 450px;
   }
 }
 
 .content-input {
-  width: 300px;
+  width: 330px;
   position: absolute;
   top: 50%;
   left: 50%;

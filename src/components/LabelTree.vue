@@ -1,6 +1,6 @@
 <script setup>
 // 分组组件对象
-import {getFile, putFile} from "@/utils/oss.js";
+import {getFile, putFile} from "@/database/index.js";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n()
@@ -83,8 +83,8 @@ watch(labelTree, () => {
 }, {deep: true})
 
 
-// 从oss加载密码文件
-const loadLabelTreeByOSS = () => {
+// 从database加载密码文件
+const loadLabelTreeByDatabase = () => {
   getFile('labelTree.json').then(res => {
     if (res && res.labelTree) {
       labelTree.value = res.labelTree;
@@ -97,7 +97,7 @@ const loadLabelTreeByOSS = () => {
   })
 }
 
-loadLabelTreeByOSS()
+loadLabelTreeByDatabase()
 
 // 导出的方法
 defineExpose({

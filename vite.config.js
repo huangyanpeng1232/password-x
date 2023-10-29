@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'path';
 import {defineConfig} from 'vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Icons from 'unplugin-icons/vite'
@@ -8,14 +8,15 @@ import Inspect from 'vite-plugin-inspect'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import vue from '@vitejs/plugin-vue'
 
-const pathSrc = path.resolve(__dirname, 'src')
+const pathSrc = path.resolve(__dirname, './src')
 
 export default defineConfig({
     base: './',
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'src'),
-        }
+            '@': pathSrc
+        },
+        extensions: ['.js', '.json', '.ts', '.vue']
     },
     server:{
         host: '0.0.0.0',

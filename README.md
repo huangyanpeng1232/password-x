@@ -9,13 +9,21 @@ password-x 不仅支持保存各种网站、服务器、数据库、应用等密
 ### 服务地址
 https://password-x.gitee.io
 
-演示账号：[点我打开](https://password-x.gitee.io/login?region=oss-cn-beijing&accessKeyId=LTAI5tRPBc5sY6KbZd1Vc1jU&accessKeySecret=4OORS9GloeAn2Jd4Tvluw1Lt0YIj21&bucket=password-x-demo)
+阿里云OSS演示账号：[点我打开](https://password-x.gitee.io/login?type=oss&region=oss-cn-beijing&keyId=LTAI5tRPBc5sY6KbZd1Vc1jU&keySecret=4OORS9GloeAn2Jd4Tvluw1Lt0YIj21&bucket=password-x-demo)
+腾讯云COS演示账号：[点我打开](https://password-x.gitee.io/login?type=cos&region=ap-beijing&keyId=AKID8BJDUZR7bu2xgR1MED0hDVbXGm43qPmw&keySecret=2vdHH7lBORIvTqyvjNp6EGBvWu7B9994&bucket=password-x-demo-1259440743)
 
-登录信息：  
+OSS登录信息：  
 region: oss-cn-beijing  
-accessKeyId: LTAI5tRPBc5sY6KbZd1Vc1jU  
-accessKeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21  
-bucket: password-x-demo  
+KeyId: LTAI5tRPBc5sY6KbZd1Vc1jU  
+KeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21  
+bucket: password-x-demo
+
+COS登录信息：  
+region: ap-beijing  
+KeyId: AKID8BJDUZR7bu2xgR1MED0hDVbXGm43qPmw  
+KeySecret: 2vdHH7lBORIvTqyvjNp6EGBvWu7B9994  
+bucket: password-x-demo-1259440743  
+
 主密码：456 或 图案密码:  
 ![](https://foruda.gitee.com/images/1698466035681541011/230bc1c8_9560465.png)
 

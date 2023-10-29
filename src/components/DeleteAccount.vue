@@ -2,7 +2,7 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {decrypt, getBowerId} from "@/utils/security.js";
-import {delFile} from "@/utils/oss.js";
+import {delFile} from "@/database/index.js";
 import store from "@/store/index.js";
 
 const {t} = useI18n()
@@ -32,10 +32,10 @@ const affirmDeleteAccount = () => {
     }
 
     // 演示账号不能注销
-    let ciphertext = localStorage.getItem('ossForm')
-    let ossFormContent = decrypt(getBowerId(), ciphertext);
-    let ossForm = JSON.parse(ossFormContent);
-    if (!import.meta.env.DEV && ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
+    let ciphertext = localStorage.getItem('databaseForm')
+    let formContent = decrypt(getBowerId(), ciphertext);
+    let form = JSON.parse(formContent);
+    if (!import.meta.env.DEV && form.keyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
       ElMessage.error('演示账号不能注销')
       return
     }

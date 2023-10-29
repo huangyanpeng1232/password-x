@@ -52,10 +52,10 @@ const saveMainPassword = () => {
   }
 
   // 演示账号不能修改/设置主密码
-  let ciphertext = localStorage.getItem('ossForm')
-  let ossFormContent = decrypt(getBowerId(), ciphertext);
-  let ossForm = JSON.parse(ossFormContent);
-  if (!import.meta.env.DEV && ossForm.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
+  let ciphertext = localStorage.getItem('databaseForm')
+  let formContent = decrypt(getBowerId(), ciphertext);
+  let form = JSON.parse(formContent);
+  if (!import.meta.env.DEV && form.accessKeyId === import.meta.env.VITE_DEMO_ACCESS_KEY_ID) {
     ElMessage.error('演示账号不能修改主密码')
     return
   }
