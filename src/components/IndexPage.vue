@@ -639,6 +639,8 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
+          <el-table-column v-if="systemConfig.showAddTime" :label="t('password.insertTime')" min-width="130px" prop="insertTime"></el-table-column>
+          <el-table-column v-if="systemConfig.showUpTime" :label="t('password.updateTime')" min-width="130px" prop="updateTime"></el-table-column>
           <el-table-column min-width="140px" :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->

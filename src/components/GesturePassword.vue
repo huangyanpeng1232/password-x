@@ -6,7 +6,6 @@ import {useDark} from "@vueuse/core";
 // 暗黑模式
 const darkMode = useDark()
 
-
 // 声明此组件可能调用的事件
 const emit = defineEmits(['complete'])
 
@@ -23,6 +22,11 @@ let param = defineProps({
   count: {
     type: Number,
     default: 3
+  },
+  // 显示手势
+  showGesture: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -136,7 +140,7 @@ const drawPoint = (point) => {
   let selected = isSelected(point)
 
   // 绘制外圈
-  if (selected) {
+  if (selected && param.showGesture) {
     ctx.beginPath();
     // 不同状态的颜色
     if (verifyStatus.value === 'fail') {
@@ -154,7 +158,7 @@ const drawPoint = (point) => {
 
   // 画圆心
   ctx.beginPath();
-  if(selected){
+  if (selected && param.showGesture) {
     if (verifyStatus.value === 'fail') {
       ctx.fillStyle = config.failColor
     } else if (verifyStatus.value === 'pass') {
@@ -263,6 +267,10 @@ const canvasMove = (e) => {
 
 // 绘制选择线
 const drawSelectLine = (moveX, moveY) => {
+
+  if (!param.showGesture) {
+    return;
+  }
 
   // 获取鼠标当先所在点
   let point = getPoint(moveX, moveY);

@@ -97,6 +97,12 @@ const getLocalMainPassword = () => {
   }
 }
 
+// 显示手势
+const isShowGesture = () => {
+  let verifyShowGesture = getSystemConfig('verifyShowGesture')
+  return verifyShowGesture !== false;
+}
+
 // 验证主密码
 const verifyMainPassword = (cache = true) => {
 
@@ -152,8 +158,8 @@ defineExpose({
       width="400px"
   >
     <div style="text-align: center">
-      <GesturePassword v-if="mainPasswordType === 'gesture'" ref="gesturePasswordRef" @complete="gestureComplete"></GesturePassword>
-      <el-form style="padding: 10px" v-if="mainPasswordType === 'common'">
+      <GesturePassword v-if="mainPasswordType === 'gesture' && alertVisStatus.verifyMainPassword" :show-gesture="isShowGesture()" ref="gesturePasswordRef" @complete="gestureComplete"></GesturePassword>
+      <el-form style="padding: 10px" v-if="mainPasswordType === 'common' && alertVisStatus.verifyMainPassword">
         <el-form-item>
           <el-input
               v-model="mainPassword"

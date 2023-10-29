@@ -33,6 +33,10 @@ const settingForm = reactive({
   darkMode: false,
   sortRule: 'insertTimeDesc',
   showPasswordStrength: false,
+  cacheDatabaseForm: true,
+  showAddTime: true,
+  showUpTime: false,
+  verifyShowGesture: true,
   defaultPasswordRule: {
     length: 16,
     number: true,
@@ -65,6 +69,30 @@ const topics = reactive([
 const cacheMains = reactive([
   {key: true, label: t('systemSetting.cacheMainPassword.enable')},
   {key: false, label: t('systemSetting.cacheMainPassword.disabled')}
+])
+
+// 显示添加时间列表
+const showAddTimes = reactive([
+  {key: true, label: t('systemSetting.showAddTime.enable')},
+  {key: false, label: t('systemSetting.showAddTime.disabled')}
+])
+
+// 显示修改时间列表
+const showUpTimes = reactive([
+  {key: true, label: t('systemSetting.showUpTime.enable')},
+  {key: false, label: t('systemSetting.showUpTime.disabled')}
+])
+
+// 验证密码时显示手势
+const verifyShowGestures = reactive([
+  {key: true, label: t('mainPasswordSetting.verify.showGesture.enable')},
+  {key: false, label: t('mainPasswordSetting.verify.showGesture.disabled')}
+])
+
+// 是否缓存登录信息列表
+const cacheDatabaseForms = reactive([
+  {key: true, label: t('systemSetting.cacheDatabaseForm.enable')},
+  {key: false, label: t('systemSetting.cacheDatabaseForm.disabled')}
 ])
 
 // 是否自动生成密码选项
@@ -104,7 +132,7 @@ const openSystemSetting = () => {
 }
 
 // 保存设置
-const saveSetting = () => {
+const saveSetting = (close) => {
 
   let generateForm = settingForm.defaultPasswordRule;
   // 密码规则校验
@@ -116,13 +144,18 @@ const saveSetting = () => {
   // 更新系统配置
   updateConfig(settingForm)
 
+  // 原有配置
+  let oldSetting = JSON.parse(oldSystemSetting)
+
   // 若设置不缓存主密码则立即删除缓存中的主密码
-  if (settingForm.cacheMainPassword === false) {
+  if (settingForm.cacheMainPassword !== oldSetting.cacheMainPassword && settingForm.cacheMainPassword === false) {
     localStorage.removeItem('mainPasswordCiphertext')
   }
 
-  // 原有配置
-  let oldSetting = JSON.parse(oldSystemSetting)
+  // 若设置不缓存登录信息则立即删除缓存中的登录信息
+  if (settingForm.cacheDatabaseForm !== oldSetting.cacheDatabaseForm && settingForm.cacheDatabaseForm === false) {
+    localStorage.removeItem('databaseForm')
+  }
 
   // 设置系统语言
   if (settingForm.language !== locale.value) {
@@ -148,8 +181,10 @@ const saveSetting = () => {
     console.log('是否显示密码强度设置为：', settingForm.showPasswordStrength)
   }
 
-  // 关闭密码弹框
-  alertVisStatus.setting = false
+  if (close) {
+    // 关闭密码弹框
+    alertVisStatus.setting = false;
+  }
 }
 
 // 退出登录
@@ -201,105 +236,155 @@ defineExpose({
       width="600px"
   >
     <el-form :model="settingForm" label-width="150px">
-      <el-form-item :label="t('systemSetting.language')">
-        <el-select v-model="settingForm.language">
-          <el-option
-              v-for="language in languages"
-              :key="language.key"
-              :label="language.label"
-              :value="language.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('systemSetting.sort')">
-        <el-select v-model="settingForm.sortRule">
-          <el-option
-              v-for="sort in sorts"
-              :key="sort.key"
-              :label="sort.label"
-              :value="sort.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('systemSetting.topic')">
-        <el-select v-model="settingForm.darkMode">
-          <el-option
-              v-for="topic in topics"
-              :key="topic.key"
-              :label="topic.label"
-              :value="topic.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('systemSetting.cacheMainPassword')">
-        <el-select v-model="settingForm.cacheMainPassword">
-          <el-option
-              v-for="cacheMain in cacheMains"
-              :key="cacheMain.key"
-              :label="cacheMain.label"
-              :value="cacheMain.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('passwordForm.autoGeneratePassword')">
-        <el-select v-model="settingForm.autoGeneratePassword">
-          <el-option
-              v-for="autoGenerate in autoGeneratePasswords"
-              :key="autoGenerate.key"
-              :label="autoGenerate.label"
-              :value="autoGenerate.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('systemSetting.showPasswordStrength')">
-        <el-select v-model="settingForm.showPasswordStrength">
-          <el-option
-              v-for="showPasswordStrength in showPasswordStrengths"
-              :key="showPasswordStrength.key"
-              :label="showPasswordStrength.label"
-              :value="showPasswordStrength.key"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('systemSetting.defaultPasswordRule')">
-        <el-row style="margin-top: 15px">
-          <el-col :span="12">
-            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.uppercase"
-                         :label="t('passwordForm.generateForm.uppercase')" border/>
-          </el-col>
-          <el-col :span="12">
-            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.lowercase"
-                         :label="t('passwordForm.generateForm.lowercase')" border/>
-          </el-col>
-          <el-col :span="12">
-            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.number"
-                         :label="t('passwordForm.generateForm.number')" border/>
-          </el-col>
-          <el-col :span="12">
-            <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
-                         :label="t('passwordForm.generateForm.symbol')" border/>
-          </el-col>
-          <el-col :span="12">
-            <div>
-              <el-input size="small" style="position: relative;top:3px"
-                        v-model="settingForm.defaultPasswordRule.length">
-                <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
-              </el-input>
-            </div>
-          </el-col>
-        </el-row>
-      </el-form-item>
+      <el-tabs tab-position="left" style="height: 350px">
+        <el-tab-pane label="常规">
+          <el-form-item :label="t('systemSetting.language')">
+            <el-select v-model="settingForm.language">
+              <el-option
+                  v-for="language in languages"
+                  :key="language.key"
+                  :label="language.label"
+                  :value="language.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.sort')">
+            <el-select v-model="settingForm.sortRule">
+              <el-option
+                  v-for="sort in sorts"
+                  :key="sort.key"
+                  :label="sort.label"
+                  :value="sort.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('passwordForm.autoGeneratePassword')">
+            <el-select v-model="settingForm.autoGeneratePassword">
+              <el-option
+                  v-for="autoGenerate in autoGeneratePasswords"
+                  :key="autoGenerate.key"
+                  :label="autoGenerate.label"
+                  :value="autoGenerate.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.defaultPasswordRule')">
+            <el-row style="margin-top: 15px">
+              <el-col :span="12">
+                <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.uppercase"
+                             :label="t('passwordForm.generateForm.uppercase')" border/>
+              </el-col>
+              <el-col :span="12">
+                <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.lowercase"
+                             :label="t('passwordForm.generateForm.lowercase')" border/>
+              </el-col>
+              <el-col :span="12">
+                <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.number"
+                             :label="t('passwordForm.generateForm.number')" border/>
+              </el-col>
+              <el-col :span="12">
+                <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
+                             :label="t('passwordForm.generateForm.symbol')" border/>
+              </el-col>
+              <el-col :span="12">
+                <div>
+                  <el-input size="small" style="position: relative;top:3px"
+                            v-model="settingForm.defaultPasswordRule.length">
+                    <template #prepend>{{ t('passwordForm.generateForm.length') }}</template>
+                  </el-input>
+                </div>
+              </el-col>
+            </el-row>
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="个性化">
+          <el-form-item :label="t('systemSetting.topic')">
+            <el-select v-model="settingForm.darkMode">
+              <el-option
+                  v-for="topic in topics"
+                  :key="topic.key"
+                  :label="topic.label"
+                  :value="topic.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.showPasswordStrength')">
+            <el-select v-model="settingForm.showPasswordStrength">
+              <el-option
+                  v-for="showPasswordStrength in showPasswordStrengths"
+                  :key="showPasswordStrength.key"
+                  :label="showPasswordStrength.label"
+                  :value="showPasswordStrength.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.showAddTime')">
+            <el-select v-model="settingForm.showAddTime">
+              <el-option
+                  v-for="showAddTime in showAddTimes"
+                  :key="showAddTime.key"
+                  :label="showAddTime.label"
+                  :value="showAddTime.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.showUpTime')">
+            <el-select v-model="settingForm.showUpTime">
+              <el-option
+                  v-for="showUpTime in showUpTimes"
+                  :key="showUpTime.key"
+                  :label="showUpTime.label"
+                  :value="showUpTime.key"
+              />
+            </el-select>
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="安全">
+          <el-form-item :label="t('systemSetting.cacheMainPassword')">
+            <el-select v-model="settingForm.cacheMainPassword">
+              <el-option
+                  v-for="cacheMain in cacheMains"
+                  :key="cacheMain.key"
+                  :label="cacheMain.label"
+                  :value="cacheMain.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('systemSetting.cacheDatabaseForm')">
+            <el-select v-model="settingForm.cacheDatabaseForm">
+              <el-option
+                  v-for="cacheDatabase in cacheDatabaseForms"
+                  :key="cacheDatabase.key"
+                  :label="cacheDatabase.label"
+                  :value="cacheDatabase.key"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('mainPasswordSetting.verify.showGesture')">
+            <el-select v-model="settingForm.verifyShowGesture">
+              <el-option
+                  v-for="verifyShowGesture in verifyShowGestures"
+                  :key="verifyShowGesture.key"
+                  :label="verifyShowGesture.label"
+                  :value="verifyShowGesture.key"
+              />
+            </el-select>
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="其他">
+          <div style="text-align: center">
+            <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
+            <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
+            <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
     </el-form>
-    <div style="text-align: center">
-      <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
-      <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
-      <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
-    </div>
-
 
     <template #footer>
           <span class="dialog-footer">
-            <el-button type="primary" @click="saveSetting">{{ t('systemSetting.save') }}</el-button>
+            <el-button type="primary" plain @click="saveSetting(false)">{{ t('systemSetting.apply') }}</el-button>
+            <el-button type="primary" plain @click="saveSetting(true)">{{ t('systemSetting.save') }}</el-button>
           </span>
     </template>
   </el-dialog>

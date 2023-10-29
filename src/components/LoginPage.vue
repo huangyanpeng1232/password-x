@@ -74,7 +74,10 @@ const loginSucceed = () => {
   // 使用浏览器指纹加密database配置信息
   let ciphertext = encrypt(bowerId, JSON.stringify(databaseForm))
   // 保存到localStorage用于下次登录
-  localStorage.setItem('databaseForm', ciphertext)
+  let cacheDatabaseForm = getSystemConfig('cacheDatabaseForm')
+  if (cacheDatabaseForm !== false) {
+    localStorage.setItem('databaseForm', ciphertext);
+  }
   // 提示登录成功
   ElNotification.success(t('login.form.successMessage'));
   // 重定向到首页

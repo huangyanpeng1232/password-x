@@ -1,6 +1,7 @@
 import {createStore} from 'vuex'
 import {login} from "@/database/index.js";
 import {decrypt, getBowerId} from "@/utils/security";
+import {getSystemConfig} from "@/utils/global.js";
 
 export default createStore({
     state: {
@@ -48,7 +49,12 @@ export default createStore({
                 }
 
                 // 获取缓存配置
-                let ciphertext = localStorage.getItem('databaseForm')
+                let cacheDatabaseForm = getSystemConfig('cacheDatabaseForm')
+                if (cacheDatabaseForm === false) {
+                    resolve(false)
+                    return
+                }
+                let ciphertext = localStorage.getItem('databaseForm');
                 if (!ciphertext) {
                     resolve(false)
                     return
