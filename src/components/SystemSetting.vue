@@ -290,9 +290,12 @@ defineExpose({
         </el-row>
       </el-form-item>
     </el-form>
-    <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
-    <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
-    <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
+    <div style="text-align: center">
+      <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
+      <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
+      <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
+    </div>
+
 
     <template #footer>
           <span class="dialog-footer">
