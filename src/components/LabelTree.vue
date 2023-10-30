@@ -107,7 +107,7 @@ defineExpose({
 </script>
 
 <template>
-  <el-card>
+  <el-card class="body-card">
     <template #header>
       {{ t('labelTree.title') }}
     </template>
@@ -119,7 +119,7 @@ defineExpose({
           ref="labelTreeRef"
           draggable
           node-key="id"
-          style="margin-top: 10px"
+          style="margin-top: 10px;background-color: rgba(0,0,0,0);"
           @check="labelTreeChange"
           :filter-node-method="labelFilterNode"
           :expand-on-click-node="false"
@@ -152,6 +152,10 @@ defineExpose({
 </template>
 
 <style scoped>
+.body-card {
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(50px);
+}
 .label-tree-node {
   flex: 1;
   display: flex;

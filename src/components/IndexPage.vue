@@ -461,9 +461,10 @@ onMounted(() => {
 </script>
 
 <template>
+  <img alt="" class="back-img" src="~@/assets/images/backImg.svg">
   <el-row id="passwordBody">
     <el-col :xl="{span:16,offset:2}" :lg="{span:19}" :md="{span:19}">
-      <el-card>
+      <el-card class="body-card">
         <template #header>
           <div style="display: flex;justify-content: space-between;">
             <div>
@@ -564,7 +565,15 @@ onMounted(() => {
             </div>
           </div>
         </template>
-        <el-table height="calc(100vh - 150px)" :data="showPasswordArray">
+        <el-table
+            height="calc(100vh - 150px)"
+            style="background-color: rgba(0,0,0,0);"
+            :header-row-style="{'background-color':'rgba(0,0,0,0)'}"
+            :header-cell-style="{'background-color':'rgba(0,0,0,0)'}"
+            :row-style="{'background-color':'rgba(0,0,0,0)'}"
+            :cell-style="{'background-color':'rgba(0,0,0,0)'}"
+            :data="showPasswordArray"
+        >
           <template #empty>
             <!--              密码列表为空时展示-->
             <el-empty :description="mainPassword?t('index.table.empty'):t('index.table.lock')">
@@ -702,6 +711,20 @@ onMounted(() => {
   #passwordBody {
     padding: 15px;
   }
+}
+
+.body-card {
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(50px);
+}
+
+.back-img {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1
 }
 
 .pass-action-div {

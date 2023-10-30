@@ -246,7 +246,7 @@ defineExpose({
       :title="t('systemSetting.title')"
       width="600px"
   >
-    <el-form :model="settingForm" label-width="150px">
+    <el-form :model="settingForm" label-width="120px">
       <el-tabs tab-position="left" style="height: 350px">
         <el-tab-pane label="常规">
           <el-form-item :label="t('systemSetting.language')">
@@ -297,7 +297,7 @@ defineExpose({
                 <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
                              :label="t('passwordForm.generateForm.symbol')" border/>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="24">
                 <div>
                   <el-input size="small" style="position: relative;top:3px"
                             v-model="settingForm.defaultPasswordRule.length">
