@@ -10,25 +10,11 @@ password-x 不仅支持保存各种网站、服务器、数据库、应用等密
 https://password-x.gitee.io
 
 阿里云OSS演示账号：[点我打开](https://password-x.gitee.io/login?type=oss&region=oss-cn-beijing&keyId=LTAI5tRPBc5sY6KbZd1Vc1jU&keySecret=4OORS9GloeAn2Jd4Tvluw1Lt0YIj21&bucket=password-x-demo)
+
 腾讯云COS演示账号：[点我打开](https://password-x.gitee.io/login?type=cos&region=ap-beijing&keyId=AKID8BJDUZR7bu2xgR1MED0hDVbXGm43qPmw&keySecret=2vdHH7lBORIvTqyvjNp6EGBvWu7B9994&bucket=password-x-demo-1259440743)
-
-OSS登录信息：  
-region: oss-cn-beijing  
-KeyId: LTAI5tRPBc5sY6KbZd1Vc1jU  
-KeySecret: 4OORS9GloeAn2Jd4Tvluw1Lt0YIj21  
-bucket: password-x-demo
-
-COS登录信息：  
-region: ap-beijing  
-KeyId: AKID8BJDUZR7bu2xgR1MED0hDVbXGm43qPmw  
-KeySecret: 2vdHH7lBORIvTqyvjNp6EGBvWu7B9994  
-bucket: password-x-demo-1259440743  
 
 主密码：456 或 图案密码:  
 ![](https://foruda.gitee.com/images/1698466035681541011/230bc1c8_9560465.png)
-
-### 阿里云账号注册指引
-[点我查看](https://gitee.com/password-x/password-x/wikis/%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%A6%E5%8F%B7%E6%93%8D%E4%BD%9C%E6%8C%87%E5%BC%95)
 
 ### 系统架构简介
 &emsp;&emsp;password-x 是一款基于 Vite、Vue3 和 Element Plus 等主流框架精心打造的密码管理工具，稳定性卓越，页面设计美观大方。我们采用先进的 AES 对称加密技术对密码文件进行处理，确保安全性和速度的双重优势。
@@ -46,24 +32,28 @@ bucket: password-x-demo-1259440743
 &emsp;&emsp;password-x 使用阿里云对象存储作为数据库保存密码文件
 > 阿里云对象存储服务（Object Storage Service，简称 OSS）是一款可提供海量、安全、低成本、高可靠服务的云存储产品。其数据可靠性高达 99.9999999999%（12个9），这一数值代表的是其在一年内丢失数据的概率极低。同时，其服务可用性也达到了不低于 99.995%，确保用户可以随时随地访问存储的数据。
 
-如您想进一步提升服务可靠性：
+如您想进一步提升数据可靠性：
 - 开启阿里云版本控制功能，即使密码不小心删除或者程序bug，您也可以随时恢复数据（会占用更多的存储空间）
 - 开启阿里云跨区域复制功能（会产生少量费用）
-- 将password-x静态页面部署在自己的Gitee pages、私有服务器或是本地电脑上
 
 ### 部署方式
-&emsp;&emsp;password-x 支持静态页面部署，如 Gitee Pages、Github Pages 和 Nginx 服务，也可以直接部署到阿里 OSS、腾讯 Cos 等平台。此外，您还可以选择将项目编译后的文件下载到本地直接使用，无需依赖任何第三方服务，随时为您提供最可靠的服务。
+&emsp;&emsp;password-x 支持静态页面部署，如 Gitee Pages、Github Pages、Nginx、Tomcat，还可以直接部署到腾讯 Cos 静态页面服务中。
 
 ### 页面展示
-![](https://foruda.gitee.com/images/1698030803794194252/78f7a2ac_9560465.png)
-![](https://foruda.gitee.com/images/1698030803931340178/b7661e95_9560465.png)
-![](https://foruda.gitee.com/images/1698030803915600594/7c66fe43_9560465.png)
-![](https://foruda.gitee.com/images/1698030803902131457/95adad8e_9560465.png)
-![](https://foruda.gitee.com/images/1698030803955678967/be65f17f_9560465.png)
-![](https://foruda.gitee.com/images/1698030803805570778/b6ad6361_9560465.png)
+![登录](https://foruda.gitee.com/images/1698639884126266512/2aabf75e_9560465.png)
+![验证密码](https://foruda.gitee.com/images/1698639949571516413/36a70ea9_9560465.png)
+![首页](https://foruda.gitee.com/images/1698030803931340178/b7661e95_9560465.png)
+![编辑](https://foruda.gitee.com/images/1698030803915600594/7c66fe43_9560465.png)
+![设置](https://foruda.gitee.com/images/1698640021798692251/93282539_9560465.png)
+![多语言](https://foruda.gitee.com/images/1698030803805570778/b6ad6361_9560465.png)
+![暗黑](https://foruda.gitee.com/images/1698030803955678967/be65f17f_9560465.png)
 
 ### 开源地址
 https://gitee.com/password-x/password-x
+
+
+### 使用方法
+请参考 阿里云账号操作指引文档
 
 ### 功能列表
 
@@ -76,15 +66,19 @@ https://gitee.com/password-x/password-x
 - 修改主密码 √
 - 注销账户 √
 - 密码强度显示 √
-- - 导入/导出密码列表 √
+- 导入/导出密码列表 √
+- 手势主密码 √
+- 对接腾讯云cos存储 √
 - 配置信息token导出（即将支持）
-- 对接腾讯云cos存储（即将支持）
+- 自定义背景图（即将支持）
 - 密码文件压缩（即将支持）
+- 密钥文件（考虑中）
+
 
 ### 作者微信
-如您有任何问题欢迎随时反馈  
-![box](https://foruda.gitee.com/images/1697444535317416303/de05c1a5_9560465.png)
+如您有任何问题欢迎随时反馈
+![作者微信](https://foruda.gitee.com/images/1697444535317416303/de05c1a5_9560465.png)
 
 ### 打赏
-作为一个开源项目，在开发和维护过程中面临着诸多困难和挑战。为了能够持续为大家提供更好的服务，希望大家能够伸出援手，给予一些经济上的支持  
-![box](https://foruda.gitee.com/images/1697444547014836574/613e0117_9560465.png)
+作为一个开源项目，在开发和维护过程中面临着诸多困难和挑战。为了能够持续为大家提供更好的服务，希望大家能够伸出援手，给予一些经济上的支持
+![赞赏码](https://foruda.gitee.com/images/1697444547014836574/613e0117_9560465.png "屏幕截图")

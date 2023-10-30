@@ -614,7 +614,7 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.userName')" min-width="120px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="200px">
+          <el-table-column :label="t('password.password')" min-width="150px">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
@@ -631,7 +631,7 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column :label="t('index.table.label')" min-width="130px">
+          <el-table-column v-if="systemConfig.showLabel !== false" :label="t('index.table.label')" min-width="130px">
             <template #default="scope">
               <el-tag style="margin: 3px" v-for="label in getLabelNameById(scope.row.label)" :key="label">
                 {{label}}

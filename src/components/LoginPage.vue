@@ -78,8 +78,6 @@ const loginSucceed = () => {
   if (cacheDatabaseForm !== false) {
     localStorage.setItem('databaseForm', ciphertext);
   }
-  // 提示登录成功
-  ElNotification.success(t('login.form.successMessage'));
   // 重定向到首页
   router.push('/')
 }

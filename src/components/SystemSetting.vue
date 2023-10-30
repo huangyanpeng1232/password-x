@@ -37,6 +37,7 @@ const settingForm = reactive({
   showAddTime: true,
   showUpTime: false,
   verifyShowGesture: true,
+  showLabel: true,
   defaultPasswordRule: {
     length: 16,
     number: true,
@@ -81,6 +82,12 @@ const showAddTimes = reactive([
 const showUpTimes = reactive([
   {key: true, label: t('systemSetting.showUpTime.enable')},
   {key: false, label: t('systemSetting.showUpTime.disabled')}
+])
+
+// 显示标签列表
+const showLabels = reactive([
+  {key: true, label: t('systemSetting.showLabel.enable')},
+  {key: false, label: t('systemSetting.showLabel.disabled')}
 ])
 
 // 验证密码时显示手势
@@ -131,8 +138,14 @@ const openSystemSetting = () => {
   alertVisStatus.setting = true
 }
 
+// 关闭设置
+const closeSetting = () => {
+  // 关闭设置
+  alertVisStatus.setting = false;
+}
+
 // 保存设置
-const saveSetting = (close) => {
+const saveSetting = () => {
 
   let generateForm = settingForm.defaultPasswordRule;
   // 密码规则校验
@@ -181,10 +194,8 @@ const saveSetting = (close) => {
     console.log('是否显示密码强度设置为：', settingForm.showPasswordStrength)
   }
 
-  if (close) {
-    // 关闭密码弹框
-    alertVisStatus.setting = false;
-  }
+  // 关闭设置弹框
+  alertVisStatus.setting = false;
 }
 
 // 退出登录
@@ -338,6 +349,16 @@ defineExpose({
               />
             </el-select>
           </el-form-item>
+          <el-form-item :label="t('systemSetting.showLabel')">
+            <el-select v-model="settingForm.showLabel">
+              <el-option
+                  v-for="showLabel in showLabels"
+                  :key="showLabel.key"
+                  :label="showLabel.label"
+                  :value="showLabel.key"
+              />
+            </el-select>
+          </el-form-item>
         </el-tab-pane>
         <el-tab-pane label="安全">
           <el-form-item :label="t('systemSetting.cacheMainPassword')">
@@ -380,11 +401,11 @@ defineExpose({
         </el-tab-pane>
       </el-tabs>
     </el-form>
-
+    <el-alert style="margin-top: 20px" type="warning">{{t('systemSetting.takeEffect')}}</el-alert>
     <template #footer>
           <span class="dialog-footer">
-            <el-button type="primary" plain @click="saveSetting(false)">{{ t('systemSetting.apply') }}</el-button>
-            <el-button type="primary" plain @click="saveSetting(true)">{{ t('systemSetting.save') }}</el-button>
+            <el-button plain @click="closeSetting">{{ t('systemSetting.close') }}</el-button>
+            <el-button type="primary" plain @click="saveSetting">{{ t('systemSetting.save') }}</el-button>
           </span>
     </template>
   </el-dialog>
