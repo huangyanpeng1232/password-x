@@ -6,8 +6,12 @@ import {copyText, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/database/index.js";
 import {decrypt, encrypt} from "@/utils/security.js";
 import store from "@/store/index.js";
+import {useDark} from '@vueuse/core'
 
 const {t, locale} = useI18n()
+
+// 暗黑模式
+const darkMode = useDark()
 
 // 密码表单组件对象
 const passwordFormRef = ref()
@@ -441,6 +445,11 @@ const logout = () => {
   systemSettingRef.value.logout()
 }
 
+// 是否暗黑模式
+const isDark = () => {
+  return darkMode.value
+}
+
 // 页面加载完成后事件
 onMounted(() => {
 
@@ -464,7 +473,7 @@ onMounted(() => {
   <img alt="" class="back-img" src="~@/assets/images/backImg.svg">
   <el-row id="passwordBody">
     <el-col :xl="{span:16,offset:2}" :lg="{span:19}" :md="{span:19}">
-      <el-card class="body-card">
+      <el-card class="body-card" :style="{'background-color': isDark()?'rgba(0,0,0,0.4)':'rgba(255,255,255,0.4)'}">
         <template #header>
           <div style="display: flex;justify-content: space-between;">
             <div>
@@ -714,7 +723,6 @@ onMounted(() => {
 }
 
 .body-card {
-  background-color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(50px);
 }
 

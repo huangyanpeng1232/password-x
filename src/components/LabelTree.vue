@@ -3,6 +3,10 @@
 // 分组组件对象
 import {getFile, putFile} from "@/database/index.js";
 import {useI18n} from "vue-i18n";
+import {useDark} from '@vueuse/core'
+
+// 暗黑模式
+const darkMode = useDark()
 
 const {t} = useI18n()
 
@@ -98,6 +102,11 @@ const loadLabelTreeByDatabase = () => {
   })
 }
 
+// 是否暗黑模式
+const isDark = () => {
+  return darkMode.value
+}
+
 loadLabelTreeByDatabase()
 
 // 导出的方法
@@ -107,7 +116,7 @@ defineExpose({
 </script>
 
 <template>
-  <el-card class="body-card">
+  <el-card class="body-card" :style="{'background-color': isDark()?'rgba(0,0,0,0.4)':'rgba(255,255,255,0.4)'}">
     <template #header>
       {{ t('labelTree.title') }}
     </template>
@@ -153,7 +162,6 @@ defineExpose({
 
 <style scoped>
 .body-card {
-  background-color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(50px);
 }
 .label-tree-node {
