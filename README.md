@@ -41,12 +41,12 @@ https://password-x.gitee.io
 
 ### 页面展示
 ![登录](https://foruda.gitee.com/images/1698639884126266512/2aabf75e_9560465.png)
-![验证密码](https://foruda.gitee.com/images/1698639949571516413/36a70ea9_9560465.png)
-![首页](https://foruda.gitee.com/images/1698030803931340178/b7661e95_9560465.png)
-![编辑](https://foruda.gitee.com/images/1698030803915600594/7c66fe43_9560465.png)
-![设置](https://foruda.gitee.com/images/1698640021798692251/93282539_9560465.png)
-![多语言](https://foruda.gitee.com/images/1698030803805570778/b6ad6361_9560465.png)
-![暗黑](https://foruda.gitee.com/images/1698030803955678967/be65f17f_9560465.png)
+![验证密码](https://foruda.gitee.com/images/1698714086606322110/a4f448e5_9560465.png)
+![首页](https://foruda.gitee.com/images/1698713936750032841/6e0d1a55_9560465.png)
+![编辑](https://foruda.gitee.com/images/1698714136725781723/e5752fdd_9560465.png)
+![设置](https://foruda.gitee.com/images/1698714175075207907/bb9fa1e8_9560465.png)
+![多语言](https://foruda.gitee.com/images/1698713962830229668/1157ff87_9560465.png)
+![暗黑模式](https://foruda.gitee.com/images/1698714002636191301/4b3092f5_9560465.png)
 
 ### 开源地址
 https://gitee.com/password-x/password-x
