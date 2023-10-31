@@ -77,7 +77,6 @@ const gestureComplete = (password) => {
 
 // 全屏
 const fullscreen = ref(document.documentElement.clientWidth < 728)
-
 window.addEventListener('resize', function () {
   fullscreen.value = document.documentElement.clientWidth < 728
 });

@@ -26,26 +26,7 @@ const alertVisStatus = reactive({
 })
 
 // 系统设置表单
-const settingForm = reactive({
-  language: 'zh-cn',
-  cacheMainPassword: true,
-  autoGeneratePassword: true,
-  darkMode: false,
-  sortRule: 'insertTimeDesc',
-  showPasswordStrength: false,
-  cacheDatabaseForm: true,
-  showAddTime: true,
-  showUpTime: false,
-  verifyShowGesture: true,
-  showLabel: true,
-  defaultPasswordRule: {
-    length: 16,
-    number: true,
-    lowercase: true,
-    uppercase: true,
-    symbol: true,
-  }
-})
+const settingForm = reactive(loadConfig())
 
 // 语言列表
 const languages = reactive([
@@ -57,7 +38,12 @@ const languages = reactive([
 const sorts = reactive([
   {key: 'insertTimeDesc', label: t('systemSetting.sort.insertTimeDesc')},
   {key: 'insertTimeAsc', label: t('systemSetting.sort.insertTimeAsc')},
-  {key: 'name', label: t('systemSetting.sort.name')},
+  {key: 'updateTimeDesc', label: t('systemSetting.sort.updateTimeDesc')},
+  {key: 'updateTimeAsc', label: t('systemSetting.sort.updateTimeAsc')},
+  {key: 'nameAsc', label: t('systemSetting.sort.nameAsc')},
+  {key: 'nameDesc', label: t('systemSetting.sort.nameDesc')},
+  {key: 'strengthDesc', label: t('systemSetting.sort.strengthAsc')},
+  {key: 'strengthAsc', label: t('systemSetting.sort.strengthDesc')},
 ])
 
 // 主题列表
@@ -120,10 +106,9 @@ let oldSystemSetting = null;
 const openSystemSetting = () => {
   // 读取系统配置
   let config = loadConfig()
-  if (config) {
-    for (let key in config) {
-      settingForm[key] = config[key]
-    }
+
+  for (let key in config) {
+    settingForm[key] = config[key]
   }
 
   // 设置界面语言
@@ -163,11 +148,13 @@ const saveSetting = () => {
   // 若设置不缓存主密码则立即删除缓存中的主密码
   if (settingForm.cacheMainPassword !== oldSetting.cacheMainPassword && settingForm.cacheMainPassword === false) {
     localStorage.removeItem('mainPasswordCiphertext')
+    console.log('删除主密码缓存')
   }
 
   // 若设置不缓存登录信息则立即删除缓存中的登录信息
   if (settingForm.cacheDatabaseForm !== oldSetting.cacheDatabaseForm && settingForm.cacheDatabaseForm === false) {
     localStorage.removeItem('databaseForm')
+    console.log('删除自动登录信息')
   }
 
   // 设置系统语言
@@ -208,6 +195,8 @@ const logout = () => {
   store.commit('delDatabase')
   // 删除database表单对象
   store.commit('delDatabaseForm')
+  // 删除主密码验证码
+  store.commit('delVerifyCode')
   // 重定向到登录界面
   router.push('/login')
 }
@@ -226,7 +215,6 @@ const showDeleteAccount = () => {
 
 // 全屏
 const fullscreen = ref(document.documentElement.clientWidth < 728)
-
 window.addEventListener('resize', function () {
   fullscreen.value = document.documentElement.clientWidth < 728
 });
@@ -235,7 +223,8 @@ window.addEventListener('resize', function () {
 defineExpose({
   logout,
   openSystemSetting,
-  showUpdateMainPassword
+  showUpdateMainPassword,
+  settingForm
 });
 </script>
 

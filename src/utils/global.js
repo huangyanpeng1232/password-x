@@ -1,4 +1,5 @@
 import {ElMessage} from 'element-plus'
+import store from "@/store/index.js";
 
 // 复制文本
 export async function copyText(text) {
@@ -15,37 +16,40 @@ export async function copyText(text) {
 
 // 更新系统全部配置
 export function updateConfig(config) {
+    store.commit('updateSetting',config)
     localStorage.setItem('systemConfig', JSON.stringify(config))
+}
+
+// 更新系统指定配置
+export function setSystemConfig(key, value) {
+    let setting = loadConfig()
+    setting[key] = value
+    updateConfig(setting)
 }
 
 // 读取系统全部配置
 export function loadConfig() {
-    let systemConfigText = localStorage.getItem('systemConfig')
-    if (!systemConfigText) {
-        return null;
+    if (store.state.setting.sync) {
+        return store.state.setting;
+    }else{
+        let systemConfigText = localStorage.getItem('systemConfig')
+        if(systemConfigText){
+            let systemConfig = JSON.parse(systemConfigText)
+            systemConfig.sync = true
+            store.commit('updateSetting',systemConfig)
+            return systemConfig;
+        }else{
+            let setting = store.state.setting
+            setting.sync = true
+            updateConfig(setting)
+        }
     }
-    return JSON.parse(systemConfigText)
 }
 
-// 获取系统配置
+// 读取系统指定配置
 export function getSystemConfig(key) {
-    let systemConfigText = localStorage.getItem('systemConfig')
-    if (!systemConfigText) {
-        return null;
-    }
-    let systemConfig = JSON.parse(systemConfigText)
-    return systemConfig[key]
-}
-
-// 设置系统配置
-export function setSystemConfig(key, value) {
-    let systemConfigText = localStorage.getItem('systemConfig')
-    let systemConfig = {}
-    if (systemConfigText) {
-        systemConfig = JSON.parse(systemConfigText)
-    }
-    systemConfig[key] = value
-    updateConfig(systemConfig)
+    let setting = loadConfig()
+    return setting[key]
 }
 
 // 判断字符串是否为url

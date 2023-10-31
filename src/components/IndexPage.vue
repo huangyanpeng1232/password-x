@@ -15,6 +15,8 @@ const darkMode = useDark()
 
 // 密码表单组件对象
 const passwordFormRef = ref()
+// table对象
+const tableRef = ref()
 // 主密码验证组件对象
 const mainPasswordVerifyRef = ref()
 // 主密码初始化/设置组件对象
@@ -231,17 +233,34 @@ const systemChangeChange = (key, value) => {
 
 // 排序规则改变
 const passwordSort = (sort) => {
+
   if (sort === 'insertTimeDesc') {
+    tableRef.value.sort('insertTime', 'descending')
     sortPasswordArray('insertTime', -1)
   } else if (sort === 'insertTimeAsc') {
+    tableRef.value.sort('insertTime', 'ascending')
     sortPasswordArray('insertTime', 1)
-  } else if (sort === 'name') {
+  } else if (sort === 'updateTimeDesc') {
+    tableRef.value.sort('updateTime', 'descending')
+    sortPasswordArray('updateTime', -1)
+  } else if (sort === 'updateTimeAsc') {
+    tableRef.value.sort('updateTime', 'ascending')
+    sortPasswordArray('updateTime', 1)
+  } else if (sort === 'nameAsc') {
+    tableRef.value.sort('name', 'ascending')
     sortPasswordArray('name', 1)
+  } else if (sort === 'nameDesc') {
+    tableRef.value.sort('name', 'descending')
+    sortPasswordArray('name', -1)
+  } else if (sort === 'strengthDesc') {
+    tableRef.value.sort('strength', 'descending')
+    sortPasswordArray('strength', -1)
+  } else if (sort === 'strengthAsc') {
+    tableRef.value.sort('strength', 'ascending')
+    sortPasswordArray('strength', 1)
   }
   // 同步数据
   syncPasswordToDatabase()
-  // 显示排序结果
-  loadShowPassword()
 }
 
 // 获取密码强度
@@ -271,14 +290,6 @@ const getPasswordStrength = (password) => {
     }
   }
 
-  // 密码重复使用
-  let useCount = getPasswordUseCount();
-  if (useCount > 2) {
-    if (lvl > 2) {
-      lvl = 2;
-    }
-  }
-
   // 最高3分
   if (lvl > 3) {
     return 3
@@ -287,15 +298,13 @@ const getPasswordStrength = (password) => {
   }
 }
 
-// 获取密码使用次数
-const getPasswordUseCount = (password) => {
-  let count = 0
-  for (let i = 0; i < passwordArray.value.length; i++) {
-    if (passwordArray.value[i].password === password) {
-      count++;
-    }
+// 安全等级排序
+const strengthSort = (a, b) => {
+  if (getPasswordStrength(a.password) > getPasswordStrength(b.password)) {
+    return 1
+  } else {
+    return -1
   }
-  return count;
 }
 
 // 获取指定强度的密码数量
@@ -316,6 +325,13 @@ const getPasswordStrengthCount = (strength) => {
 // 密码排序
 const sortPasswordArray = (attr, rev) => {
   passwordArray.value.sort((a, b) => {
+    if (attr === 'strength') {
+      if (rev > 0) {
+        return strengthSort(a, b);
+      } else {
+        return strengthSort(b, a);
+      }
+    }
     a = a[attr];
     b = b[attr];
     if (a < b) {
@@ -582,6 +598,8 @@ onMounted(() => {
             :row-style="{'background-color':'rgba(0,0,0,0)'}"
             :cell-style="{'background-color':'rgba(0,0,0,0)'}"
             :data="showPasswordArray"
+            highlight-current-row
+            ref="tableRef"
         >
           <template #empty>
             <!--              密码列表为空时展示-->
@@ -592,7 +610,8 @@ onMounted(() => {
               <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
-          <el-table-column v-if="systemConfig.showPasswordStrength" width="30px">
+          <el-table-column sortable :sort-method="strengthSort" v-if="systemConfig.showPasswordStrength" prop="strength"
+                           width="30px">
             <template #default="scope">
               <el-tooltip v-if="getPasswordStrength(scope.row.password) === 3">
                 <template #content>
@@ -620,7 +639,7 @@ onMounted(() => {
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.name')" min-width="140px" prop="name"></el-table-column>
+          <el-table-column sortable :label="t('password.name')" min-width="140px" prop="name"></el-table-column>
           <el-table-column :label="t('password.address')" min-width="200px" prop="address">
             <template #default="scope">
               <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
@@ -632,7 +651,7 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.userName')" min-width="120px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="150px">
+          <el-table-column :label="t('password.password')" min-width="150px" prop="password">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
@@ -649,7 +668,8 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column v-if="systemConfig.showLabel !== false" :label="t('index.table.label')" min-width="130px">
+          <el-table-column v-if="systemConfig.showLabel !== false" :label="t('index.table.label')" min-width="130px"
+                           prop="label">
             <template #default="scope">
               <el-tag style="margin: 3px" v-for="label in getLabelNameById(scope.row.label)" :key="label">
                 {{label}}
@@ -657,8 +677,10 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
-          <el-table-column v-if="systemConfig.showAddTime" :label="t('password.insertTime')" min-width="130px" prop="insertTime"></el-table-column>
-          <el-table-column v-if="systemConfig.showUpTime" :label="t('password.updateTime')" min-width="130px" prop="updateTime"></el-table-column>
+          <el-table-column sortable v-if="systemConfig.showAddTime" :label="t('password.insertTime')" min-width="130px"
+                           prop="insertTime"></el-table-column>
+          <el-table-column sortable v-if="systemConfig.showUpTime" :label="t('password.updateTime')" min-width="130px"
+                           prop="updateTime"></el-table-column>
           <el-table-column min-width="140px" :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->

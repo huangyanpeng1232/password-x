@@ -3,7 +3,6 @@ import router from './router/index'
 import i18n from "@/language/index.js";
 import App from './App.vue'
 
-import './style.css'
 import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/display.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'

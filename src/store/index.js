@@ -13,6 +13,40 @@ export default createStore({
         verifyCode: null,
         // 主密码类型 手势 gesture、普通 common
         mainPasswordType: null,
+        // 系统设置
+        setting: {
+            sync: false,
+            // 语言
+            language: 'zh-cn',
+            // 缓存主密码
+            cacheMainPassword: true,
+            // 新增是自动生成一次密码
+            autoGeneratePassword: true,
+            // 暗黑模式
+            darkMode: false,
+            // 排序规则
+            sortRule: 'insertTimeDesc',
+            // 显示密码强度
+            showPasswordStrength: false,
+            // 缓存登录信息
+            cacheDatabaseForm: true,
+            // 显示添加时间
+            showAddTime: true,
+            // 显示更新时间
+            showUpTime: false,
+            // 手势主密码验证时显示手势
+            verifyShowGesture: true,
+            // 显示标签
+            showLabel: true,
+            // 默认密码生成规则
+            defaultPasswordRule: {
+                length: 16,
+                number: true,
+                lowercase: true,
+                uppercase: true,
+                symbol: true,
+            }
+        }
     },
     mutations: {
         setDatabase(state, database) {
@@ -36,6 +70,9 @@ export default createStore({
         },
         setMainPasswordType(state, code) {
             state.mainPasswordType = code
+        },
+        updateSetting(state, setting) {
+            state.setting = setting
         }
     },
     actions: {
