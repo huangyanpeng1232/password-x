@@ -29,20 +29,22 @@ export function setSystemConfig(key, value) {
 
 // 读取系统全部配置
 export function loadConfig() {
-    if (store.state.setting.sync) {
+    if (store.state.settingSync) {
         return store.state.setting;
     }else{
         let systemConfigText = localStorage.getItem('systemConfig')
         if(systemConfigText){
             let systemConfig = JSON.parse(systemConfigText)
-            systemConfig.sync = true
             store.commit('updateSetting',systemConfig)
+            store.commit('syncSetting')
             return systemConfig;
         }else{
             let setting = store.state.setting
-            setting.sync = true
             updateConfig(setting)
+            store.commit('syncSetting')
+            return setting;
         }
+
     }
 }
 

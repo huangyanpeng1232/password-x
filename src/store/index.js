@@ -13,9 +13,10 @@ export default createStore({
         verifyCode: null,
         // 主密码类型 手势 gesture、普通 common
         mainPasswordType: null,
+        // 设置是否与缓存同步
+        settingSync: false,
         // 系统设置
         setting: {
-            sync: false,
             // 语言
             language: 'zh-cn',
             // 缓存主密码
@@ -73,6 +74,9 @@ export default createStore({
         },
         updateSetting(state, setting) {
             state.setting = setting
+        },
+        syncSetting(state) {
+            state.settingSync = true
         }
     },
     actions: {
