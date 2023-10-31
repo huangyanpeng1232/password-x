@@ -54,6 +54,11 @@ export function getSystemConfig(key) {
     return setting[key]
 }
 
+// 读取配置文件
+export function getEnv(key) {
+    return import.meta.env[key]
+}
+
 // 判断字符串是否为url
 export function isUrl(str) {
     return str && /^.*:\/\/.*$/.test(str)

@@ -2,7 +2,7 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
-import {loadConfig, updateConfig} from "@/utils/global.js";
+import {loadConfig, updateConfig, getEnv} from "@/utils/global.js";
 import store from "@/store/index.js";
 import {useDark} from '@vueuse/core'
 
@@ -413,6 +413,17 @@ defineExpose({
             <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
             <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>
             <el-button type="warning" plain @click="logout">{{ t('systemSetting.logout') }}</el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane :label="t('systemSetting.about')" style="text-align: center">
+          <div style="margin-top: 20px;">
+            {{t('systemSetting.about.version')}}：{{getEnv('VITE_VERSION')}}
+          </div>
+          <div style="margin-top: 20px;">
+            {{t('systemSetting.about.openSourceUrl')}}：<el-link target="_blank" :href="getEnv('VITE_OPEN_SOURCE_URL')">{{getEnv('VITE_OPEN_SOURCE_URL')}}</el-link>
+          </div>
+          <div style="margin-top: 20px;">
+              {{t('systemSetting.about.submit')}}
           </div>
         </el-tab-pane>
       </el-tabs>
