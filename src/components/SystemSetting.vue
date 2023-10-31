@@ -28,92 +28,119 @@ const alertVisStatus = reactive({
 // 系统设置表单
 const settingForm = reactive(loadConfig())
 
-// 语言列表
-const languages = reactive([
-  {key: 'zh-cn', label: '简体中文',},
-  {key: 'en-us', label: 'English',}
-])
+// 系统设置选项
+const options = reactive({
+  // 语言列表
+  languages:[],
+  // 排序规则列表
+  sorts:[],
+  // 主题列表
+  topics:[],
+  // 是否缓存主密码列表
+  cacheMains:[],
+  // 显示添加时间列表
+  showAddTimes:[],
+  // 显示修改时间列表
+  showUpTimes:[],
+  // 显示标签列表
+  showLabels:[],
+  // 验证密码时显示手势
+  verifyShowGestures:[],
+  // 是否缓存登录信息列表
+  cacheDatabaseForms:[],
+  // 是否自动生成密码选项
+  autoGeneratePasswords:[],
+  // 密码强度提示
+  showPasswordStrengths:[],
+})
 
-// 排序规则列表
-const sorts = reactive([
-  {key: 'insertTimeDesc', label: t('systemSetting.sort.insertTimeDesc')},
-  {key: 'insertTimeAsc', label: t('systemSetting.sort.insertTimeAsc')},
-  {key: 'updateTimeDesc', label: t('systemSetting.sort.updateTimeDesc')},
-  {key: 'updateTimeAsc', label: t('systemSetting.sort.updateTimeAsc')},
-  {key: 'nameAsc', label: t('systemSetting.sort.nameAsc')},
-  {key: 'nameDesc', label: t('systemSetting.sort.nameDesc')},
-  {key: 'strengthDesc', label: t('systemSetting.sort.strengthAsc')},
-  {key: 'strengthAsc', label: t('systemSetting.sort.strengthDesc')},
-])
+const initOptions = () => {
+  // 语言列表
+  options.languages = [
+    {key: 'zh-cn', label: '简体中文',},
+    {key: 'en-us', label: 'English',}
+  ]
 
-// 主题列表
-const topics = reactive([
-  {key: false, label: t('systemSetting.topic.light')},
-  {key: true, label: t('systemSetting.topic.dark')}
-])
+  // 排序规则列表
+  options.sorts = [
+    {key: 'insertTimeDesc', label: t('systemSetting.sort.insertTimeDesc')},
+    {key: 'insertTimeAsc', label: t('systemSetting.sort.insertTimeAsc')},
+    {key: 'updateTimeDesc', label: t('systemSetting.sort.updateTimeDesc')},
+    {key: 'updateTimeAsc', label: t('systemSetting.sort.updateTimeAsc')},
+    {key: 'nameAsc', label: t('systemSetting.sort.nameAsc')},
+    {key: 'nameDesc', label: t('systemSetting.sort.nameDesc')},
+    {key: 'strengthDesc', label: t('systemSetting.sort.strengthAsc')},
+    {key: 'strengthAsc', label: t('systemSetting.sort.strengthDesc')},
+  ]
 
-// 是否缓存主密码列表
-const cacheMains = reactive([
-  {key: true, label: t('systemSetting.cacheMainPassword.enable')},
-  {key: false, label: t('systemSetting.cacheMainPassword.disabled')}
-])
+  // 主题列表
+  options.topics = [
+    {key: false, label: t('systemSetting.topic.light')},
+    {key: true, label: t('systemSetting.topic.dark')}
+  ]
 
-// 显示添加时间列表
-const showAddTimes = reactive([
-  {key: true, label: t('systemSetting.showAddTime.enable')},
-  {key: false, label: t('systemSetting.showAddTime.disabled')}
-])
+  // 是否缓存主密码列表
+  options.cacheMains = [
+    {key: true, label: t('systemSetting.cacheMainPassword.enable')},
+    {key: false, label: t('systemSetting.cacheMainPassword.disabled')}
+  ]
 
-// 显示修改时间列表
-const showUpTimes = reactive([
-  {key: true, label: t('systemSetting.showUpTime.enable')},
-  {key: false, label: t('systemSetting.showUpTime.disabled')}
-])
+  // 显示添加时间列表
+  options.showAddTimes = [
+    {key: true, label: t('systemSetting.showAddTime.enable')},
+    {key: false, label: t('systemSetting.showAddTime.disabled')}
+  ]
 
-// 显示标签列表
-const showLabels = reactive([
-  {key: true, label: t('systemSetting.showLabel.enable')},
-  {key: false, label: t('systemSetting.showLabel.disabled')}
-])
+  // 显示修改时间列表
+  options.showUpTimes = [
+    {key: true, label: t('systemSetting.showUpTime.enable')},
+    {key: false, label: t('systemSetting.showUpTime.disabled')}
+  ]
 
-// 验证密码时显示手势
-const verifyShowGestures = reactive([
-  {key: true, label: t('mainPasswordSetting.verify.showGesture.enable')},
-  {key: false, label: t('mainPasswordSetting.verify.showGesture.disabled')}
-])
+  // 显示标签列表
+  options.showLabels = [
+    {key: true, label: t('systemSetting.showLabel.enable')},
+    {key: false, label: t('systemSetting.showLabel.disabled')}
+  ]
 
-// 是否缓存登录信息列表
-const cacheDatabaseForms = reactive([
-  {key: true, label: t('systemSetting.cacheDatabaseForm.enable')},
-  {key: false, label: t('systemSetting.cacheDatabaseForm.disabled')}
-])
+  // 验证密码时显示手势
+  options.verifyShowGestures = [
+    {key: true, label: t('mainPasswordSetting.verify.showGesture.enable')},
+    {key: false, label: t('mainPasswordSetting.verify.showGesture.disabled')}
+  ]
 
-// 是否自动生成密码选项
-const autoGeneratePasswords = reactive([
-  {key: true, label: t('passwordForm.autoGeneratePassword.enable')},
-  {key: false, label: t('passwordForm.autoGeneratePassword.disabled')}
-])
+  // 是否缓存登录信息列表
+  options.cacheDatabaseForms = [
+    {key: true, label: t('systemSetting.cacheDatabaseForm.enable')},
+    {key: false, label: t('systemSetting.cacheDatabaseForm.disabled')}
+  ]
 
-// 密码强度提示
-const showPasswordStrengths = reactive([
-  {key: true, label: t('systemSetting.showPasswordStrength.enable')},
-  {key: false, label: t('systemSetting.showPasswordStrength.disabled')}
-])
+  // 是否自动生成密码选项
+  options.autoGeneratePasswords = [
+    {key: true, label: t('passwordForm.autoGeneratePassword.enable')},
+    {key: false, label: t('passwordForm.autoGeneratePassword.disabled')}
+  ]
+
+  // 密码强度提示
+  options.showPasswordStrengths = [
+    {key: true, label: t('systemSetting.showPasswordStrength.enable')},
+    {key: false, label: t('systemSetting.showPasswordStrength.disabled')}
+  ]
+}
 
 let oldSystemSetting = null;
 
 // 打开系统设置
 const openSystemSetting = () => {
+
+  // 初始化选项
+  initOptions()
+
   // 读取系统配置
   let config = loadConfig()
 
   for (let key in config) {
     settingForm[key] = config[key]
-  }
-
-  // 设置界面语言
-  if (settingForm.language !== locale.value) {
-    settingForm.language = locale.value;
   }
 
   // 保存现有配置
@@ -235,13 +262,13 @@ defineExpose({
       :title="t('systemSetting.title')"
       width="600px"
   >
-    <el-form :model="settingForm" label-width="120px">
+    <el-form label-width="120px">
       <el-tabs tab-position="left" style="height: 350px">
-        <el-tab-pane label="常规">
+        <el-tab-pane :label="t('systemSetting.type.general')">
           <el-form-item :label="t('systemSetting.language')">
             <el-select v-model="settingForm.language">
               <el-option
-                  v-for="language in languages"
+                  v-for="language in options.languages"
                   :key="language.key"
                   :label="language.label"
                   :value="language.key"
@@ -251,7 +278,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.sort')">
             <el-select v-model="settingForm.sortRule">
               <el-option
-                  v-for="sort in sorts"
+                  v-for="sort in options.sorts"
                   :key="sort.key"
                   :label="sort.label"
                   :value="sort.key"
@@ -261,7 +288,7 @@ defineExpose({
           <el-form-item :label="t('passwordForm.autoGeneratePassword')">
             <el-select v-model="settingForm.autoGeneratePassword">
               <el-option
-                  v-for="autoGenerate in autoGeneratePasswords"
+                  v-for="autoGenerate in options.autoGeneratePasswords"
                   :key="autoGenerate.key"
                   :label="autoGenerate.label"
                   :value="autoGenerate.key"
@@ -297,11 +324,11 @@ defineExpose({
             </el-row>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="个性化">
+        <el-tab-pane :label="t('systemSetting.type.personalization')">
           <el-form-item :label="t('systemSetting.topic')">
             <el-select v-model="settingForm.darkMode">
               <el-option
-                  v-for="topic in topics"
+                  v-for="topic in options.topics"
                   :key="topic.key"
                   :label="topic.label"
                   :value="topic.key"
@@ -311,7 +338,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.showPasswordStrength')">
             <el-select v-model="settingForm.showPasswordStrength">
               <el-option
-                  v-for="showPasswordStrength in showPasswordStrengths"
+                  v-for="showPasswordStrength in options.showPasswordStrengths"
                   :key="showPasswordStrength.key"
                   :label="showPasswordStrength.label"
                   :value="showPasswordStrength.key"
@@ -321,7 +348,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.showAddTime')">
             <el-select v-model="settingForm.showAddTime">
               <el-option
-                  v-for="showAddTime in showAddTimes"
+                  v-for="showAddTime in options.showAddTimes"
                   :key="showAddTime.key"
                   :label="showAddTime.label"
                   :value="showAddTime.key"
@@ -331,7 +358,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.showUpTime')">
             <el-select v-model="settingForm.showUpTime">
               <el-option
-                  v-for="showUpTime in showUpTimes"
+                  v-for="showUpTime in options.showUpTimes"
                   :key="showUpTime.key"
                   :label="showUpTime.label"
                   :value="showUpTime.key"
@@ -341,7 +368,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.showLabel')">
             <el-select v-model="settingForm.showLabel">
               <el-option
-                  v-for="showLabel in showLabels"
+                  v-for="showLabel in options.showLabels"
                   :key="showLabel.key"
                   :label="showLabel.label"
                   :value="showLabel.key"
@@ -349,11 +376,11 @@ defineExpose({
             </el-select>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="安全">
+        <el-tab-pane :label="t('systemSetting.type.security')">
           <el-form-item :label="t('systemSetting.cacheMainPassword')">
             <el-select v-model="settingForm.cacheMainPassword">
               <el-option
-                  v-for="cacheMain in cacheMains"
+                  v-for="cacheMain in options.cacheMains"
                   :key="cacheMain.key"
                   :label="cacheMain.label"
                   :value="cacheMain.key"
@@ -363,7 +390,7 @@ defineExpose({
           <el-form-item :label="t('systemSetting.cacheDatabaseForm')">
             <el-select v-model="settingForm.cacheDatabaseForm">
               <el-option
-                  v-for="cacheDatabase in cacheDatabaseForms"
+                  v-for="cacheDatabase in options.cacheDatabaseForms"
                   :key="cacheDatabase.key"
                   :label="cacheDatabase.label"
                   :value="cacheDatabase.key"
@@ -373,7 +400,7 @@ defineExpose({
           <el-form-item :label="t('mainPasswordSetting.verify.showGesture')">
             <el-select v-model="settingForm.verifyShowGesture">
               <el-option
-                  v-for="verifyShowGesture in verifyShowGestures"
+                  v-for="verifyShowGesture in options.verifyShowGestures"
                   :key="verifyShowGesture.key"
                   :label="verifyShowGesture.label"
                   :value="verifyShowGesture.key"
@@ -381,7 +408,7 @@ defineExpose({
             </el-select>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="其他">
+        <el-tab-pane :label="t('systemSetting.type.other')">
           <div style="text-align: center">
             <el-button plain @click="showUpdateMainPassword">{{ t('systemSetting.updateMainPassword') }}</el-button>
             <el-button plain type="danger" @click="showDeleteAccount">{{ t('systemSetting.deleteAccount') }}</el-button>

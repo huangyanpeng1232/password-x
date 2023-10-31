@@ -121,7 +121,7 @@ defineExpose({
       {{ t('labelTree.title') }}
     </template>
     <el-input v-model="labelFilterText" clearable :placeholder="t('labelTree.search.placeholder')"/>
-    <el-scrollbar height="35vh">
+    <el-scrollbar height="50vh">
       <el-tree
           :data="labelTree"
           show-checkbox
