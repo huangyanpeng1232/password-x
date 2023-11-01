@@ -67,11 +67,12 @@ const loadShowPassword = async () => {
     let password = passwordArray.value[i].password || ''
 
 
-    let searchVis = !searchText.value || (name.includes(searchText.value)
-        || userName.includes(searchText.value)
-        || address.includes(searchText.value)
-        || remark.includes(searchText.value)
-        || password.includes(searchText.value))
+    let searchVis = !searchText.value || (
+        name.toUpperCase().includes(searchText.value.toUpperCase())
+        || userName.toUpperCase().includes(searchText.value.toUpperCase())
+        || address.toUpperCase().includes(searchText.value.toUpperCase())
+        || remark.toUpperCase().includes(searchText.value.toUpperCase())
+        || password.toUpperCase().includes(searchText.value.toUpperCase()))
 
 
     let labelCheckVis = false;
