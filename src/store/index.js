@@ -37,6 +37,8 @@ export default createStore({
             showUpTime: false,
             // 手势主密码验证时显示手势
             verifyShowGesture: true,
+            // 启用标签
+            enableLabel: true,
             // 显示标签
             showLabel: true,
             // 默认密码生成规则

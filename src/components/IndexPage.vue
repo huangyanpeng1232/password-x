@@ -411,6 +411,14 @@ const getLabelNameById = (ids) => {
   return result;
 }
 
+// 格式化时间
+const getDateTime = (dateTime) => {
+  if (dateTime && dateTime.length === 19) {
+    return dateTime.substring(0, 16)
+  }
+  return dateTime
+}
+
 // 根据标签id获取标签名
 const getLabelNameByIdRecursion = (array, ids, result) => {
   for (let i = 0; i < array.length; i++) {
@@ -488,7 +496,10 @@ onMounted(() => {
 <template>
   <img alt="" class="back-img" src="~@/assets/images/backImg.svg">
   <el-row id="passwordBody">
-    <el-col :xl="{span:16,offset:2}" :lg="{span:19}" :md="{span:19}">
+    <el-col
+        :xl="{span:systemConfig.enableLabel?16:20,offset:2}"
+        :lg="{span:systemConfig.enableLabel?19:24}"
+        :md="{span:systemConfig.enableLabel?19:24}">
       <el-card class="body-card" :style="{'background-color': isDark()?'rgba(0,0,0,0.4)':'rgba(255,255,255,0.4)'}">
         <template #header>
           <div style="display: flex;justify-content: space-between;">
@@ -591,14 +602,13 @@ onMounted(() => {
           </div>
         </template>
         <el-table
-            height="calc(100vh - 150px)"
+            height="calc(100vh - 130px)"
             style="background-color: rgba(0,0,0,0);"
             :header-row-style="{'background-color':'rgba(0,0,0,0)'}"
             :header-cell-style="{'background-color':'rgba(0,0,0,0)'}"
             :row-style="{'background-color':'rgba(0,0,0,0)'}"
             :cell-style="{'background-color':'rgba(0,0,0,0)'}"
             :data="showPasswordArray"
-            highlight-current-row
             ref="tableRef"
         >
           <template #empty>
@@ -639,7 +649,7 @@ onMounted(() => {
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column sortable :label="t('password.name')" min-width="140px" prop="name"></el-table-column>
+          <el-table-column sortable :label="t('password.name')" min-width="130px" prop="name"></el-table-column>
           <el-table-column :label="t('password.address')" min-width="200px" prop="address">
             <template #default="scope">
               <el-link v-if="isUrl(scope.row.address)" :href="scope.row.address" target="_blank">
@@ -650,12 +660,12 @@ onMounted(() => {
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.userName')" min-width="120px" prop="userName"></el-table-column>
-          <el-table-column :label="t('password.password')" min-width="150px" prop="password">
+          <el-table-column :label="t('password.userName')" min-width="140px" prop="userName"></el-table-column>
+          <el-table-column :label="t('password.password')" min-width="180px" prop="password">
             <template #default="scope">
               <div v-if="scope.row.password">
                   <span class="password-text">
-                    <template v-if="!scope.row.show">•••••••</template>
+                    <template v-if="!scope.row.show">•••••••••</template>
                     <template v-if="scope.row.show">{{ scope.row.password }}</template>
                   </span>
                 <div class="pass-action-div">
@@ -668,7 +678,8 @@ onMounted(() => {
               </div>
             </template>
           </el-table-column>
-          <el-table-column v-if="systemConfig.showLabel !== false" :label="t('index.table.label')" min-width="130px"
+          <el-table-column v-if="systemConfig.enableLabel !== false && systemConfig.showLabel !== false"
+                           :label="t('index.table.label')" min-width="130px"
                            prop="label">
             <template #default="scope">
               <el-tag style="margin: 3px" v-for="label in getLabelNameById(scope.row.label)" :key="label">
@@ -676,12 +687,21 @@ onMounted(() => {
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column :label="t('password.remark')" min-width="100px" prop="remark"></el-table-column>
-          <el-table-column sortable v-if="systemConfig.showAddTime" :label="t('password.insertTime')" min-width="130px"
-                           prop="insertTime"></el-table-column>
-          <el-table-column sortable v-if="systemConfig.showUpTime" :label="t('password.updateTime')" min-width="130px"
-                           prop="updateTime"></el-table-column>
-          <el-table-column min-width="140px" :label="t('index.table.operation')">
+          <el-table-column :label="t('password.remark')" min-width="130px" prop="remark"></el-table-column>
+          <el-table-column sortable v-if="systemConfig.showAddTime" :label="t('password.insertTime')" width="145px"
+                           prop="insertTime">
+            <template #default="scope">
+              {{ getDateTime(scope.row.insertTime) }}
+            </template>
+
+          </el-table-column>
+          <el-table-column sortable v-if="systemConfig.showUpTime" :label="t('password.updateTime')" width="145px"
+                           prop="updateTime">
+            <template #default="scope">
+              {{ getDateTime(scope.row.updateTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column width="135px" :label="t('index.table.operation')">
             <template #default="scope">
               <!--                分享-->
               <el-link type="success" :underline="false" @click="sharePassword(scope.row)">
@@ -709,7 +729,8 @@ onMounted(() => {
         </el-table>
       </el-card>
     </el-col>
-    <el-col :xl="{span:4}" :lg="{span:5}" :md="{span:5}" class="hidden-sm-and-down" style="padding-left: 15px">
+    <el-col v-if="systemConfig.enableLabel" :xl="{span:4}" :lg="{span:5}" :md="{span:5}" class="hidden-sm-and-down"
+            style="padding-left: 15px">
       <LabelTree ref="labelTreeRef" @labelCheckChange="labelCheckChange" @labelTreeChange="labelTreeChange"></LabelTree>
     </el-col>
 
@@ -738,12 +759,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@media screen and (min-width: 728px) {
-  #passwordBody {
-    padding: 15px;
-  }
-}
-
 .body-card {
   backdrop-filter: blur(50px);
 }

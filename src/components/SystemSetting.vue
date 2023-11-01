@@ -44,6 +44,8 @@ const options = reactive({
   showUpTimes:[],
   // 显示标签列表
   showLabels:[],
+  // 启用标签
+  enableLabels:[],
   // 验证密码时显示手势
   verifyShowGestures:[],
   // 是否缓存登录信息列表
@@ -101,6 +103,12 @@ const initOptions = () => {
   options.showLabels = [
     {key: true, label: t('systemSetting.showLabel.enable')},
     {key: false, label: t('systemSetting.showLabel.disabled')}
+  ]
+
+  // 启用标签
+  options.enableLabels = [
+    {key: true, label: t('systemSetting.enableLabel.enable')},
+    {key: false, label: t('systemSetting.enableLabel.disabled')}
   ]
 
   // 验证密码时显示手势
@@ -262,7 +270,7 @@ defineExpose({
       :title="t('systemSetting.title')"
       width="600px"
   >
-    <el-form label-width="120px">
+    <el-form label-width="150px">
       <el-tabs tab-position="left" style="height: 350px">
         <el-tab-pane :label="t('systemSetting.type.general')">
           <el-form-item :label="t('systemSetting.language')">
@@ -313,7 +321,7 @@ defineExpose({
                 <el-checkbox size="small" v-model="settingForm.defaultPasswordRule.symbol"
                              :label="t('passwordForm.generateForm.symbol')" border/>
               </el-col>
-              <el-col :span="24">
+              <el-col :span="16">
                 <div>
                   <el-input size="small" style="position: relative;top:3px"
                             v-model="settingForm.defaultPasswordRule.length">
@@ -365,8 +373,18 @@ defineExpose({
               />
             </el-select>
           </el-form-item>
+          <el-form-item :label="t('systemSetting.enableLabel')">
+            <el-select v-model="settingForm.enableLabel">
+              <el-option
+                  v-for="enableLabel in options.enableLabels"
+                  :key="enableLabel.key"
+                  :label="enableLabel.label"
+                  :value="enableLabel.key"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item :label="t('systemSetting.showLabel')">
-            <el-select v-model="settingForm.showLabel">
+            <el-select :disabled="!settingForm.enableLabel" v-model="settingForm.showLabel">
               <el-option
                   v-for="showLabel in options.showLabels"
                   :key="showLabel.key"
@@ -416,15 +434,26 @@ defineExpose({
           </div>
         </el-tab-pane>
         <el-tab-pane :label="t('systemSetting.about')" style="text-align: center">
-          <div style="margin-top: 20px;">
-            {{t('systemSetting.about.version')}}：{{getEnv('VITE_VERSION')}}
-          </div>
-          <div style="margin-top: 20px;">
-            {{t('systemSetting.about.openSourceUrl')}}：<el-link target="_blank" :href="getEnv('VITE_OPEN_SOURCE_URL')">{{getEnv('VITE_OPEN_SOURCE_URL')}}</el-link>
-          </div>
-          <div style="margin-top: 20px;">
+          <el-descriptions
+              :column="1"
+              style="margin: 15px"
+          >
+            <el-descriptions-item>
+              <template #label>
+                {{t('systemSetting.about.version')}}:
+              </template>
+              {{getEnv('VITE_VERSION')}}
+            </el-descriptions-item>
+            <el-descriptions-item>
+              <template #label>
+                {{t('systemSetting.about.openSourceUrl')}}:
+              </template>
+              <el-link target="_blank" :href="getEnv('VITE_OPEN_SOURCE_URL')">{{getEnv('VITE_OPEN_SOURCE_URL')}}</el-link>
+            </el-descriptions-item>
+            <el-descriptions-item>
               {{t('systemSetting.about.submit')}}
-          </div>
+            </el-descriptions-item>
+          </el-descriptions>
         </el-tab-pane>
       </el-tabs>
     </el-form>

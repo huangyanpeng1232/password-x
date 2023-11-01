@@ -32,19 +32,23 @@ export function loadConfig() {
     if (store.state.settingSync) {
         return store.state.setting;
     }else{
-        let systemConfigText = localStorage.getItem('systemConfig')
-        if(systemConfigText){
-            let systemConfig = JSON.parse(systemConfigText)
-            store.commit('updateSetting',systemConfig)
-            store.commit('syncSetting')
-            return systemConfig;
-        }else{
-            let setting = store.state.setting
-            updateConfig(setting)
-            store.commit('syncSetting')
-            return setting;
+        // 获取基础设置
+        let setting = store.state.setting
+
+        // 获取本地设置
+        let localConfigText = localStorage.getItem('systemConfig')
+        if(localConfigText){
+            let localConfig = JSON.parse(localConfigText)
+            for (const key in setting) {
+                if (localConfig[key] !== undefined) {
+                    setting[key] = localConfig[key]
+                }
+            }
         }
 
+        updateConfig(setting)
+        store.commit('syncSetting')
+     return  setting
     }
 }
 

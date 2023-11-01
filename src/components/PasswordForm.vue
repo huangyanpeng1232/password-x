@@ -233,7 +233,7 @@ defineExpose({
           </el-row>
         </el-card>
       </el-form-item>
-      <el-form-item :label="t('password.label')">
+      <el-form-item v-if="getSystemConfig('enableLabel') !== false" :label="t('password.label')">
         <el-tree-select
             v-model="passwordForm.label"
             value-key="id"
