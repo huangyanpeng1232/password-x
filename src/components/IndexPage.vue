@@ -60,29 +60,38 @@ const loadShowPassword = async () => {
   // 搜索结果列表
   let array = [];
   for (let i = 0; i < passwordArray.value.length; i++) {
-    let name = passwordArray.value[i].name || ''
-    let userName = passwordArray.value[i].userName || ''
-    let address = passwordArray.value[i].address || ''
-    let remark = passwordArray.value[i].remark || ''
-    let password = passwordArray.value[i].password || ''
+    let name = (passwordArray.value[i].name || '').toUpperCase()
+    let userName = (passwordArray.value[i].userName || '').toUpperCase()
+    let address = (passwordArray.value[i].address || '').toUpperCase()
+    let remark = (passwordArray.value[i].remark || '').toUpperCase()
+    let password = (passwordArray.value[i].password || '').toUpperCase()
 
-
-    let searchVis = !searchText.value || (
-        name.toUpperCase().includes(searchText.value.toUpperCase())
-        || userName.toUpperCase().includes(searchText.value.toUpperCase())
-        || address.toUpperCase().includes(searchText.value.toUpperCase())
-        || remark.toUpperCase().includes(searchText.value.toUpperCase())
-        || password.toUpperCase().includes(searchText.value.toUpperCase()))
-
+    let searchVis = false;
+    if (searchText.value) {
+      let searchTextUpCaseArray = searchText.value.toUpperCase().split(/\s|,|\t|\r|\n|;/)
+      for (let j = 0; j < searchTextUpCaseArray.length; j++) {
+        if (
+            name.includes(searchTextUpCaseArray[j])
+            || userName.includes(searchTextUpCaseArray[j])
+            || address.includes(searchTextUpCaseArray[j])
+            || remark.includes(searchTextUpCaseArray[j])
+            || password.includes(searchTextUpCaseArray[j])
+        ) {
+          searchVis = true
+          break
+        }
+      }
+    } else {
+      searchVis = true
+    }
 
     let labelCheckVis = false;
-
     if (labelCheckNodes.value.length > 0) {
       for (let j = 0; j < labelCheckNodes.value.length; j++) {
         let checkedNode = labelCheckNodes.value[j];
-
         if (passwordArray.value[i].label && passwordArray.value[i].label.includes(checkedNode.id)) {
           labelCheckVis = true
+          break
         }
       }
     } else {
