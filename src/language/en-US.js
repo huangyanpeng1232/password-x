@@ -126,6 +126,7 @@ export default {
     'systemSetting.enableLabel.enable': 'on',
     'systemSetting.enableLabel.disabled': 'off',
     'systemSetting.takeEffect': 'Some Settings take effect after you refresh the page',
+    'systemSetting.type.userDefined': 'user defined',
     'passwordForm.autoGeneratePassword': 'automatically generated a password',
     'passwordForm.autoGeneratePassword.enable': 'on',
     'passwordForm.autoGeneratePassword.disabled': 'off',

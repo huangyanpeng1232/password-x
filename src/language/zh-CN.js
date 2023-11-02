@@ -126,6 +126,8 @@ export default  {
     'systemSetting.enableLabel.enable': '启用',
     'systemSetting.enableLabel.disabled': '停用',
     'systemSetting.takeEffect': '部分设置需刷新页面后生效',
+    'systemSetting.type.userDefined': '自定义',
+    'systemSetting.type.userDefined.alert': '自定义密码字段可以个根据您的需要动态配置首页显示的信息',
     'passwordForm.autoGeneratePassword': '添加时自动生成密码',
     'passwordForm.autoGeneratePassword.enable': '自动生成',
     'passwordForm.autoGeneratePassword.disabled': '不需要',

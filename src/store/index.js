@@ -48,7 +48,9 @@ export default createStore({
                 lowercase: true,
                 uppercase: true,
                 symbol: true,
-            }
+            },
+            // 自定义字段
+            userDefinedArray:[]
         }
     },
     mutations: {

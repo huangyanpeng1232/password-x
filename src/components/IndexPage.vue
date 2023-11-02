@@ -698,6 +698,11 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column :label="t('password.remark')" min-width="130px" prop="remark"></el-table-column>
+          <el-table-column :label="userDefined.name" v-for="userDefined in systemConfig.userDefinedArray">
+            <template #default="scope">
+              <el-text v-if="scope.row.userDefined && scope.row.userDefined[userDefined.name]">{{scope.row.userDefined[userDefined.name]}}</el-text>
+            </template>
+          </el-table-column>
           <el-table-column sortable v-if="systemConfig.showAddTime" :label="t('password.insertTime')" width="145px"
                            prop="insertTime">
             <template #default="scope">

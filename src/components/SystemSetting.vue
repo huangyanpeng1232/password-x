@@ -2,7 +2,7 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
-import {loadConfig, updateConfig, getEnv} from "@/utils/global.js";
+import {getEnv, loadConfig, updateConfig} from "@/utils/global.js";
 import store from "@/store/index.js";
 import {useDark} from '@vueuse/core'
 
@@ -145,7 +145,7 @@ const openSystemSetting = () => {
   initOptions()
 
   // 读取系统配置
-  let config = loadConfig()
+  let config = JSON.parse(JSON.stringify(loadConfig()))
 
   for (let key in config) {
     settingForm[key] = config[key]
@@ -172,6 +172,11 @@ const saveSetting = () => {
   if (!generateForm.number && !generateForm.symbol && !generateForm.lowercase && !generateForm.uppercase) {
     ElMessage.error(t('systemSetting.passwordRuleVerify'))
     return
+  }
+  for (let i = 0; i < settingForm.userDefinedArray.length; i++) {
+    if (settingForm.userDefinedArray[i].name === '') {
+      settingForm.userDefinedArray[i].name = '自定义'
+    }
   }
 
   // 更新系统配置
@@ -240,6 +245,25 @@ const logout = () => {
 const showUpdateMainPassword = () => {
   alertVisStatus.setting = false
   emit('updateMainPassword')
+}
+
+// 添加自定义字段
+const addUserDefined = () => {
+  settingForm.userDefinedArray.push({
+    id: Date.now(),
+    name: '自定义'
+  })
+}
+
+// 删除自定义字段
+const delUserDefined = (id) => {
+  console.log(settingForm.userDefinedArray, id)
+  for (let i = 0; i < settingForm.userDefinedArray.length; i++) {
+    if (settingForm.userDefinedArray[i].id === id) {
+      settingForm.userDefinedArray.splice(i, 1)
+      break
+    }
+  }
 }
 
 // 显示注销账号弹框
@@ -425,6 +449,26 @@ defineExpose({
               />
             </el-select>
           </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane :label="t('systemSetting.type.userDefined')">
+          <el-alert>
+            {{ t('systemSetting.type.userDefined.alert') }}
+          </el-alert>
+          <div style="text-align: right;margin-top: 15px;margin-bottom: 15px">
+            <el-button size="small" type="primary" plain @click="addUserDefined">新增</el-button>
+          </div>
+          <el-form inline style="text-align: center">
+            <el-form-item v-for="userDefined in settingForm.userDefinedArray">
+              <el-row>
+                <el-col :span="18">
+                  <el-input v-model="userDefined.name"></el-input>
+                </el-col>
+                <el-col :span="6">
+                  <el-button size="small" type="danger" @click="delUserDefined(userDefined.id)">删除</el-button>
+                </el-col>
+              </el-row>
+            </el-form-item>
+          </el-form>
         </el-tab-pane>
         <el-tab-pane :label="t('systemSetting.type.other')">
           <div style="text-align: center">

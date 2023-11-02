@@ -42,7 +42,8 @@ const defaultPassword = () => {
     remark: '',
     label: '',
     insertTime: '',
-    updateTime: ''
+    updateTime: '',
+    userDefined: {}
   }
 }
 
@@ -160,6 +161,10 @@ const showUpdatePassword = (password) => {
     passwordForm[key] = password[key]
   }
 
+  if (!passwordForm['userDefined']) {
+    passwordForm['userDefined'] = {}
+  }
+
   // 设置表单模式为修改
   passwordAlertMode.value = 'update'
   // 显示表单
@@ -249,6 +254,12 @@ defineExpose({
         <el-input type="textarea" :placeholder="t('passwordForm.generateForm.remark')" :rows="4"
                   v-model="passwordForm.remark"></el-input>
       </el-form-item>
+      <template v-for="userDefined in getSystemConfig('userDefinedArray')">
+        <el-form-item v-if="passwordForm.userDefined" :label="userDefined.name">
+          <el-input v-model="passwordForm.userDefined[userDefined.name]"></el-input>
+        </el-form-item>
+      </template>
+
     </el-form>
     <template #footer>
           <span class="dialog-footer">
