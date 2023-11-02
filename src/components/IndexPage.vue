@@ -2,7 +2,7 @@
 <script setup>
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
-import {copyText, isUrl, loadConfig} from "@/utils/global.js";
+import {copyText, isUrl, loadConfig,getPasswordStrength} from "@/utils/global.js";
 import {getFile, putFile} from "@/database/index.js";
 import {decrypt, encrypt} from "@/utils/security.js";
 import store from "@/store/index.js";
@@ -143,7 +143,7 @@ const updatePassword = (password) => {
 // 锁定密码（删除主密码以及密码列表但保留未解密的密码字符串）
 const lockMainPassword = () => {
   // 更新加密后的密码字符串
-  passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
+  passwordCiphertext.value = encryptPassword(passwordArray.value)
   // 设置同步状态为不可同步
   passwordSyncStatus.value = false
   // 清空展示的密码列表
@@ -202,9 +202,7 @@ const mainPasswordLoadSucceed = (password) => {
   // 设置主密码
   mainPassword.value = password
   // 根据主密码解密密文
-  let passwordListText = decrypt(password, passwordCiphertext.value)
-  // 设置密码列表
-  passwordArray.value = JSON.parse(passwordListText)
+  passwordArray.value = decryptPassword(passwordCiphertext.value)
   // 设置同步状态为可同步
   passwordSyncStatus.value = true
   // 显示密码列表
@@ -273,41 +271,6 @@ const passwordSort = (sort) => {
   syncPasswordToDatabase()
 }
 
-// 获取密码强度
-const getPasswordStrength = (password) => {
-  let lvl = 0
-  // 数字
-  if (/[0-9]/.test(password)) {
-    lvl++;
-  }
-  // 小写字母
-  if (/[a-z]/.test(password)) {
-    lvl++;
-  }
-  // 大写字母
-  if (/[A-Z]/.test(password)) {
-    lvl++;
-  }
-  // 特殊符号
-  if (/[^0-9a-zA-Z_]/.test(password)) {
-    lvl++;
-  }
-
-  // 长度小于6位
-  if (password.length < 6) {
-    if (lvl > 2) {
-      lvl = 2;
-    }
-  }
-
-  // 最高3分
-  if (lvl > 3) {
-    return 3
-  } else {
-    return lvl;
-  }
-}
-
 // 安全等级排序
 const strengthSort = (a, b) => {
   if (getPasswordStrength(a.password) > getPasswordStrength(b.password)) {
@@ -360,8 +323,9 @@ const syncPasswordToDatabase = () => {
     // 不允许同步
     return
   }
+
   // 使用主密码加密密码列表
-  passwordCiphertext.value = encrypt(mainPassword.value, JSON.stringify(passwordArray.value))
+  passwordCiphertext.value = encryptPassword(passwordArray.value)
   // 使用主密码加密密码验证字符
   let verifyCode = encrypt(mainPassword.value, 'password-x')
   store.commit('setVerifyCode', verifyCode)
@@ -482,6 +446,49 @@ const logout = () => {
 // 是否暗黑模式
 const isDark = () => {
   return darkMode.value
+}
+
+// 加密密码
+const encryptPassword = (passwordArray) => {
+  if (passwordArray.length === 0) {
+    return
+  }
+  let keys = {}
+  let datas = []
+  let i = 0;
+  for (let j = 0; j < passwordArray.length; j++) {
+    let dataArray = []
+    for (let key in passwordArray[j]) {
+      let IKey = keys[key]
+      if (IKey === undefined) {
+        keys[key] = i++
+        IKey = keys[key]
+      }
+      dataArray[IKey] = passwordArray[j][key]
+    }
+    datas.push(dataArray)
+  }
+  return encrypt(mainPassword.value, JSON.stringify({keys: keys, datas: datas}))
+}
+
+// 解密密码
+const decryptPassword = (ciphertext) => {
+  let obj = JSON.parse(decrypt(mainPassword.value, ciphertext))
+  if (obj instanceof Array) {
+    return obj
+  }
+  let datas = obj.datas;
+  let keys = obj.keys
+  let passwordArray = []
+  for (let i = 0; i < datas.length; i++) {
+    let dataArray = datas[i]
+    let password = {}
+    for (let key in keys) {
+      password[key] = dataArray[keys[key]]
+    }
+    passwordArray.push(password)
+  }
+  return passwordArray;
 }
 
 // 页面加载完成后事件

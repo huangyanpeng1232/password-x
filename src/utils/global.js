@@ -99,3 +99,38 @@ export function randomText(pool, length) {
     }
     return arr.join('')
 }
+
+// 获取密码强度
+export function getPasswordStrength(password) {
+    let lvl = 0
+    // 数字
+    if (/[0-9]/.test(password)) {
+        lvl++;
+    }
+    // 小写字母
+    if (/[a-z]/.test(password)) {
+        lvl++;
+    }
+    // 大写字母
+    if (/[A-Z]/.test(password)) {
+        lvl++;
+    }
+    // 特殊符号
+    if (/[^0-9a-zA-Z_]/.test(password)) {
+        lvl++;
+    }
+
+    // 长度小于6位
+    if (password.length < 6) {
+        if (lvl > 2) {
+            lvl = 2;
+        }
+    }
+
+    // 最高3分
+    if (lvl > 3) {
+        return 3
+    } else {
+        return lvl;
+    }
+}
