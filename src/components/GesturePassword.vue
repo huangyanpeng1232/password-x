@@ -9,6 +9,7 @@ const darkMode = useDark()
 // 声明此组件可能调用的事件
 const emit = defineEmits(['complete'])
 
+// 画板
 const canvasRef = ref()
 
 // 配置参数
@@ -88,7 +89,7 @@ let ctx = null
 
 // 初始化
 const init = () => {
-  config.background = darkMode.value ? 'rgb(20,20,20)' : '#fff',
+  config.background = darkMode.value ? 'rgb(20,20,20)' : '#fff'
   ctx = canvasRef.value.getContext('2d')
   draw()
 }

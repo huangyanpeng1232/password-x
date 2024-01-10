@@ -66,25 +66,23 @@ const loadShowPassword = async () => {
     let remark = (passwordArray.value[i].remark || '').toUpperCase()
     let password = (passwordArray.value[i].password || '').toUpperCase()
 
+    // 是否满足内容搜索
     let searchVis = false;
     if (searchText.value) {
-      let searchTextUpCaseArray = searchText.value.toUpperCase().split(/\s|,|\t|\r|\n|;/)
-      for (let j = 0; j < searchTextUpCaseArray.length; j++) {
-        if (
-            name.includes(searchTextUpCaseArray[j])
-            || userName.includes(searchTextUpCaseArray[j])
-            || address.includes(searchTextUpCaseArray[j])
-            || remark.includes(searchTextUpCaseArray[j])
-            || password.includes(searchTextUpCaseArray[j])
-        ) {
-          searchVis = true
-          break
-        }
+      if (
+          name.includes(searchText.value)
+          || userName.includes(searchText.value)
+          || address.includes(searchText.value)
+          || remark.includes(searchText.value)
+          || password.includes(searchText.value)
+      ) {
+        searchVis = true
       }
     } else {
       searchVis = true
     }
 
+    // 是否满足标签过滤
     let labelCheckVis = false;
     if (labelCheckNodes.value.length > 0) {
       for (let j = 0; j < labelCheckNodes.value.length; j++) {
@@ -98,6 +96,7 @@ const loadShowPassword = async () => {
       labelCheckVis = true
     }
 
+    // 满足内容索索+标签过滤 则展示
     if (searchVis && labelCheckVis) {
       array.push(passwordArray.value[i]);
     }
