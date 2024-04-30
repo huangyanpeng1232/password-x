@@ -2,16 +2,16 @@
 <script setup>
 import {CopyDocument, Hide, Lock, Search, Setting, Unlock, View} from '@element-plus/icons-vue'
 import {useI18n} from "vue-i18n";
-import {copyText, isUrl, loadConfig,getPasswordStrength} from "@/utils/global.js";
+import {copyText, getPasswordStrength, isUrl, loadConfig} from "@/utils/global.js";
 import {getFile, putFile} from "@/database/index.js";
 import {decrypt, encrypt} from "@/utils/security.js";
 import store from "@/store/index.js";
 import {useDark} from '@vueuse/core'
-
-const {t, locale} = useI18n()
-
 // 暗黑模式
 const darkMode = useDark()
+const {t, locale} = useI18n()
+
+
 
 // 密码表单组件对象
 const passwordFormRef = ref()
@@ -49,6 +49,18 @@ const labelCheckNodes = ref([])
 // 标签树数据
 const labelTree = ref([])
 
+let searchKeyupTimeout = null;
+
+// 搜索自动触发
+const searchKeyup = () => {
+  if (searchKeyupTimeout != null) {
+    clearTimeout(searchKeyupTimeout)
+  }
+  searchKeyupTimeout = setTimeout(function () {
+    loadShowPassword()
+  }, 200);
+}
+
 // 搜索（根据搜索字符串显示符合条件的密码）
 const loadShowPassword = async () => {
   // 搜索条件与标签选择为空，直接复制密码列表
@@ -68,23 +80,30 @@ const loadShowPassword = async () => {
 
     // 是否满足内容搜索
     let searchVis = false;
-    if (searchText.value) {
-      if (
-          name.includes(searchText.value)
-          || userName.includes(searchText.value)
-          || address.includes(searchText.value)
-          || remark.includes(searchText.value)
-          || password.includes(searchText.value)
-      ) {
+
+    if (!searchText.value) {
+      // 搜索内容为空
+      searchVis = true
+    } else {
+      let text = searchText.value.toLowerCase()
+
+      let nameVis = (name || '').toLowerCase().includes(text)
+      let userNameVis = (userName || '').toLowerCase().includes(text)
+      let addressVis = (address || '').toLowerCase().includes(text)
+      let remarkVis = (remark || '').toLowerCase().includes(text)
+      let passwordVis = (password || '').toLowerCase().includes(text)
+
+      if (nameVis || userNameVis || addressVis || remarkVis || passwordVis) {
         searchVis = true
       }
-    } else {
-      searchVis = true
     }
 
     // 是否满足标签过滤
     let labelCheckVis = false;
-    if (labelCheckNodes.value.length > 0) {
+    if (labelCheckNodes.value.length === 0) {
+      // 没有选中标签
+      labelCheckVis = true
+    } else {
       for (let j = 0; j < labelCheckNodes.value.length; j++) {
         let checkedNode = labelCheckNodes.value[j];
         if (passwordArray.value[i].label && passwordArray.value[i].label.includes(checkedNode.id)) {
@@ -92,8 +111,6 @@ const loadShowPassword = async () => {
           break
         }
       }
-    } else {
-      labelCheckVis = true
     }
 
     // 满足内容索索+标签过滤 则展示
@@ -162,7 +179,7 @@ const unlockMainPassword = () => {
 
 // 分享密码（按照一定格式将密码拼接并复制到剪切板）
 const sharePassword = (password) => {
-  let text = t('password.name') + ': ' + password.name + '\r\n'
+  let text = password.name + '\r\n'
   if (password.address) {
     text += t('password.address') + ': ' + password.address + '\r\n'
   }
@@ -322,6 +339,9 @@ const syncPasswordToDatabase = () => {
     // 不允许同步
     return
   }
+  for (let i in passwordArray.value) {
+    delete passwordArray.value[i].show
+  }
 
   // 使用主密码加密密码列表
   passwordCiphertext.value = encryptPassword(passwordArray.value)
@@ -372,6 +392,10 @@ const labelCheckChange = (labelTreeCheckNodes) => {
 // 标签数据变化
 const labelTreeChange = (labelTreeData) => {
   labelTree.value = labelTreeData
+}
+
+const dropLabel = (item) =>{
+  console.log(item)
 }
 
 // 根据标签id获取标签名
@@ -543,9 +567,11 @@ onMounted(() => {
                     v-model="searchText"
                     style="max-width: 300px"
                     clearable
+                    @clear="loadShowPassword"
                     :placeholder="t('index.title.search')"
                     :prefix-icon="Search"
                     :disabled="!mainPassword"
+                    @keyup="searchKeyup"
                     @keyup.enter="loadShowPassword"
                 />
               </div>
@@ -696,6 +722,8 @@ onMounted(() => {
           </el-table-column>
           <el-table-column v-if="systemConfig.enableLabel !== false && systemConfig.showLabel !== false"
                            :label="t('index.table.label')" min-width="130px"
+                           @drop="dropLabel"
+
                            prop="label">
             <template #default="scope">
               <el-tag style="margin: 3px" v-for="label in getLabelNameById(scope.row.label)" :key="label">

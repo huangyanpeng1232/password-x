@@ -21,7 +21,7 @@ export default createStore({
             language: 'zh-cn',
             // 缓存主密码
             cacheMainPassword: true,
-            // 新增是自动生成一次密码
+            // 创建时自动生成一次密码
             autoGeneratePassword: true,
             // 暗黑模式
             darkMode: false,
@@ -32,7 +32,7 @@ export default createStore({
             // 缓存登录信息
             cacheDatabaseForm: true,
             // 显示添加时间
-            showAddTime: true,
+            showAddTime: false,
             // 显示更新时间
             showUpTime: false,
             // 手势主密码验证时显示手势

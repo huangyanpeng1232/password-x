@@ -17,7 +17,6 @@ export async function login(form) {
             {
                 Bucket: form.bucket,
                 Region: form.region,
-                Prefix: 'password-x/',
                 MaxKeys: 1
             },
             function (err, data) {

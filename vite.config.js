@@ -4,7 +4,6 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
-import Inspect from 'vite-plugin-inspect'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import vue from '@vitejs/plugin-vue'
 
@@ -58,6 +57,5 @@ export default defineConfig({
         Icons({
             autoInstall: true,
         }),
-        Inspect(),
     ],
 })

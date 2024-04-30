@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import router from './router/index'
 import i18n from "@/language/index.js";
 import App from './App.vue'
