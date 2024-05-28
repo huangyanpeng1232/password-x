@@ -496,7 +496,10 @@ const encryptPassword = (passwordArray) => {
 
 // 解密密码
 const decryptPassword = (ciphertext) => {
-  let obj = JSON.parse(decrypt(mainPassword.value, ciphertext))
+  if (!ciphertext) {
+    return []
+  }
+  let obj = JSON.parse(decrypt(mainPassword.value, ciphertext));
   if (obj instanceof Array) {
     return obj
   }
@@ -659,7 +662,7 @@ onMounted(() => {
               <template v-if="!mainPassword" #image>
                 <Lock />
               </template>
-              <el-button @click="unlockMainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
+              <el-button @click="unlockMainPassword" v-if="!mainPassword" plain type="primary">{{t('index.title.unlock')}}</el-button>
             </el-empty>
           </template>
           <el-table-column sortable :sort-method="strengthSort" v-if="systemConfig.showPasswordStrength" prop="strength"
