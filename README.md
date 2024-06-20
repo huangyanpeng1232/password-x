@@ -55,6 +55,8 @@ https://gitee.com/password-x/password-x
 ### 使用方法
 请参考 阿里云账号操作指引文档
 
+### 刷新页面404问题，请参考：https://gitee.com/password-x/password-x/issues/IA4CB9#note_28830880_link
+
 ### 功能列表
 
 - 多语言 √
